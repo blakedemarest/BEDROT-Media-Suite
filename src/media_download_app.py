@@ -9,9 +9,11 @@ import re        # For parsing time strings
 import math      # For aspect ratio comparison tolerance and chopping duration
 
 # --- Define Settings File Path ---
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SETTINGS_FILENAME = "yt_downloader_gui_settings.json"
-SETTINGS_FILE_PATH = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME)
+import os
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is now the 'src' directory
+CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config') # Go up to root, then into 'config'
+SETTINGS_FILENAME = "yt_downloader_gui_settings.json" # Original filename
+SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
 
 # --- Common Aspect Ratios ---
 ASPECT_RATIOS = [
