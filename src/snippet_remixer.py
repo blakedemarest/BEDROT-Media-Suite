@@ -11,11 +11,13 @@ import shutil     # For removing temporary directory
 import time       # For small sleeps if needed
 
 # --- Constants ---
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SETTINGS_FILENAME = "video_remixer_settings.json"
-SETTINGS_FILE_PATH = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME)
-TEMP_DIR_NAME = "remixer_temp_snippets" # Subdirectory for intermediate files
-TEMP_CONCAT_FILENAME = "_temp_concat.mp4" # Intermediate concatenated file
+import os
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # 'src' directory
+CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config') # Relative path to config
+SETTINGS_FILENAME = "video_remixer_settings.json" # Original filename
+SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
+TEMP_DIR_NAME = "remixer_temp_snippets" # Keep temp dir relative to script or root? Decide. If root: os.path.join(SCRIPT_DIR, '..', TEMP_DIR_NAME)
+TEMP_CONCAT_FILENAME = "_temp_concat.mp4"
 
 # BPM Units for Combobox and Calculation (Based on provided image)
 BPM_UNITS = {

@@ -10,12 +10,19 @@ import time
 import datetime # Import datetime for timestamps
 
 # --- Configuration ---
-# Script paths (Use raw strings 'r' for Windows paths)
-SCRIPT_1_PATH = r"C:\Users\Earth\BEDROT PRODUCTIONS\slideshow_editor\media_download_app.py"
-SCRIPT_2_PATH = r"C:\Users\Earth\BEDROT PRODUCTIONS\slideshow_editor\snippet_remixer.py"
-SCRIPT_3_PATH = r"C:\Users\Earth\BEDROT PRODUCTIONS\slideshow_editor\random_slideshow.py" # <-- Added new script path
+import os
+import sys
+# ... other imports
 
-PYTHON_EXECUTABLE = sys.executable # Use the current Python interpreter
+# --- Configuration ---
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # Directory of launcher.py (root)
+
+# Script paths (Use raw strings 'r' for Windows paths if needed, though os.path.join is better)
+SCRIPT_1_PATH = os.path.join(SCRIPT_DIR, 'src', 'media_download_app.py')
+SCRIPT_2_PATH = os.path.join(SCRIPT_DIR, 'src', 'snippet_remixer.py')
+SCRIPT_3_PATH = os.path.join(SCRIPT_DIR, 'src', 'random_slideshow.py')
+
+PYTHON_EXECUTABLE = sys.executable
 
 # --- Globals for Process Management ---
 active_processes = []
