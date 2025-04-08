@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folders
+venv/
+.venv/
+ENV/
+env/
+# If you use conda:
+.conda/
+.condarc
+.conda_lock/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode / PyCharm / IntelliJ
+.vscode/
+.idea/
+*.iml
+
+# Mac / Linux
+.DS_Store
+*.swp
+
+# Logs
+*.log
+
+# Your slideshow video output (optional, if you don't want to commit large files)
+*.mp4
+.env

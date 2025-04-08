@@ -1,0 +1,10 @@
+{
+    "download_path": "C:/Users/Earth/Videos/videos to chop up",
+    "video_only": true,
+    "enable_cut": false,
+    "start_time": "01:00",
+    "end_time": "02:00",
+    "aspect_ratio": "9:16",
+    "enable_chop": false,
+    "chop_interval": "60"
+}
