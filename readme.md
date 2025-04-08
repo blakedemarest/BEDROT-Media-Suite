@@ -1,25 +1,46 @@
 # Bedrot Productions - Media Tool Suite
 
-This suite provides a collection of Python-based tools for downloading, remixing, and generating video content, all managed through a central graphical user interface (GUI) launcher.
+This suite provides a collection of Python-based tools for downloading, remixing, and generating video content, all managed through a central graphical user interface (GUI) launcher (`launcher.py`).
+
+## Directory Structure
+
+The codebase is organized as follows:
+
+* `launcher.py`: The main application entry point (run this file).
+* `readme.md`: This documentation file.
+* `requirements.txt`: Lists the required Python libraries.
+* `config/`: Contains all JSON configuration files for the tools.
+    * `yt_downloader_gui_settings.json`: Settings for the Media Downloader.
+    * `video_remixer_settings.json`: Settings for the Snippet Remixer.
+    * `combined_random_config.json`: Settings for the Random Slideshow Generator.
+    * `config.json`: Settings for the Slideshow Editor.
+* `src/`: Contains the core Python source code for the tools.
+    * `media_download_app.py`: Media Downloader tool.
+    * `snippet_remixer.py`: Snippet Remixer tool.
+    * `random_slideshow.py`: Random Slideshow Generator tool.
+    * `slideshow_editor.py`: A separate tool for creating single slideshows.
+* `tools/`: Contains utility scripts.
+    * `xyimagescaler.py`: A simple image scaling/cropping utility.
 
 **Core Components:**
 
-1.  **Launcher (`launcher.py`):** A Tkinter GUI to run and monitor the other tools.
-2.  **Media Downloader (`media_download_app.py`):** Downloads video/audio using `yt-dlp` with post-processing options (format conversion, cutting, aspect ratio, chopping via FFmpeg).
-3.  **Snippet Remixer (`snippet_remixer.py`):** Creates new videos by randomly combining short snippets from multiple source videos (uses FFmpeg).
-4.  **Random Slideshow Generator (`random_slideshow.py`):** Continuously generates short, randomized video slideshows from a folder of images (uses PyQt5, MoviePy, Pillow).
+1.  **Launcher (`launcher.py`):** A Tkinter GUI to run and monitor the other tools located in the `src/` directory.
+2.  **Media Downloader (`src/media_download_app.py`):** Downloads video/audio using `yt-dlp` with post-processing options. Uses settings from `config/yt_downloader_gui_settings.json`.
+3.  **Snippet Remixer (`src/snippet_remixer.py`):** Creates new videos by randomly combining short snippets. Uses settings from `config/video_remixer_settings.json`.
+4.  **Random Slideshow Generator (`src/random_slideshow.py`):** Continuously generates short, randomized video slideshows. Uses settings from `config/combined_random_config.json`.
 
 ---
 
 ## 1. The Launcher (`launcher.py`)
 
-This application provides the main interface to launch and monitor the three media tools.
+This application, run from the project root directory, provides the main interface to launch and monitor the media tools found in the `src/` directory.
 
 ### Launcher Features
 
 * **Tabbed Interface:** Uses a `ttk.Notebook` to provide separate controls for launching each target script.
 * **Simple Launch Buttons:** Dedicated buttons on each tab to run the corresponding script.
 * **Independent Processes:** Each script is launched as a separate process using Python's `subprocess` module.
+* **Relative Pathing:** Automatically locates the scripts within the `src/` directory relative to its own position. No manual path configuration is needed.
 * **Real-time Log Output:** Captures both standard output (`stdout`) and standard error (`stderr`) streams from the launched scripts.
 * **Timestamped Logging:** Displays the captured output in a shared, scrollable text area, with each line prefixed by a timestamp.
 * **Background Execution:** Script execution and output streaming are handled in background threads (`threading`) to keep the main GUI responsive.
@@ -27,7 +48,6 @@ This application provides the main interface to launch and monitor the three med
 * **Process Management:** Tracks the processes of actively running scripts.
 * **Graceful Shutdown:** When closing the launcher window, it checks for active script processes, prompts the user for confirmation, and attempts to terminate (`terminate`/`kill`) any running scripts before exiting.
 * **Log Clearing:** A button is provided to clear the contents of the log display area.
-* **Configurable Paths (Hardcoded):** The paths to the target scripts are defined as constants within the `launcher.py` file.
 * **Cross-Platform Considerations:** Attempts to use platform-appropriate UI themes and process termination methods.
 
 ---
@@ -37,41 +57,32 @@ This application provides the main interface to launch and monitor the three med
 Follow these steps to set up the entire suite:
 
 1.  **Python:** Ensure you have Python 3.x installed. Download from [python.org](https://www.python.org/) if needed.
-2.  **Create Virtual Environment (Recommended):**
-    * Navigate to the project directory in your terminal.
+2.  **Clone/Download:** Obtain the project files and navigate to the root project directory (`blakedemarest-bedrot-media-suite.git/`) in your terminal.
+3.  **Create Virtual Environment (Recommended):**
+    * Navigate to the project root directory.
     * Create a virtual environment: `python -m venv venv`
     * Activate it:
         * Windows: `.\venv\Scripts\activate`
         * macOS/Linux: `source venv/bin/activate`
-3.  **Install Python Libraries:** Install all necessary Python packages using pip:
+4.  **Install Python Libraries:** Install all necessary Python packages using the `requirements.txt` file:
     ```bash
-    pip install -U yt-dlp PyQt5 moviepy numpy Pillow
+    pip install -r requirements.txt
     ```
-    *(Note: Tkinter is usually included with Python and does not need separate installation via pip).*
-4.  **Install External Tools (FFmpeg/FFprobe):**
-    * Download `ffmpeg` from the official website: [ffmpeg.org](https://ffmpeg.org/download.html). `ffprobe` is typically included in the download.
+    *(Note: Tkinter is usually included with Python).*
+5.  **Install External Tools (FFmpeg/FFprobe):**
+    * Download `ffmpeg` from the official website: [ffmpeg.org](https://ffmpeg.org/download.html). `ffprobe` is typically included.
     * Follow their installation instructions for your operating system.
-    * **Crucially, ensure the directory containing the `ffmpeg` and `ffprobe` executables is added to your system's PATH environment variable.** All three tools rely on being able to call these commands directly. You may need to restart your terminal or computer after modifying the PATH.
+    * **Crucially, ensure the directory containing the `ffmpeg` and `ffprobe` executables is added to your system's PATH environment variable.** The tools rely on calling these commands directly. You may need to restart your terminal or computer after modifying the PATH.
     * *Alternative (Package Managers):* `sudo apt update && sudo apt install ffmpeg` (Debian/Ubuntu), `brew install ffmpeg` (macOS), `choco install ffmpeg` (Windows - verify PATH).
-5.  **Configure Launcher Paths:**
-    * Open the `launcher.py` script in a text editor.
-    * Locate the `SCRIPT_1_PATH`, `SCRIPT_2_PATH`, and `SCRIPT_3_PATH` variables near the top.
-    * **Modify these paths** to point to the exact locations where you have saved `media_download_app.py`, `snippet_remixer.py`, and `random_slideshow.py`, respectively. Use raw strings (e.g., `r"C:\Users\..."`) for Windows paths if they contain backslashes.
-    ```python
-    # --- Configuration ---
-    # Script paths (Use raw strings 'r' for Windows paths if needed)
-    SCRIPT_1_PATH = r"C:\path\to\your\media_download_app.py"
-    SCRIPT_2_PATH = r"C:\path\to\your\snippet_remixer.py"
-    SCRIPT_3_PATH = r"C:\path\to\your\random_slideshow.py"
-    ```
+6.  **Configuration Files:** Settings for each tool (e.g., default folders, options) are stored in `.json` files within the `config/` directory. You can modify these directly if needed, but the tools should also save your preferences there during use.
 
 ---
 
 ## 3. How to Run
 
-1.  Ensure you have completed all steps in the "Installation & Setup" section, especially activating your virtual environment (if used) and configuring the paths in `launcher.py`.
+1.  Ensure you have completed all steps in the "Installation & Setup" section, especially activating your virtual environment (if used).
 2.  Open your terminal or command prompt.
-3.  Navigate to the directory containing `launcher.py`.
+3.  **Navigate to the root project directory** (the one containing `launcher.py`, `src/`, `config/`, etc.).
 4.  Run the launcher application:
     ```bash
     python launcher.py
@@ -82,10 +93,10 @@ Follow these steps to set up the entire suite:
 
 ## 4. Using the Suite
 
-1.  **Run the Launcher:** Start `launcher.py` as described above.
+1.  **Run the Launcher:** Start `launcher.py` from the project root as described above.
 2.  **Select a Tool:** Click the tab corresponding to the tool you want to use (e.g., "MP4 downloader/MP3 Converter", "Snippet Remixer", "Random Slideshow").
-3.  **Launch the Tool:** Click the "Run..." button on the selected tab. This will open the chosen tool in its own window (or start its process).
-4.  **Use the Tool:** Interact with the specific tool's GUI as needed (see detailed guides below).
+3.  **Launch the Tool:** Click the "Run..." button on the selected tab. This will open the chosen tool's window.
+4.  **Use the Tool:** Interact with the specific tool's GUI as needed (see detailed guides below). Settings are loaded from/saved to the corresponding JSON file in the `config/` directory.
 5.  **Monitor Status & Logs:**
     * The "Status:" label on the launcher's tab for that tool will update (Idle, Running, Finished...).
     * The main "Log Output" area at the bottom of the launcher shows timestamped `stdout` and `stderr` messages from all launched scripts. Errors often appear here prefixed with `[stderr]`.
@@ -97,60 +108,52 @@ Follow these steps to set up the entire suite:
 
 ## 5. Included Tools - Details
 
-### 5.1 Media Downloader GUI (`media_download_app.py`)
+### 5.1 Media Downloader GUI (`src/media_download_app.py`)
 
 Downloads videos/audio using `yt-dlp` with post-processing options.
 
-* **Features:** GUI (Tkinter), URL Queue, MP4/MP3 format, Video-Only option, Time Cutting, Aspect Ratio adjustment, Video Chopping, Persistent Settings (`yt_downloader_gui_settings.json`), Status/Progress updates.
+* **Features:** GUI (Tkinter), URL Queue, MP4/MP3 format, Video-Only option, Time Cutting, Aspect Ratio adjustment, Video Chopping, Persistent Settings (in `config/yt_downloader_gui_settings.json`), Status/Progress updates.
 * **Dependencies:** Python, Tkinter, `yt-dlp`, `ffmpeg`, `ffprobe`.
-* **Usage Guide:**
-    1.  **Video URL:** Paste URL, click "Add to Queue".
-    2.  **Download Folder:** Browse to select destination.
-    3.  **Format Options:** Choose MP4/MP3, optionally check "Video Only".
-    4.  **Processing Options:** Enable and configure Time Cut, Aspect Ratio, or Chopping as needed (requires FFmpeg/FFprobe).
-    5.  **Download Queue:** View and manage URLs.
-    6.  **Action Buttons:** Use "Download Queue", "Clear Selected", "Clear All".
-    7.  **Status Bar:** Monitor progress and results within the downloader window. Check launcher log for details.
-* **Troubleshooting:** Ensure `yt-dlp`, `ffmpeg`, `ffprobe` are in PATH. Check launcher log for specific `yt-dlp` or `ffmpeg` errors.
+* **Usage Guide:** (Refer to original guide - functionality unchanged)
+* **Troubleshooting:** Ensure `yt-dlp`, `ffmpeg`, `ffprobe` are in PATH. Check launcher log for specific errors. Check permissions for the output folder specified in the tool's GUI or `config/yt_downloader_gui_settings.json`.
 
-### 5.2 Video Snippet Remixer (`snippet_remixer.py`)
+### 5.2 Video Snippet Remixer (`src/snippet_remixer.py`)
 
 Creates remixes by combining random short snippets from source videos.
 
-* **Features:** GUI (Tkinter), Multi-file input, Output naming control (unique `(n)` suffix), Length definition (Seconds or BPM), Random snippet selection, Intermediate transcoding (`.ts`), Reliable concatenation, Aspect Ratio adjustment, Background processing, Persistent Settings (`video_remixer_settings.json`), Temp file management.
+* **Features:** GUI (Tkinter), Multi-file input, Output naming control (unique `(n)` suffix), Length definition (Seconds or BPM), Random snippet selection, Intermediate transcoding (`.ts`), Reliable concatenation, Aspect Ratio adjustment, Background processing, Persistent Settings (in `config/video_remixer_settings.json`), Temp file management (in `remixer_temp_snippets` subdirectory).
 * **Dependencies:** Python, Tkinter, `ffmpeg`, `ffprobe`.
-* **Usage Guide:**
-    1.  **Input Videos:** Browse to add source video files.
-    2.  **Output Settings:** Select folder, enter filename, choose final Aspect Ratio ("Original" keeps intermediate 720p).
-    3.  **Remix Length:** Choose "Seconds" mode (enter total duration) or "BPM" mode (enter BPM, unit, total units).
-    4.  **Generate Remix:** Click to start processing. Monitor status bar and launcher log.
-* **Troubleshooting:** Ensure `ffmpeg`/`ffprobe` are in PATH. Input videos must be longer than the calculated snippet duration. Check launcher log for `ffmpeg` errors during cutting or concatenation. Temp folder (`remixer_temp_snippets`) should be auto-deleted; check if script crashes.
+* **Usage Guide:** (Refer to original guide - functionality unchanged)
+* **Troubleshooting:** Ensure `ffmpeg`/`ffprobe` are in PATH. Input videos must be longer than the calculated snippet duration. Check launcher log for `ffmpeg` errors. Temp folder (`remixer_temp_snippets`) should be auto-deleted; check if script crashes. Check permissions for the output folder specified in the tool's GUI or `config/video_remixer_settings.json`.
 
-### 5.3 Random Slideshow Generator (`random_slideshow.py`)
+### 5.3 Random Slideshow Generator (`src/random_slideshow.py`)
 
 Continuously generates short, randomized video slideshows from images.
 
-* **Features:** GUI (PyQt5), Folder selection (input/output), Aspect Ratio options (16:9 Landscape / 9:16 Portrait with specific processing), Randomized duration/image timing, Continuous generation loop, Background processing (QThread), Status updates & generation count, Persistent Settings (`combined_random_config.json`), Error handling.
+* **Features:** GUI (PyQt5), Folder selection (input/output), Aspect Ratio options (16:9 Landscape / 9:16 Portrait), Randomized duration/timing, Continuous generation loop, Background processing (QThread), Status updates & count, Persistent Settings (in `config/combined_random_config.json`), Error handling.
 * **Dependencies:** Python, `PyQt5`, `MoviePy`, `NumPy`, `Pillow`.
-* **Usage Guide:**
-    1.  **Image Folder:** Browse to select folder with source images.
-    2.  **Output Folder:** Browse to select destination for MP4 videos.
-    3.  **Output Aspect Ratio:** Choose 16:9 (letterboxed) or 9:16 (scaled/cropped).
-    4.  **Start/Stop Button:** Toggle the continuous generation process.
-    5.  **Status/Generation Labels:** Monitor progress within the slideshow window. Check launcher log for details.
-* **Troubleshooting:** Ensure `PyQt5`, `MoviePy`, `NumPy`, `Pillow` are installed. Requires valid image files. Processing can be resource-intensive.
+* **Usage Guide:** (Refer to original guide - functionality unchanged)
+* **Troubleshooting:** Ensure dependencies are installed (`pip install -r requirements.txt`). Requires valid image files. Processing can be resource-intensive. Check permissions for input/output folders specified in the tool's GUI or `config/combined_random_config.json`.
 
 ---
 
-## 6. Overall Troubleshooting
+## 6. Other Included Tools
 
-* **Launcher "Script not found" Error:** Verify the `SCRIPT_X_PATH` variables in `launcher.py` point to the correct locations of the target `.py` files.
+* **Slideshow Editor (`src/slideshow_editor.py`):** A PyQt5 tool for creating single slideshow videos from dragged-and-dropped images with specific duration and aspect ratio settings. Uses `config/config.json` for output folder history. (Can be launched via the launcher).
+* **XY Image Scaler (`tools/xyimagescaler.py`):** A simple Tkinter utility to scale and crop an image to a target width and height (defaults to 1632x2912). This needs to be run separately (`python tools/xyimagescaler.py`).
+
+---
+
+## 7. Overall Troubleshooting
+
+* **Launcher Errors:** Ensure `launcher.py` is run from the project's root directory. If scripts don't launch, check the console for errors related to finding the `src` directory or the scripts within it.
 * **Errors Running Tools:** If a tool fails after being launched, check the **"Log Output"** area in the **launcher window**. Errors prefixed with `[stderr]` often indicate problems within the launched tool itself or its dependencies. Common issues include:
-    * Missing Python libraries for the specific tool (e.g., `pip install moviepy`).
+    * Missing Python libraries (`pip install -r requirements.txt`).
     * External tools (`ffmpeg`, `ffprobe`, `yt-dlp`) not installed or not found in the system PATH. Re-check PATH configuration.
-    * Invalid input provided in the tool's own GUI (e.g., incorrect URL, non-existent folder, invalid time format).
+    * Invalid input provided in the tool's own GUI (e.g., incorrect URL, non-existent folder, invalid time format). Check the relevant `.json` file in `config/` for saved invalid paths.
     * Permissions issues (cannot write to output folder, cannot read input files).
-    * Bugs within the specific tool's script.
-* **Process Termination:** The launcher attempts to stop scripts gracefully when closed, but unresponsive scripts might require manual termination via your OS Task Manager / Activity Monitor.
+    * Bugs within the specific tool's script in the `src/` directory.
+* **Process Termination:** The launcher attempts to stop scripts gracefully, but unresponsive scripts might require manual termination via your OS Task Manager / Activity Monitor.
 
 ---
+
