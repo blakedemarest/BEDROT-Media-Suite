@@ -1,11 +1,11 @@
 {
     "last_input_folder": "C:/Users/Earth/Videos/videos to chop up",
     "output_folder": "C:/Users/Earth/Videos",
-    "output_filename": "REMIXXXX (1) (1).mp4",
+    "output_filename": "REMIX (1) (1) (1).mp4",
     "length_mode": "BPM",
     "duration_seconds": 15.0,
-    "bpm": 225.0,
+    "bpm": 172.0,
     "bpm_unit": "Beat",
-    "num_units": 200,
+    "num_units": 80,
     "aspect_ratio": "9:16"
 }
