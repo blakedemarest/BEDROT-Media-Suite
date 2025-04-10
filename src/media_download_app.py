@@ -10,7 +10,7 @@ import math      # For aspect ratio comparison tolerance and chopping duration
 
 # --- Define Settings File Path ---
 import os
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is now the 'src' directory
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # src directory
 CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config') # Go up to root, then into 'config'
 SETTINGS_FILENAME = "yt_downloader_gui_settings.json" # Original filename
 SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
@@ -43,7 +43,7 @@ def parse_time_to_seconds(time_str):
 
 # --- Helper: Aspect Ratio String Parsing ---
 def parse_aspect_ratio(ratio_str):
-    # (No changes needed)
+    
     if ratio_str == "Original":
         return None
     try:
@@ -64,8 +64,8 @@ def load_settings():
         "start_time": "",
         "end_time": "",
         "aspect_ratio": "Original",
-        "enable_chop": False,        # NEW Setting
-        "chop_interval": "60"        # NEW Setting (default 60 seconds)
+        "enable_chop": False,        
+        "chop_interval": "60"        
     }
     if os.path.exists(SETTINGS_FILE_PATH):
         try:
