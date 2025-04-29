@@ -7,12 +7,11 @@ import subprocess # For running yt-dlp, ffmpeg, ffprobe
 import json      # For parsing yt-dlp progress AND saving settings
 import re        # For parsing time strings
 import math      # For aspect ratio comparison tolerance and chopping duration
-import datetime  # <-- ADDED for timestamp
-import random    # <-- ADDED for random string
-import string    # <-- ADDED for random string characters
+import datetime  # For timestamp
+import random    # For random string
+import string    # For random string characters
 
 # --- Define Settings File Path ---
-# (No changes needed here)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config')
 SETTINGS_FILENAME = "yt_downloader_gui_settings.json"
@@ -23,18 +22,15 @@ if not os.path.exists(CONFIG_DIR): # Create config dir if it doesn't exist
         print(f"INFO: Created config directory: {CONFIG_DIR}")
     except OSError as e:
         print(f"ERROR: Could not create config directory: {CONFIG_DIR}. Error: {e}")
-        # Optionally fallback to SCRIPT_DIR or handle error differently
         SETTINGS_FILE_PATH = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME) # Fallback
 
 
 # --- Common Aspect Ratios ---
-# (No changes needed here)
 ASPECT_RATIOS = [
     "Original", "16:9", "4:3", "1:1", "9:16", "21:9", "2.35:1", "1.85:1"
 ]
 
 # --- Helper: Time String Parsing ---
-# (No changes needed here)
 def parse_time_to_seconds(time_str):
     if not time_str:
         return None
@@ -55,7 +51,6 @@ def parse_time_to_seconds(time_str):
         return None
 
 # --- Helper: Aspect Ratio String Parsing ---
-# (No changes needed here)
 def parse_aspect_ratio(ratio_str):
     if ratio_str == "Original":
         return None
@@ -68,7 +63,6 @@ def parse_aspect_ratio(ratio_str):
         return None
 
 # --- Settings Load/Save Functions ---
-# (No changes needed here)
 def load_settings():
     """Loads settings from the JSON file."""
     default_settings = {
@@ -88,7 +82,6 @@ def load_settings():
             print(f"INFO: Created config directory: {CONFIG_DIR}")
         except OSError as e:
             print(f"ERROR: Could not create config directory: {CONFIG_DIR}. Using script directory for settings. Error: {e}")
-            # Use script dir path if config dir creation fails
             settings_path = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME)
     else:
         settings_path = SETTINGS_FILE_PATH
@@ -142,7 +135,6 @@ def save_settings(settings_dict):
             print(f"INFO: Created config directory: {CONFIG_DIR}")
         except OSError as e:
             print(f"ERROR: Could not create config directory: {CONFIG_DIR}. Saving to script directory instead. Error: {e}")
-            # Use script dir path if config dir creation fails
             settings_path = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME)
     else:
         settings_path = SETTINGS_FILE_PATH
@@ -180,7 +172,6 @@ def save_settings(settings_dict):
 
 
 # --- FFmpeg & FFprobe Check ---
-# (No changes needed here)
 ffmpeg_path = None
 ffmpeg_found = False
 ffprobe_path = None
@@ -240,7 +231,6 @@ except (subprocess.CalledProcessError, FileNotFoundError) as e:
 
 
 # --- Helper: Get Video Dimensions ---
-# (No changes needed here)
 def get_video_dimensions(filepath):
     if not ffprobe_found or not os.path.exists(filepath):
         return None, None
@@ -262,7 +252,6 @@ def get_video_dimensions(filepath):
         return None, None
 
 # --- Helper: Get Video Duration ---
-# (No changes needed here)
 def get_video_duration(filepath):
     """Uses ffprobe to get the duration of a media file in seconds."""
     if not ffprobe_found or not os.path.exists(filepath):
@@ -294,18 +283,70 @@ def get_video_duration(filepath):
         print(f"Unexpected error getting duration for '{filepath}': {e}")
         return None
 
-# --- *** NEW: Helper: Generate Unique Suffix *** ---
+# --- Helper: Generate Unique Suffix ---
 def generate_unique_suffix(length=8):
     """Generates a unique suffix string using datetime and random characters."""
     now = datetime.datetime.now()
-    # Format: YYYYMMDD_HHMMSS_randomstring
     timestamp = now.strftime("%Y%m%d_%H%M%S")
     random_part = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
     return f"_{timestamp}_{random_part}"
 
+# --- Helper: Expand Playlist/Profile URL ---
+def expand_playlist_url(url_to_expand):
+    """
+    Uses yt-dlp to extract individual video URLs from a playlist or profile URL.
+    Returns a list of URLs. Returns [url_to_expand] on failure or if it's likely a single video.
+    """
+    try:
+        cmd_where = "where" if os.name == 'nt' else "which"
+        subprocess.run([cmd_where, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name=='nt'))
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("ERROR: yt-dlp not found, cannot expand URL.")
+        return [url_to_expand] # Fallback
+
+    command = [
+        "yt-dlp",
+        "--flat-playlist",
+        "--print", "webpage_url",
+        "--no-warnings",
+        "--skip-download",
+        url_to_expand
+    ]
+    print(f"Attempting to expand URL: {url_to_expand}")
+    try:
+        proc = subprocess.run(command, capture_output=True, text=True, check=True,
+                              encoding='utf-8', errors='replace',
+                              creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        output_urls = proc.stdout.strip().splitlines()
+        output_urls = [u for u in output_urls if u.strip()]
+
+        if not output_urls:
+            print(f"INFO: No URLs extracted from '{url_to_expand}'. Treating as single item.")
+            return [url_to_expand]
+        elif len(output_urls) == 1 and output_urls[0] == url_to_expand:
+             print(f"INFO: Expansion returned the original URL. Treating as single item: {url_to_expand}")
+             return [url_to_expand]
+        else:
+            print(f"INFO: Expanded '{url_to_expand}' into {len(output_urls)} items.")
+            return output_urls
+
+    except subprocess.CalledProcessError as e:
+        stderr_lower = e.stderr.lower() if e.stderr else ""
+        if "unavailable" in stderr_lower or "not found" in stderr_lower or "no media found" in stderr_lower:
+             print(f"Warning: yt-dlp reported issue expanding '{url_to_expand}', but treating as single item anyway. Stderr: {e.stderr.strip()}")
+        else:
+             print(f"ERROR: yt-dlp failed to expand URL '{url_to_expand}' (Code: {e.returncode}). Treating as single item. Stderr: {e.stderr.strip()}")
+        return [url_to_expand]
+    except FileNotFoundError:
+        print("ERROR: yt-dlp command not found during expansion.")
+        return [url_to_expand]
+    except Exception as e:
+        print(f"Unexpected error during URL expansion for '{url_to_expand}': {e}")
+        return [url_to_expand]
+
+
 # --- Main Application Class ---
 class MediaDownloaderApp:
-    # (No changes in __init__ or create_widgets)
     def __init__(self, root):
         self.root = root
         self.root.title("Media Downloader (yt-dlp)")
@@ -315,7 +356,7 @@ class MediaDownloaderApp:
 
         self.download_queue = []
         self.download_path = tk.StringVar(value=initial_path)
-        self.download_format = tk.StringVar(value="mp4") # Default to mp4
+        self.download_format = tk.StringVar(value="mp4")
 
         # Option Variables
         self.video_only_var = tk.BooleanVar(value=self.settings.get("video_only", False))
@@ -323,32 +364,33 @@ class MediaDownloaderApp:
         self.start_time_var = tk.StringVar(value=self.settings.get("start_time", ""))
         self.end_time_var = tk.StringVar(value=self.settings.get("end_time", ""))
         self.aspect_ratio_var = tk.StringVar(value=self.settings.get("aspect_ratio", "Original"))
-        self.enable_chop_var = tk.BooleanVar(value=self.settings.get("enable_chop", False)) # NEW
-        self.chop_interval_var = tk.StringVar(value=self.settings.get("chop_interval", "60")) # NEW
+        self.enable_chop_var = tk.BooleanVar(value=self.settings.get("enable_chop", False))
+        self.chop_interval_var = tk.StringVar(value=self.settings.get("chop_interval", "60"))
 
-        # Traces for enabling/disabling related fields
+        # Traces
         self.enable_cut_var.trace_add("write", self.toggle_time_entries)
-        self.enable_chop_var.trace_add("write", self.toggle_chop_entry) # NEW Trace
+        self.enable_chop_var.trace_add("write", self.toggle_chop_entry)
         self.download_format.trace_add("write", self.toggle_video_only_option)
 
-        self.root.geometry("600x750") # Increased height for chopping option
+        self.root.geometry("600x750")
         self.create_widgets()
-        self.toggle_time_entries() # Initial state sync
-        self.toggle_chop_entry() # NEW Initial state sync
-        self.toggle_video_only_option() # Initial state sync
+        self.toggle_time_entries()
+        self.toggle_chop_entry()
+        self.toggle_video_only_option()
 
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.is_adding_to_queue = False
 
     def create_widgets(self):
-        # --- Input & Folder Frames ---
+        # Input & Folder Frames
         input_frame = ttk.Frame(self.root, padding="10")
         input_frame.pack(fill=tk.X)
-        ttk.Label(input_frame, text="Video URL:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Label(input_frame, text="Video/Playlist URL:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         self.url_entry = ttk.Entry(input_frame, width=50)
         self.url_entry.grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
         input_frame.columnconfigure(1, weight=1)
-        add_button = ttk.Button(input_frame, text="Add to Queue", command=self.add_to_queue)
-        add_button.grid(row=0, column=2, padx=5, pady=5)
+        self.add_button = ttk.Button(input_frame, text="Add to Queue", command=self.add_to_queue_threaded)
+        self.add_button.grid(row=0, column=2, padx=5, pady=5)
 
         folder_frame = ttk.Frame(self.root, padding="10")
         folder_frame.pack(fill=tk.X)
@@ -359,14 +401,13 @@ class MediaDownloaderApp:
         browse_button = ttk.Button(folder_frame, text="Browse...", command=self.choose_folder)
         browse_button.grid(row=0, column=2, padx=5, pady=5)
 
-        # --- *** Options Frame (Container for Format, Cut, AR, Chop) *** ---
+        # Options Frame
         options_outer_frame = ttk.Frame(self.root, padding="10")
         options_outer_frame.pack(fill=tk.X)
 
-        # -- Column 1: Format & MP4 Options --
+        # Format Column
         format_column = ttk.Frame(options_outer_frame)
         format_column.pack(side=tk.LEFT, padx=5, pady=5, anchor='nw', fill=tk.Y)
-
         format_frame = ttk.LabelFrame(format_column, text="Format", padding="5")
         format_frame.pack(fill=tk.X)
         mp4_radio = ttk.Radiobutton(format_frame, text="MP4", variable=self.download_format, value="mp4")
@@ -376,11 +417,11 @@ class MediaDownloaderApp:
         self.video_only_check = ttk.Checkbutton(format_frame, text="Video Only (No Audio)", variable=self.video_only_var)
         self.video_only_check.pack(anchor=tk.W, padx=(15, 0))
 
-        # -- Column 2: Processing (Cutting, Aspect Ratio, Chopping) --
+        # Processing Column
         processing_column = ttk.Frame(options_outer_frame)
         processing_column.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True, anchor='nw')
 
-        # -- Cutting Options --
+        # Cutting Options
         cut_frame = ttk.LabelFrame(processing_column, text="Time Range Cut (Requires FFmpeg)", padding="5")
         cut_frame.pack(fill=tk.X, pady=(0, 5))
         enable_cut_check = ttk.Checkbutton(cut_frame, text="Cut to Selected Time Range", variable=self.enable_cut_var)
@@ -394,28 +435,24 @@ class MediaDownloaderApp:
         time_format_label = ttk.Label(cut_frame, text="(HH:MM:SS or MM:SS or SS)")
         time_format_label.grid(row=2, column=0, columnspan=4, sticky=tk.W, pady=(5,0))
 
-        # --- Aspect Ratio Frame ---
+        # Aspect Ratio Frame
         ar_frame = ttk.LabelFrame(processing_column, text="Aspect Ratio (Requires FFmpeg/FFprobe)", padding="5")
-        ar_frame.pack(fill=tk.X, pady=(5, 5)) # Add padding below
+        ar_frame.pack(fill=tk.X, pady=(5, 5))
         ttk.Label(ar_frame, text="Adjust to:").pack(side=tk.LEFT, padx=(0, 5))
         self.ar_combobox = ttk.Combobox(ar_frame, textvariable=self.aspect_ratio_var, values=ASPECT_RATIOS, state="readonly", width=15)
         self.ar_combobox.pack(side=tk.LEFT)
         ttk.Label(ar_frame, text="(Crop/Pad)").pack(side=tk.LEFT, padx=(10, 0))
 
-        # --- *** NEW: Chopping Frame *** ---
+        # Chopping Frame
         chop_frame = ttk.LabelFrame(processing_column, text="Chop into Intervals (Requires FFmpeg/FFprobe)", padding="5")
         chop_frame.pack(fill=tk.X, pady=(5, 0))
-
         enable_chop_check = ttk.Checkbutton(chop_frame, text="Chop output into segments of:", variable=self.enable_chop_var)
         enable_chop_check.grid(row=0, column=0, sticky=tk.W)
-
         self.chop_interval_entry = ttk.Entry(chop_frame, textvariable=self.chop_interval_var, width=8)
         self.chop_interval_entry.grid(row=0, column=1, padx=5, sticky=tk.W)
-
         ttk.Label(chop_frame, text="seconds").grid(row=0, column=2, sticky=tk.W)
 
-
-        # --- Queue Frame ---
+        # Queue Frame
         queue_frame = ttk.LabelFrame(self.root, text="Download Queue", padding="10")
         queue_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5,0))
         self.queue_listbox = tk.Listbox(queue_frame, height=6)
@@ -424,7 +461,7 @@ class MediaDownloaderApp:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.queue_listbox.config(yscrollcommand=scrollbar.set)
 
-        # --- Action Buttons Frame ---
+        # Action Buttons Frame
         action_frame = ttk.Frame(self.root, padding="10")
         action_frame.pack(fill=tk.X)
         self.download_button = ttk.Button(action_frame, text="Download Queue", command=self.start_download_thread)
@@ -434,20 +471,20 @@ class MediaDownloaderApp:
         clear_all_button = ttk.Button(action_frame, text="Clear All", command=self.clear_all)
         clear_all_button.pack(side=tk.LEFT, padx=5)
 
-        # --- Status Bar ---
+        # Status Bar
         self.status_var = tk.StringVar(value="Ready (using yt-dlp)")
         status_bar = ttk.Label(self.root, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W, padding=5)
         status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
-    # --- Toggle Control States ---
-    # (No changes needed here)
+
+    # Toggle Control States
     def toggle_time_entries(self, *args):
         state = tk.NORMAL if self.enable_cut_var.get() else tk.DISABLED
         try:
             if self.start_time_entry.winfo_exists() and self.end_time_entry.winfo_exists():
                 self.start_time_entry.config(state=state)
                 self.end_time_entry.config(state=state)
-        except tk.TclError: pass # Widget might not exist yet
+        except tk.TclError: pass
 
     def toggle_video_only_option(self, *args):
          try:
@@ -462,35 +499,87 @@ class MediaDownloaderApp:
          try:
              if self.chop_interval_entry.winfo_exists():
                  self.chop_interval_entry.config(state=state)
-         except tk.TclError: pass # Widget might not exist yet
+         except tk.TclError: pass
 
 
-    # --- GUI actions (add_to_queue, choose_folder, clear_*, etc.) ---
-    # (No changes needed here)
-    def add_to_queue(self):
+    # GUI action to start expansion thread
+    def add_to_queue_threaded(self):
+        """Starts the URL expansion and adding process in a separate thread."""
+        if self.is_adding_to_queue:
+            self.update_status("Already processing previous add request...")
+            return
+
         url = self.url_entry.get().strip()
-        if url:
-            if not (url.startswith("http://") or url.startswith("https://")):
-                 self.update_status("Please enter a valid URL (starting with http:// or https://).")
-                 return
-            current_items = self.queue_listbox.get(0, tk.END)
-            if url not in current_items:
-                 # No need to add to self.download_queue here, it's rebuilt before download
-                 self.queue_listbox.insert(tk.END, url)
-                 self.url_entry.delete(0, tk.END)
-                 self.update_status(f"Added: {url}")
-            else:
-                 self.update_status("URL already in queue.")
-        else:
-            self.update_status("Please enter a Video URL.")
+        if not url:
+            self.update_status("Please enter a Video or Playlist/Profile URL.")
+            return
+        if not (url.startswith("http://") or url.startswith("https://")):
+             self.update_status("Please enter a valid URL (starting with http:// or https://).")
+             return
 
+        self.is_adding_to_queue = True
+        self.add_button.config(state=tk.DISABLED)
+        self.update_status(f"Fetching items from URL: {url[:60]}...")
+
+        expansion_thread = threading.Thread(target=self._add_to_queue_worker, args=(url,), daemon=True)
+        expansion_thread.start()
+
+    # Worker function for URL expansion and adding
+    def _add_to_queue_worker(self, url_to_process):
+        """
+        Expands the URL and adds results to the queue listbox. Runs in a separate thread.
+        """
+        expanded_urls = expand_playlist_url(url_to_process)
+        added_count = 0
+        duplicate_count = 0
+
+        def _update_gui():
+            nonlocal added_count, duplicate_count
+            current_items = set(self.queue_listbox.get(0, tk.END))
+
+            for individual_url in expanded_urls:
+                if individual_url not in current_items:
+                    self.queue_listbox.insert(tk.END, individual_url)
+                    current_items.add(individual_url)
+                    added_count += 1
+                else:
+                    duplicate_count += 1
+
+            # Update Status
+            final_status = ""
+            if added_count > 0 and duplicate_count > 0:
+                final_status = f"Added {added_count} item(s). Skipped {duplicate_count} duplicates."
+            elif added_count > 0:
+                final_status = f"Added {added_count} item(s) to the queue."
+            elif duplicate_count > 0:
+                final_status = f"All {duplicate_count} item(s) from URL are already in the queue."
+            else:
+                 final_status = f"Failed to add items from URL. Check logs. Treating as single URL '{url_to_process[:60]}...'"
+                 if url_to_process not in current_items:
+                     self.queue_listbox.insert(tk.END, url_to_process)
+                     added_count = 1
+                     final_status = f"Expansion failed, added original URL: {url_to_process[:60]}..."
+
+            self.update_status(final_status)
+            if added_count > 0 :
+                self.url_entry.delete(0, tk.END)
+
+            # Re-enable button and reset flag (ensure it happens even if error)
+            self.add_button.config(state=tk.NORMAL)
+            self.is_adding_to_queue = False
+
+        # Schedule the GUI update
+        self.root.after(0, _update_gui)
+
+
+    # Other GUI actions
     def choose_folder(self):
         folder_selected = filedialog.askdirectory(initialdir=self.download_path.get())
         if folder_selected:
             self.download_path.set(folder_selected)
             self.update_status(f"Download folder: {folder_selected}")
             self.settings["download_path"] = folder_selected
-            save_settings(self.settings) # Save immediately on change
+            save_settings(self.settings)
 
     def clear_selected(self):
         selected_indices = self.queue_listbox.curselection()
@@ -499,12 +588,10 @@ class MediaDownloaderApp:
             return
         for i in sorted(selected_indices, reverse=True):
             self.queue_listbox.delete(i)
-        # No need to update self.download_queue here
         self.update_status("Selected items removed.")
 
     def clear_all(self):
         self.queue_listbox.delete(0, tk.END)
-        # No need to update self.download_queue here
         self.update_status("Queue cleared.")
 
     def update_status(self, message):
@@ -513,42 +600,40 @@ class MediaDownloaderApp:
                  self.root.after(0, self.status_var.set, message)
         except tk.TclError: pass
 
-    # --- Download Start & Pre-checks ---
-    # (No changes needed here)
+    # Download Start & Pre-checks
     def start_download_thread(self):
-        self.download_queue = list(self.queue_listbox.get(0, tk.END)) # Refresh internal queue from GUI
+        self.download_queue = list(self.queue_listbox.get(0, tk.END))
 
         if not self.download_queue:
             messagebox.showwarning("Queue Empty", "Add URLs to the queue first.")
             return
 
-        # --- Pre-checks ---
-        try: # yt-dlp check
+        # Pre-checks (yt-dlp, path, ffmpeg/ffprobe based on OPTIONS)
+        try:
              cmd = "where" if os.name == 'nt' else "which"
              subprocess.run([cmd, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name=='nt'))
         except (subprocess.CalledProcessError, FileNotFoundError):
-             messagebox.showerror("yt-dlp Error", "yt-dlp command not found in PATH.")
+             messagebox.showerror("yt-dlp Error", "yt-dlp command not found in PATH. Cannot download or expand URLs.")
              return
 
         if not os.path.isdir(self.download_path.get()):
              messagebox.showerror("Invalid Path", f"Download folder is invalid:\n{self.download_path.get()}")
              return
 
-        # --- Specific FFmpeg/FFprobe checks based on selected options ---
+        # Specific FFmpeg/FFprobe checks based on selected options
         is_tiktok_video_only = False
         if self.download_format.get() == "mp4" and self.video_only_var.get():
-            # Check if *any* URL in the queue is a TikTok URL to ensure FFmpeg is present if needed
             if any("tiktok.com" in url for url in self.download_queue):
-                is_tiktok_video_only = True # More accurately: FFmpeg *might* be needed for TikTok audio removal
+                is_tiktok_video_only = True
 
         needs_ffmpeg = (self.enable_cut_var.get() or
                         self.aspect_ratio_var.get() != "Original" or
                         self.download_format.get() == "mp3" or
-                        is_tiktok_video_only or # Audio removal for TikTok requires FFmpeg
-                        self.enable_chop_var.get()) # Chopping requires FFmpeg
+                        is_tiktok_video_only or
+                        self.enable_chop_var.get())
 
-        needs_ffprobe = (self.aspect_ratio_var.get() != "Original" or # AR needs dimensions
-                         self.enable_chop_var.get()) # Chopping needs duration
+        needs_ffprobe = (self.aspect_ratio_var.get() != "Original" or
+                         self.enable_chop_var.get())
 
         if needs_ffmpeg and not ffmpeg_found:
              messagebox.showerror("FFmpeg Error", "The selected options (Cutting, Aspect Ratio, MP3, TikTok Video-Only, Chopping) require FFmpeg, but it was not found in your PATH.")
@@ -557,7 +642,7 @@ class MediaDownloaderApp:
              messagebox.showerror("FFprobe Error", "Aspect ratio adjustment or Chopping requires FFprobe, but it was not found in your PATH.")
              return
 
-        # --- Validate Times and Intervals ---
+        # Validate Times and Intervals
         start_sec, end_sec = None, None
         if self.enable_cut_var.get():
             start_str = self.start_time_var.get()
@@ -580,45 +665,43 @@ class MediaDownloaderApp:
                 messagebox.showerror("Invalid Interval", f"Invalid Chop Interval: '{self.chop_interval_var.get()}'. Must be numeric.")
                 return
 
-        # Validate selected aspect ratio format (redundant due to Combobox, but safe)
         selected_ar = self.aspect_ratio_var.get()
         if selected_ar != "Original" and parse_aspect_ratio(selected_ar) is None:
             messagebox.showerror("Invalid Aspect Ratio", f"Selected aspect ratio '{selected_ar}' is invalid.")
             return
 
-        # --- Start Download ---
+        # Start Download
         self.download_button.config(state=tk.DISABLED)
+        self.add_button.config(state=tk.DISABLED) # Disable Add button during download
         self.update_status("Starting download...")
-        queue_copy = list(self.download_queue) # Use the refreshed queue
+        queue_copy = list(self.download_queue)
         time_range = (start_sec, end_sec) if self.enable_cut_var.get() else None
         aspect_ratio_selection = self.aspect_ratio_var.get()
         video_only_state = self.video_only_var.get()
         selected_format_state = self.download_format.get()
-        chop_settings = (self.enable_chop_var.get(), chop_interval_sec) # Pass chop settings
+        chop_settings = (self.enable_chop_var.get(), chop_interval_sec)
 
         download_thread = threading.Thread(
             target=self.process_queue_sequential,
             args=(queue_copy, time_range, aspect_ratio_selection,
-                  video_only_state, selected_format_state, chop_settings), # Pass chop settings
+                  video_only_state, selected_format_state, chop_settings),
             daemon=True)
         download_thread.start()
 
 
-    # --- *** MODIFIED SEQUENTIAL PROCESSING LOGIC *** ---
+    # --- SEQUENTIAL PROCESSING LOGIC (with SyntaxError fixes) ---
     def process_queue_sequential(self, queue_to_process, time_range, aspect_ratio_selection,
-                                 video_only_setting, selected_format_setting, chop_settings): # Receive chop settings
+                                 video_only_setting, selected_format_setting, chop_settings):
         """
         Processes queue item by item: Download -> Apply Unique Suffix -> Remove Audio -> Adjust AR -> Cut -> Chop -> Finalize.
-        Manages intermediate files.
+        Manages intermediate files. Receives only INDIVIDUAL video URLs.
         """
         path = self.download_path.get()
         selected_format = selected_format_setting
-        # is_video_only is used LATER to determine if audio removal is needed for non-TikTok
-        # tiktok_video_only_special_case handles the specific TikTok download/removal logic
         is_video_only_general_flag = video_only_setting if selected_format == "mp4" else False
         is_cutting = time_range is not None
         is_adjusting_ar = aspect_ratio_selection != "Original"
-        is_chopping, chop_interval_seconds = chop_settings # Unpack chop settings
+        is_chopping, chop_interval_seconds = chop_settings
 
         initial_queue_size = len(queue_to_process)
         processed_count = 0
@@ -626,19 +709,16 @@ class MediaDownloaderApp:
         for url in queue_to_process:
             processed_count += 1
             progress_prefix = f"[{processed_count}/{initial_queue_size}]"
-            self.update_status(f"{progress_prefix} Starting: {url}")
+            self.update_status(f"{progress_prefix} Starting: {url[:70]}...")
 
             # --- Stage 0: Determine Filenames & Tags ---
-            base_title = None # Will hold the original title
-            unique_suffix = generate_unique_suffix() # <-- Generate the unique part here
+            base_title = None
+            unique_suffix = generate_unique_suffix()
             initial_download_path = None
             final_extension = ".mp3" if selected_format == "mp3" else ".mp4"
 
-            # Determine tags for intermediate and final files (excluding unique suffix and chop part number)
             is_tiktok_url = "tiktok.com" in url
-            # We download TikTok with audio first if video-only is selected, then remove it
             tiktok_video_only_special_case = is_tiktok_url and selected_format == "mp4" and is_video_only_general_flag
-            # Tag is added *after* potential audio removal
             no_audio_tag = "_NoAudio" if tiktok_video_only_special_case else ""
             ar_tag = ""
             time_tag = ""
@@ -646,51 +726,43 @@ class MediaDownloaderApp:
                 ar_tag = f"_AR_{aspect_ratio_selection.replace(':', 'x').replace('.', '_')}"
             if is_cutting:
                 start_sec, end_sec = time_range
-                # Use integer seconds for simpler filenames unless sub-second precision needed
                 time_tag = f"_{int(start_sec)}s-{int(end_sec)}s"
 
-            # Base path template will be constructed *after* base_title is confirmed
-            intermediate_output_base = "PLACEHOLDER"
-
+            intermediate_output_base = "PLACEHOLDER" # Constructed after title obtained
 
             # --- Stage 1: Download with yt-dlp ---
             self.update_status(f"{progress_prefix} Downloading...")
             yt_dlp_success = False
             stderr_info = ""
-            needs_audio_removal_post_dl = False # Flag for post-processing if TikTok+VideoOnly
+            needs_audio_removal_post_dl = False
 
-            # Ensure temp file has the expected *final* extension for compatibility
-            # Use a more generic temp name that doesn't rely on title yet
             temp_output_template = os.path.join(path, f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}{final_extension}")
             print(f"DEBUG: Using temp download template: {temp_output_template}")
 
-
             command = [
-                "yt-dlp", url, "--no-playlist", "--progress",
+                "yt-dlp", url,
+                "--no-playlist", # Critical: Prevent re-interpreting individual URL
+                "--progress",
                 "--progress-template", "download-status:%(progress)j",
                 "--no-warnings",
-                #"--verbose",
-                #"--force-overwrites", # Ensure temp file is overwritten if somehow exists
-                "-o", temp_output_template, # Output to temp name
+                "-o", temp_output_template,
                 "--ffmpeg-location", ffmpeg_path if ffmpeg_path else "ffmpeg"
             ]
 
-            # --- Determine yt-dlp Format Flags ---
+            # Determine yt-dlp Format Flags
             if tiktok_video_only_special_case:
-                # Download best video and audio, merge, we'll remove audio later
                 command.extend(["-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--merge-output-format", "mp4"])
                 needs_audio_removal_post_dl = True
                 print(f"INFO: ({os.path.basename(url[:50])}...): TikTok+VideoOnly. Downloading with audio first.")
             elif selected_format == "mp3":
                  command.extend(["-x", "--audio-format", "mp3", "-f", "bestaudio/best"])
             else: # Standard MP4
-                 # Check the general video-only flag for non-TikTok URLs
-                 if is_video_only_general_flag:
+                 if is_video_only_general_flag and not is_tiktok_url:
                      command.extend(["-f", "bestvideo[ext=mp4]/bestvideo", "--recode-video", "mp4"])
-                 else: # Normal MP4 with audio
+                 else:
                      command.extend(["-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--merge-output-format", "mp4"])
 
-            # --- Execute yt-dlp and Parse Output ---
+            # Execute yt-dlp and Parse Output
             try:
                 process = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                             text=True, encoding='utf-8', errors='replace', bufsize=1,
@@ -708,16 +780,13 @@ class MediaDownloaderApp:
                                  json_str = line.split(":", 1)[1]
                                  progress_data = json.loads(json_str)
                                  status = progress_data.get('status', 'N/A')
-                                 dl_filename_progress = progress_data.get('filename') # This should be our temp filename
+                                 dl_filename_progress = progress_data.get('filename')
                                  info_dict = progress_data.get('info_dict', {})
-                                 # Try to get title from info_dict early
                                  if info_dict and not captured_title_from_progress:
                                      captured_title_from_progress = info_dict.get('title')
 
-                                 # Important: set initial_download_path *only* when status is 'finished'
-                                 # and use the filename reported by yt-dlp at that point.
                                  if status == 'finished' and dl_filename_progress and not initial_download_path:
-                                     initial_download_path = dl_filename_progress # Capture actual temp path used
+                                     initial_download_path = dl_filename_progress
                                      print(f"DEBUG: Captured initial_download_path='{initial_download_path}' on finish.")
 
                                  percent_str = progress_data.get('_percent_str', 'N/A')
@@ -731,9 +800,8 @@ class MediaDownloaderApp:
                                  elif status == 'error': current_status_msg = f"{progress_prefix} Error DL: {display_filename}"
                                  else: current_status_msg = f"{progress_prefix} Status '{status}': {short_filename}"
                                  self.update_status(current_status_msg)
-                             except json.JSONDecodeError: pass # Ignore non-JSON progress lines
+                             except json.JSONDecodeError: pass
                              except Exception as e: print(f"Error parsing progress line: {line} | Error: {e}")
-                        #else: print(f"yt-dlp stdout: {line}") # Debug other output
 
                 process.stdout.close() if process.stdout else None
                 return_code = process.wait()
@@ -741,43 +809,35 @@ class MediaDownloaderApp:
                 process.stderr.close() if process.stderr else None
                 stderr_info = stderr_output
 
-                # --- Check download result ---
+                # Check download result
                 if return_code == 0 and initial_download_path and os.path.exists(initial_download_path):
                     yt_dlp_success = True
                     self.update_status(f"{progress_prefix} Download successful.")
 
-                    # ---> Get Base Title <---
-                    # Try getting title from ffprobe (more reliable after download)
+                    # Get Base Title
                     ffprobe_title_cmd = [ ffprobe_path if ffprobe_path else "ffprobe", "-v", "error",
                                           "-show_entries", "format_tags=title", "-of", "default=noprint_wrappers=1:nokey=1",
                                           initial_download_path]
                     try:
-                        title_proc = subprocess.run(ffprobe_title_cmd, capture_output=True, text=True, check=False, # Allow failure
+                        title_proc = subprocess.run(ffprobe_title_cmd, capture_output=True, text=True, check=False,
                                                      creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
                         if title_proc.returncode == 0 and title_proc.stdout.strip():
                             base_title = title_proc.stdout.strip()
                             print(f"DEBUG: Got base_title from ffprobe: '{base_title}'")
+                        elif captured_title_from_progress:
+                            base_title = captured_title_from_progress
+                            print(f"DEBUG: Using base_title from yt-dlp progress: '{base_title}'")
                         else:
-                            # Fallback 1: Title captured during progress parsing
-                            if captured_title_from_progress:
-                                base_title = captured_title_from_progress
-                                print(f"DEBUG: Using base_title from yt-dlp progress: '{base_title}'")
-                            else:
-                                # Fallback 2: Derive from temp filename (last resort)
-                                base_title, _ = os.path.splitext(os.path.basename(temp_output_template))
-                                base_title = base_title.replace(f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}", "Untitled_Video") # Generic fallback
-                                print(f"DEBUG: Fallback base_title from temp template: '{base_title}'")
+                            base_title, _ = os.path.splitext(os.path.basename(temp_output_template))
+                            base_title = base_title.replace(f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}", "Untitled_Video")
+                            print(f"DEBUG: Fallback base_title from temp template: '{base_title}'")
                     except Exception as e:
                          print(f"Warning: Error getting title via ffprobe: {e}. Falling back.")
                          if captured_title_from_progress: base_title = captured_title_from_progress
                          else: base_title, _ = os.path.splitext(os.path.basename(temp_output_template)); base_title = base_title.replace(f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}", "Untitled_Video")
 
-                    # Clean the title for filesystem use (basic cleaning)
-                    base_title = re.sub(r'[\\/*?:"<>|]', '', base_title) # Remove invalid chars
-                    base_title = base_title.strip() # Remove leading/trailing whitespace
-                    if not base_title: base_title = "Untitled_Download" # Ensure it's not empty
-
-                    # ---> Construct Unique Base Filename <---
+                    base_title = re.sub(r'[\\/*?:"<>|]', '', base_title).strip()
+                    if not base_title: base_title = "Untitled_Download"
                     unique_base_title = f"{base_title}{unique_suffix}"
                     print(f"DEBUG: Final unique base title: '{unique_base_title}'")
 
@@ -790,26 +850,20 @@ class MediaDownloaderApp:
                     final_msg = f"{progress_prefix} Download Failed: {specific_error}"
                     print(f"yt-dlp Error Log ({url}):\n{stderr_info}")
                     self.update_status(final_msg)
-                    # Cleanup potentially incomplete temp file
                     if initial_download_path and os.path.exists(initial_download_path):
-                        try:
-                            os.remove(initial_download_path)
-                            print(f"Cleaned up failed download: {initial_download_path}")
-                        except OSError as e:
-                            print(f"Warning: Could not delete failed download temp file: {e}")
-                    elif os.path.exists(temp_output_template): # Check original template name if path wasn't captured
-                         try:
-                            os.remove(temp_output_template)
-                            print(f"Cleaned up likely failed temp: {temp_output_template}")
-                         except OSError as e:
-                            print(f"Warning: Could not delete likely failed temp file: {e}")
-                    continue # Move to next URL
+                        try: os.remove(initial_download_path); print(f"Cleaned up failed download: {initial_download_path}")
+                        except OSError as e: print(f"Warning: Could not delete failed download temp file: {e}")
+                    elif os.path.exists(temp_output_template):
+                         try: os.remove(temp_output_template); print(f"Cleaned up likely failed temp: {temp_output_template}")
+                         except OSError as e: print(f"Warning: Could not delete likely failed temp file: {e}")
+                    continue
 
-            except FileNotFoundError: self.update_status(f"{progress_prefix} Error: yt-dlp command not found!"); self.root.after(0, self.enable_download_button); return
+            except FileNotFoundError: self.update_status(f"{progress_prefix} Error: yt-dlp command not found!"); self.root.after(0, self.enable_download_button_and_add); return
             except Exception as e: self.update_status(f"{progress_prefix} Download Error: {e}"); yt_dlp_success = False; continue
 
-            # --- Proceed only if download succeeded ---
-            if not yt_dlp_success or not initial_download_path or not unique_base_title: # Use unique_base_title here
+
+            # Proceed only if download succeeded
+            if not yt_dlp_success or not initial_download_path or not unique_base_title:
                 self.update_status(f"{progress_prefix} Skipping post-processing due to download issue.")
                 if initial_download_path and os.path.exists(initial_download_path):
                     try: os.remove(initial_download_path)
@@ -819,10 +873,8 @@ class MediaDownloaderApp:
             # --- Post-Download Processing ---
             current_file_path = initial_download_path
             processing_error = False
-            re_encoding_occurred = False # Track if any step forces re-encoding
+            re_encoding_occurred = False
 
-            # Update the intermediate base path now that we have the real unique title
-            # Use the unique_base_title + processing tags
             intermediate_output_base = f"{unique_base_title}{no_audio_tag}{ar_tag}{time_tag}"
             intermediate_output_path = os.path.join(path, f"{intermediate_output_base}{final_extension}")
             print(f"DEBUG: Intermediate Output Base planned: {intermediate_output_base}")
@@ -831,7 +883,6 @@ class MediaDownloaderApp:
             # --- Stage 1.5: Remove Audio (if TikTok Video-Only case) ---
             if needs_audio_removal_post_dl and not processing_error:
                  self.update_status(f"{progress_prefix} Removing audio track...")
-                 # Use unique base for the temp name here too
                  output_noaudio_path = os.path.join(path, f"{unique_base_title}_TEMP_NOAUDIO{final_extension}")
                  ffmpeg_an_command = [ ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "error",
                                        "-i", current_file_path, "-c:v", "copy", "-an", "-map", "0:v:0?", output_noaudio_path ]
@@ -847,50 +898,48 @@ class MediaDownloaderApp:
                      print(f"DEBUG: current_file_path is now '{current_file_path}'")
                  except subprocess.CalledProcessError as e:
                      print(f"Error during FFmpeg Audio Removal:\nStderr:\n{e.stderr}"); self.update_status(f"{progress_prefix} Error removing audio."); processing_error = True
+                     # *** CORRECTED CLEANUP ***
                      if os.path.exists(output_noaudio_path):
-                         try: os.remove(output_noaudio_path)
-                         except OSError: pass
+                         try:
+                             os.remove(output_noaudio_path)
+                             print(f"Cleaned up intermediate file: {output_noaudio_path}")
+                         except OSError as clean_e:
+                             print(f"Warning: Could not remove intermediate file '{output_noaudio_path}' during audio removal error cleanup: {clean_e}")
                  except Exception as e:
                      print(f"Unexpected error during FFmpeg audio removal: {e}"); self.update_status(f"{progress_prefix} Error removing audio."); processing_error = True
+                     # *** CORRECTED CLEANUP ***
                      if os.path.exists(output_noaudio_path):
-                         try: os.remove(output_noaudio_path)
-                         except OSError: pass
+                         try:
+                             os.remove(output_noaudio_path)
+                             print(f"Cleaned up intermediate file: {output_noaudio_path}")
+                         except OSError as clean_e:
+                             print(f"Warning: Could not remove intermediate file '{output_noaudio_path}' during audio removal error cleanup: {clean_e}")
 
 
             # --- Stage 2: Aspect Ratio Adjustment ---
             if is_adjusting_ar and not processing_error:
                  self.update_status(f"{progress_prefix} Adjusting Aspect Ratio to {aspect_ratio_selection}...")
                  width, height = get_video_dimensions(current_file_path)
+                 output_ar_path = os.path.join(path, f"{unique_base_title}_TEMP_AR{final_extension}") # Define path outside try/except
                  if width and height:
                      target_ar_val = parse_aspect_ratio(aspect_ratio_selection)
                      source_ar_val = width / height
                      tolerance = 0.01
                      ffmpeg_ar_command = None
-                     # Use unique base for temp name
-                     output_ar_path = os.path.join(path, f"{unique_base_title}_TEMP_AR{final_extension}")
                      needs_ar_processing = True
 
-                     if abs(source_ar_val - target_ar_val) < tolerance: self.update_status(f"{progress_prefix} Source AR matches target. Skipping."); needs_ar_processing = False
+                     if abs(source_ar_val - target_ar_val) < tolerance:
+                         self.update_status(f"{progress_prefix} Source AR matches target. Skipping."); needs_ar_processing = False
                      else:
                          common_opts = [ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "error", "-i", current_file_path]
                          filter_vf = ""
                          if source_ar_val > target_ar_val: # Crop
                              filter_vf = f"crop=w=ih*{target_ar_val:.4f}:h=ih,scale=trunc(iw/2)*2:trunc(ih/2)*2"
-                             print("AR Filter (Crop):", filter_vf)
                          else: # Pad
                              filter_vf = f"pad=w=ih*{target_ar_val:.4f}:h=ih:x=(ow-iw)/2:y=0:color=black,scale=trunc(iw/2)*2:trunc(ih/2)*2"
-                             print("AR Filter (Pad):", filter_vf)
-
                          ffmpeg_ar_command = common_opts + ["-vf", filter_vf]
-                         # Only copy audio if it wasn't specifically removed (TikTok case)
-                         if not needs_audio_removal_post_dl:
-                             ffmpeg_ar_command.extend(["-c:a", "copy"])
-                         else: # If audio was removed, explicitly state -an again maybe? Safe not to.
-                             pass
-
-                         # Always re-encode video for AR adjustment
+                         if not needs_audio_removal_post_dl: ffmpeg_ar_command.extend(["-c:a", "copy"])
                          ffmpeg_ar_command.extend(["-map", "0", "-preset", "fast", output_ar_path])
-
 
                      if ffmpeg_ar_command and needs_ar_processing:
                          try:
@@ -898,7 +947,7 @@ class MediaDownloaderApp:
                              ar_proc = subprocess.run(ffmpeg_ar_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
                              print(f"FFmpeg AR Output:\n{ar_proc.stderr}")
                              self.update_status(f"{progress_prefix} Aspect Ratio adjusted.")
-                             re_encoding_occurred = True # AR adjustment forces re-encoding
+                             re_encoding_occurred = True
                              try:
                                  print(f"DEBUG: Removing '{current_file_path}' after AR adjust."); os.remove(current_file_path)
                              except OSError as e: print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
@@ -906,14 +955,22 @@ class MediaDownloaderApp:
                              print(f"DEBUG: current_file_path is now '{current_file_path}'")
                          except subprocess.CalledProcessError as e:
                              print(f"Error during FFmpeg AR adjustment:\nStderr:\n{e.stderr}"); self.update_status(f"{progress_prefix} Error adjusting AR."); processing_error = True
+                             # *** CORRECTED CLEANUP ***
                              if os.path.exists(output_ar_path):
-                                 try: os.remove(output_ar_path)
-                                 except OSError: pass
+                                 try:
+                                     os.remove(output_ar_path)
+                                     print(f"Cleaned up intermediate file: {output_ar_path}")
+                                 except OSError as clean_e:
+                                      print(f"Warning: Could not remove intermediate file '{output_ar_path}' during AR error cleanup: {clean_e}")
                          except Exception as e:
                              print(f"Unexpected error during FFmpeg AR adjustment: {e}"); self.update_status(f"{progress_prefix} Error adjusting AR."); processing_error = True
+                             # *** CORRECTED CLEANUP ***
                              if os.path.exists(output_ar_path):
-                                 try: os.remove(output_ar_path)
-                                 except OSError: pass
+                                 try:
+                                     os.remove(output_ar_path)
+                                     print(f"Cleaned up intermediate file: {output_ar_path}")
+                                 except OSError as clean_e:
+                                     print(f"Warning: Could not remove intermediate file '{output_ar_path}' during AR error cleanup: {clean_e}")
                  else:
                      self.update_status(f"{progress_prefix} Warning: Could not get dimensions. Skipping AR adjustment.")
 
@@ -922,23 +979,18 @@ class MediaDownloaderApp:
             if is_cutting and not processing_error:
                  self.update_status(f"{progress_prefix} Cutting time range...")
                  start_sec, end_sec = time_range
-                 # Use unique base for temp name
-                 output_cut_path = os.path.join(path, f"{unique_base_title}_TEMP_CUT{final_extension}")
-
+                 output_cut_path = os.path.join(path, f"{unique_base_title}_TEMP_CUT{final_extension}") # Define path outside try/except
                  ffmpeg_cut_command = [
-                       ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "warning", # Show warnings for cut
-                       # Input seeking is faster but can be less accurate for some formats/cuts
-                       #"-ss", str(start_sec),   # Input seeking
+                       ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "warning",
                        "-i", current_file_path,
-                       "-ss", str(start_sec),   # Output seeking (more accurate, potentially slower)
+                       "-ss", str(start_sec),
                        "-to", str(end_sec),
                        "-map", "0",
                        "-avoid_negative_ts", "make_zero",
                        "-preset", "fast",
-                       *(["-c", "copy"] if not re_encoding_occurred else []), # Copy codecs only if no prior re-encode
+                       *(["-c", "copy"] if not re_encoding_occurred else []),
                        output_cut_path
                  ]
-
                  try:
                      print(f"Running FFmpeg Cut: {' '.join(ffmpeg_cut_command)}")
                      cut_proc = subprocess.run(ffmpeg_cut_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
@@ -952,25 +1004,35 @@ class MediaDownloaderApp:
                      print(f"DEBUG: current_file_path is now '{current_file_path}'")
                  except subprocess.CalledProcessError as e:
                      print(f"Error during FFmpeg time cutting:\nStderr:\n{e.stderr}"); self.update_status(f"{progress_prefix} Error cutting time."); processing_error = True
+                     # *** CORRECTED CLEANUP ***
                      if os.path.exists(output_cut_path):
-                         try: os.remove(output_cut_path)
-                         except OSError: pass
+                         try:
+                             os.remove(output_cut_path)
+                             print(f"Cleaned up intermediate file: {output_cut_path}")
+                         except OSError as clean_e:
+                             print(f"Warning: Could not remove intermediate file '{output_cut_path}' during cut error cleanup: {clean_e}")
                  except Exception as e:
                      print(f"Unexpected error during FFmpeg time cutting: {e}"); self.update_status(f"{progress_prefix} Error cutting time."); processing_error = True
+                     # *** CORRECTED CLEANUP ***
                      if os.path.exists(output_cut_path):
-                         try: os.remove(output_cut_path)
-                         except OSError: pass
+                          try:
+                             os.remove(output_cut_path)
+                             print(f"Cleaned up intermediate file: {output_cut_path}")
+                          except OSError as clean_e:
+                             print(f"Warning: Could not remove intermediate file '{output_cut_path}' during cut error cleanup: {clean_e}")
 
 
-            # --- *** Stage 4: Chopping into Intervals *** ---
+            # --- Stage 4: Chopping into Intervals ---
             if is_chopping and not processing_error:
                 self.update_status(f"{progress_prefix} Preparing to chop into {chop_interval_seconds}s intervals...")
                 source_duration = get_video_duration(current_file_path)
 
                 if source_duration is None:
                     self.update_status(f"{progress_prefix} Error: Could not get duration for chopping. Skipping chop.")
+                    processing_error = True # Mark as error for this URL if duration fails
                 elif source_duration <= 0:
                      self.update_status(f"{progress_prefix} Error: Source duration is zero or negative. Skipping chop.")
+                     processing_error = True # Mark as error
                 else:
                     num_segments = math.ceil(source_duration / chop_interval_seconds)
                     print(f"DEBUG: Chopping '{current_file_path}' (Duration: {source_duration:.2f}s) into {num_segments} segments of ~{chop_interval_seconds}s")
@@ -980,25 +1042,22 @@ class MediaDownloaderApp:
                     for i in range(num_segments):
                         segment_start_time = i * chop_interval_seconds
                         segment_duration = min(chop_interval_seconds, source_duration - segment_start_time)
-                        if segment_duration < 0.01: break # Avoid tiny segments
+                        if segment_duration < 0.01: break
 
                         processed_segments += 1
                         segment_num = i + 1
-                        # Use the already calculated intermediate_output_base which includes unique id and tags
                         segment_output_path = os.path.join(path, f"{intermediate_output_base}_part_{segment_num}{final_extension}")
-
                         self.update_status(f"{progress_prefix} Chopping segment {segment_num}/{num_segments}...")
 
                         ffmpeg_chop_command = [
                             ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "warning",
-                            # Use accurate input seeking for chopping? Test needed. Output seeking safer.
                             "-i", current_file_path,
                             "-ss", str(segment_start_time),
                             "-t", str(segment_duration),
                             "-map", "0",
                             "-avoid_negative_ts", "make_zero",
                             "-preset", "fast",
-                            *(["-c", "copy"] if not re_encoding_occurred else []), # Copy only if no prior re-encode
+                            *(["-c", "copy"] if not re_encoding_occurred else []),
                             segment_output_path
                         ]
 
@@ -1007,31 +1066,35 @@ class MediaDownloaderApp:
                             chop_proc = subprocess.run(ffmpeg_chop_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
                             if chop_proc.stderr and chop_proc.stderr.strip(): print(f"FFmpeg Chop Output (Segment {segment_num}):\n{chop_proc.stderr}")
                         except subprocess.CalledProcessError as e:
-                            print(f"Error chopping segment {segment_num} for '{os.path.basename(current_file_path)}':")
-                            print(f"Command: {' '.join(e.cmd)}")
-                            print(f"Stderr:\n{e.stderr}")
-                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}.")
-                            segment_success = False
+                            print(f"Error chopping segment {segment_num} for '{os.path.basename(current_file_path)}':"); print(f"Command: {' '.join(e.cmd)}"); print(f"Stderr:\n{e.stderr}")
+                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}."); segment_success = False
+                            # *** CORRECTED CLEANUP ***
                             if os.path.exists(segment_output_path):
-                                try: os.remove(segment_output_path)
-                                except OSError: pass
-                            break
+                                try:
+                                    os.remove(segment_output_path)
+                                    print(f"Cleaned up failed segment file: {segment_output_path}")
+                                except OSError as clean_e:
+                                    print(f"Warning: Could not remove failed segment file '{segment_output_path}' during chop error cleanup: {clean_e}")
+                            break # Exit loop on error
                         except Exception as e:
                             print(f"Unexpected error chopping segment {segment_num}: {e}")
-                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}.")
-                            segment_success = False
+                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}."); segment_success = False
+                            # *** CORRECTED CLEANUP ***
                             if os.path.exists(segment_output_path):
-                                try: os.remove(segment_output_path)
-                                except OSError: pass
-                            break
+                                try:
+                                    os.remove(segment_output_path)
+                                    print(f"Cleaned up failed segment file: {segment_output_path}")
+                                except OSError as clean_e:
+                                    print(f"Warning: Could not remove failed segment file '{segment_output_path}' during chop error cleanup: {clean_e}")
+                            break # Exit loop on error
 
                     # --- After Chopping Loop ---
                     if segment_success and processed_segments > 0:
                         self.update_status(f"{progress_prefix} Successfully chopped into {processed_segments} segments.")
                         try:
-                            print(f"DEBUG: Removing '{current_file_path}' after successful chopping.")
-                            os.remove(current_file_path)
-                            current_file_path = None # Indicate the original is gone
+                             print(f"DEBUG: Removing '{current_file_path}' after successful chopping.")
+                             os.remove(current_file_path)
+                             current_file_path = None # Indicate the original is gone
                         except OSError as e: print(f"Warning: Failed to remove source file '{current_file_path}' after chopping: {e}")
                         processing_error = False # Ensure it's false if chopping succeeded
                         self.root.after(0, self.remove_url_from_gui_and_internal, url)
@@ -1039,67 +1102,62 @@ class MediaDownloaderApp:
                     else:
                         if processed_segments == 0 and segment_success:
                              self.update_status(f"{progress_prefix} No segments generated (source too short?). Keeping original.")
-                        else: # Actual error occurred
+                             # Keep processing_error as it was (could have been False if source was short)
+                        else: # Actual error occurred during chopping
                             self.update_status(f"{progress_prefix} Chopping failed. Keeping intermediate file.")
                             processing_error = True # Mark as error
 
 
-            # --- Stage 5: Finalization (Only if NOT chopping, or if chopping failed) ---
+            # --- Stage 5: Finalization (Only if NOT chopping, or if chopping failed/skipped) ---
             if not processing_error and current_file_path:
-                # Rename the last intermediate file to its final intended name
                 if current_file_path != intermediate_output_path:
                     try:
                         print(f"Finalizing: Renaming '{current_file_path}' to '{intermediate_output_path}'")
                         os.makedirs(os.path.dirname(intermediate_output_path), exist_ok=True)
-                        # Check if target exists - should not happen with unique names, but maybe if run twice quickly?
-                        if os.path.exists(intermediate_output_path):
-                            print(f"Warning: Final target path already exists, overwriting: {intermediate_output_path}")
+                        if os.path.exists(intermediate_output_path): print(f"Warning: Final target path already exists, overwriting: {intermediate_output_path}")
                         os.rename(current_file_path, intermediate_output_path)
                         self.update_status(f"{progress_prefix} Success: {os.path.basename(intermediate_output_path)}")
                         self.root.after(0, self.remove_url_from_gui_and_internal, url)
                     except OSError as e:
-                        print(f"Error renaming final file: {e}")
-                        self.update_status(f"{progress_prefix} Error finalizing file (rename failed).")
-                        processing_error = True
-                else:
-                    # This can happen if the *initial* temp file name somehow matched the final intended name
-                    # (less likely now with generic temp names) OR if chopping failed and we kept the intermediate file.
+                        print(f"Error renaming final file: {e}"); self.update_status(f"{progress_prefix} Error finalizing file (rename failed)."); processing_error = True
+                else: # current_file_path is already the intended final path
                     if os.path.exists(intermediate_output_path):
                          self.update_status(f"{progress_prefix} Success: {os.path.basename(intermediate_output_path)}")
                          self.root.after(0, self.remove_url_from_gui_and_internal, url)
                     else:
-                         # This case *shouldn't* happen if current_file_path == intermediate_output_path
-                         print(f"Error: Final file path '{intermediate_output_path}' does not exist, but was expected.")
-                         self.update_status(f"{progress_prefix} Error finalizing file (missing).")
-                         processing_error = True
+                         print(f"Error: Final file path '{intermediate_output_path}' does not exist, but was expected."); self.update_status(f"{progress_prefix} Error finalizing file (missing)."); processing_error = True
 
 
             # --- Cleanup on Error during post-processing ---
             if processing_error and current_file_path and os.path.exists(current_file_path):
-                self.update_status(f"{progress_prefix} Failed during post-processing. Check console.")
+                self.update_status(f"{progress_prefix} Failed processing '{url[:70]}...'. Check console.")
                 print(f"Keeping intermediate file due to error: {current_file_path}")
-                # Consider renaming the failed intermediate file to include an _ERROR tag
                 try:
                     error_filename = os.path.join(path, f"{unique_base_title}_PROCESSING_ERROR{final_extension}")
                     print(f"Attempting to rename failed intermediate to: {error_filename}")
+                    # Avoid overwriting an existing error file from a previous run if possible
+                    if os.path.exists(error_filename):
+                        error_filename = os.path.join(path, f"{unique_base_title}_PROCESSING_ERROR_{random.randint(100,999)}{final_extension}")
                     os.rename(current_file_path, error_filename)
                 except OSError as rename_err:
                     print(f"Could not rename errored intermediate file: {rename_err}")
+            elif processing_error: # Error occurred, but current_file_path is None (e.g., chop duration failed)
+                self.update_status(f"{progress_prefix} Failed processing '{url[:70]}...'. No intermediate file to keep.")
 
 
         # --- Loop finished ---
-        self.root.after(0, self.enable_download_button)
+        self.root.after(0, self.enable_download_button_and_add)
         remaining_items = self.queue_listbox.get(0, tk.END)
         if not remaining_items:
             self.update_status("Download queue finished. All items processed.")
         else:
              failed_count = len(remaining_items)
-             total_processed = initial_queue_size - failed_count
-             self.update_status(f"Queue finished. {total_processed} item(s) processed, {failed_count} failed or skipped.")
+             successful_count = initial_queue_size - failed_count # Approximate success count
+             self.update_status(f"Queue finished. {successful_count} item(s) likely processed, {failed_count} failed or skipped.")
 
 
+    # GUI Update Helper
     def remove_url_from_gui_and_internal(self, url):
-        # (No changes needed) - only removes from GUI listbox
         try:
             if self.root.winfo_exists():
                 items = list(self.queue_listbox.get(0, tk.END))
@@ -1110,14 +1168,17 @@ class MediaDownloaderApp:
         except Exception as e: print(f"Error removing URL from GUI: {e}")
 
 
-    def enable_download_button(self):
-        # (No changes needed)
+    # Combined Button Enabling
+    def enable_download_button_and_add(self):
+        """Enables both Download and Add buttons."""
         try:
-            if self.root.winfo_exists(): self.download_button.config(state=tk.NORMAL)
+            if self.root.winfo_exists():
+                self.download_button.config(state=tk.NORMAL)
+                if not self.is_adding_to_queue: # Only enable if not currently adding
+                    self.add_button.config(state=tk.NORMAL)
         except tk.TclError: pass
 
-    # --- Modified on_closing to save new settings ---
-    # (No changes needed here)
+    # Modified on_closing
     def on_closing(self):
         """Called when the user tries to close the window."""
         current_path = self.download_path.get()
@@ -1125,9 +1186,8 @@ class MediaDownloaderApp:
             self.settings["download_path"] = current_path
         else:
              print(f"Warning: Download path invalid on close. Saving script directory.")
-             self.settings["download_path"] = SCRIPT_DIR # Fallback to script dir
+             self.settings["download_path"] = SCRIPT_DIR
 
-        # Save all settings
         self.settings["video_only"] = self.video_only_var.get()
         self.settings["enable_cut"] = self.enable_cut_var.get()
         self.settings["start_time"] = self.start_time_var.get()
@@ -1143,6 +1203,19 @@ class MediaDownloaderApp:
 
 # --- Main Execution ---
 if __name__ == "__main__":
+    # Check for yt-dlp on startup
+    try:
+        cmd_where = "where" if os.name == 'nt' else "which"
+        subprocess.run([cmd_where, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name == 'nt'), creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        print("INFO: Found yt-dlp.")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("ERROR: yt-dlp command not found in system PATH.")
+        root_temp = tk.Tk()
+        root_temp.withdraw()
+        messagebox.showerror("Missing Dependency", "yt-dlp was not found in your system's PATH.\n\nPlease install yt-dlp and ensure it's accessible from the command line.\n\nThe application will close now.")
+        root_temp.destroy()
+        sys.exit(1)
+
     root = tk.Tk()
     app = MediaDownloaderApp(root)
     root.mainloop()
