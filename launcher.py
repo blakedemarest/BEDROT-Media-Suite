@@ -21,6 +21,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # Directory of launcher.
 SCRIPT_1_PATH = os.path.join(SCRIPT_DIR, 'src', 'media_download_app.py')
 SCRIPT_2_PATH = os.path.join(SCRIPT_DIR, 'src', 'snippet_remixer.py')
 SCRIPT_3_PATH = os.path.join(SCRIPT_DIR, 'src', 'random_slideshow.py')
+SCRIPT_4_PATH = os.path.join(SCRIPT_DIR, 'src', 'reel_tracker_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -328,7 +329,7 @@ run_button2 = ttk.Button(
 )
 run_button2.pack(pady=20)
 
-# --- Tab 3: Random Slideshow ---  <-- NEW TAB ADDED HERE ---
+# --- Tab 3: Random Slideshow ---
 tab3 = ttk.Frame(notebook, padding="10")
 notebook.add(tab3, text='Random Slideshow') # Set Tab Title
 label3 = ttk.Label(tab3, text="Run the Random Slideshow Generator script.")
@@ -342,7 +343,22 @@ run_button3 = ttk.Button(
     command=lambda: run_script(SCRIPT_3_PATH, status_label3, log_area) # Pass correct path and status label
 )
 run_button3.pack(pady=20)
-# --- END OF NEW TAB ---
+
+# --- Tab 4: Reel Tracker ---
+tab4 = ttk.Frame(notebook, padding="10")
+notebook.add(tab4, text='Reel Tracker') # Set Tab Title
+label4 = ttk.Label(tab4, text="Run the Reel Tracker application for CSV-based reel management.")
+label4.pack(pady=10)
+status_label4 = ttk.Label(tab4, text="Status: Idle", width=50, anchor="w") # Create unique status label
+status_label4.pack(pady=5)
+# Button command uses SCRIPT_4_PATH and status_label4
+run_button4 = ttk.Button(
+    tab4,
+    text="Run Reel Tracker",
+    command=lambda: run_script(SCRIPT_4_PATH, status_label4, log_area) # Pass correct path and status label
+)
+run_button4.pack(pady=20)
+# --- END OF REEL TRACKER TAB ---
 
 
 notebook.pack(expand=True, fill='both') # Pack notebook after adding all tabs

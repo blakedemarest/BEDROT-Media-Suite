@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./venv/Scripts/python.exe -m pip install pandas)",
+      "Bash(python:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(rg:*)"
+    ],
+    "deny": []
+  }
+}

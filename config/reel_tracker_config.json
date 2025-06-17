@@ -1,0 +1,83 @@
+{
+    "dropdown_values": {
+        "persona": [
+            "",
+            "Fitness Influencer",
+            "Tech Reviewer",
+            "Lifestyle Blogger",
+            "Food Creator",
+            "Travel Vlogger",
+            "Educational",
+            "Entertainment",
+            "Business",
+            "Music Artist",
+            "Fashion",
+            "Gaming",
+            "Comedy"
+        ],
+        "release": [
+            "",
+            "RENEGADE PIPELINE",
+            "THE STATE OF THE WORLD",
+            "THE SCALE"
+        ],
+        "reel_type": [
+            "",
+            "Tutorial",
+            "Product Review",
+            "Behind the Scenes",
+            "Q&A",
+            "Transformation",
+            "Day in Life",
+            "Tips & Tricks",
+            "Unboxing",
+            "Comparison",
+            "Story Time",
+            "Challenge",
+            "Trend",
+            "Educational"
+        ]
+    },
+    "last_csv_path": "",
+    "window_settings": {
+        "geometry": "1600x800",
+        "column_widths": {
+            "Reel ID": 140,
+            "Persona": 130,
+            "Release": 100,
+            "Reel Type": 130,
+            "Clip Filename": 180,
+            "Caption": 220,
+            "FilePath": 350
+        }
+    },
+    "app_settings": {
+        "auto_load_last_csv": true,
+        "auto_save_config": true,
+        "show_file_stats": true
+    },
+    "default_metadata": {
+        "persona": "Test Creator",
+        "release": "RENEGADE PIPELINE",
+        "reel_type": "Tutorial",
+        "caption_template": "Check out {filename}! #content #creator"
+    },
+    "version_history": [
+        {
+            "timestamp": "2025-06-17 06:02:30",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "",
+                "release": "Draft",
+                "reel_type": "",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "Test Creator",
+                "release": "Draft",
+                "reel_type": "Tutorial",
+                "caption_template": "Check out {filename}! #content #creator"
+            }
+        }
+    ]
+}
