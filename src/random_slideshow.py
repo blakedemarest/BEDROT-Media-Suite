@@ -222,7 +222,7 @@ class RandomSlideshowWorker(QThread):
                 # Use logger=None to reduce console output noise
                 # Use threads=os.cpu_count() or a fixed number like 4 for potential speedup
                 num_threads = os.cpu_count() if os.cpu_count() else 4 # Use available cores or default to 4
-                final_clip.write_videofile(output_path, fps=24, logger=None, threads=num_threads)
+                final_clip.write_videofile(output_path, fps=30, logger=None, threads=num_threads)
 
                 # Close clips to release resources (MoviePy recommendation)
                 final_clip.close()

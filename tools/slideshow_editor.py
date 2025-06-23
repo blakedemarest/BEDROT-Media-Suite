@@ -114,7 +114,7 @@ class SlideshowWorker(QThread):
             output_path = os.path.join(self.output_folder, output_filename)
 
             # Write the video
-            final_clip.write_videofile(output_path, fps=24, logger=None)
+            final_clip.write_videofile(output_path, fps=30, logger=None)
             self.progress_updated.emit(100)
 
             self.completed.emit(output_path)
