@@ -11,18 +11,37 @@ import datetime  # For timestamp
 import random    # For random string
 import string    # For random string characters
 
-# --- Define Settings File Path ---
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config')
-SETTINGS_FILENAME = "yt_downloader_gui_settings.json"
-SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
-if not os.path.exists(CONFIG_DIR): # Create config dir if it doesn't exist
-    try:
-        os.makedirs(CONFIG_DIR)
-        print(f"INFO: Created config directory: {CONFIG_DIR}")
-    except OSError as e:
-        print(f"ERROR: Could not create config directory: {CONFIG_DIR}. Error: {e}")
-        SETTINGS_FILE_PATH = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME) # Fallback
+# --- Import centralized configuration system ---
+try:
+    from core import get_config_manager, load_app_config, save_app_config
+    from core.env_loader import get_env_var
+    from core.path_utils import resolve_config_path, resolve_output_path
+    
+    # Load environment and configuration
+    config_manager = get_config_manager()
+    APP_CONFIG = load_app_config('media_download', 'yt_downloader_gui_settings.json')
+    SETTINGS_FILE_PATH = str(resolve_config_path('yt_downloader_gui_settings.json'))
+    
+except ImportError as e:
+    print(f"Warning: Could not import core configuration system: {e}")
+    print("Falling back to hardcoded paths")
+    
+    # --- Fallback: Define Settings File Path ---
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config')
+    SETTINGS_FILENAME = "yt_downloader_gui_settings.json"
+    SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
+    
+    if not os.path.exists(CONFIG_DIR): # Create config dir if it doesn't exist
+        try:
+            os.makedirs(CONFIG_DIR)
+            print(f"INFO: Created config directory: {CONFIG_DIR}")
+        except OSError as e:
+            print(f"ERROR: Could not create config directory: {CONFIG_DIR}. Error: {e}")
+            SETTINGS_FILE_PATH = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME) # Fallback
+    
+    config_manager = None
+    APP_CONFIG = {}
 
 
 # --- Common Aspect Ratios ---
@@ -65,13 +84,23 @@ def parse_aspect_ratio(ratio_str):
 # --- Settings Load/Save Functions ---
 def load_settings():
     """Loads settings from the JSON file."""
+    # Get default download path from centralized config or fallback
+    if config_manager:
+        try:
+            default_download_path = str(resolve_output_path())
+        except Exception as e:
+            print(f"Warning: Could not resolve default output path: {e}")
+            default_download_path = SCRIPT_DIR
+    else:
+        default_download_path = SCRIPT_DIR
+    
     default_settings = {
-        "download_path": SCRIPT_DIR,
+        "download_path": default_download_path,
         "video_only": False,
         "enable_cut": False,
         "start_time": "",
         "end_time": "",
-        "aspect_ratio": "Original",
+        "aspect_ratio": get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', 'Original') if config_manager else "Original",
         "enable_chop": False,
         "chop_interval": "60"
     }

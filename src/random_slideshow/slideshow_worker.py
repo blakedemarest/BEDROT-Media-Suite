@@ -47,8 +47,15 @@ class RandomSlideshowWorker(QThread):
             self.error.emit(str(e))
             return
 
+        # Initialize clips list outside try block to ensure it exists for cleanup
+        clips = []
+        final_clip = None
+        
         while self._is_running:
             try:
+                # Add small delay between generations to prevent CPU overload
+                if self.generation_count > 0:
+                    self.msleep(100)  # 100ms delay between videos
                 # 1. Randomly select total slideshow length (12.0 - 17.8 seconds)
                 total_slideshow_length = random.uniform(12.0, 17.8)
                 # 2. Randomly select duration per image (0.05 - 0.45 seconds)
@@ -79,7 +86,7 @@ class RandomSlideshowWorker(QThread):
                     chosen_images = [random.choice(image_paths) for _ in range(num_images)]
 
                 # 6. Build list of moviepy ImageClips based on aspect ratio mode
-                clips = []
+                clips = []  # Reset clips list for this iteration
                 self.status_update.emit(f"Processing {len(chosen_images)} images for {self.aspect_ratio} video...")
                 processed_count = 0
                 
@@ -98,10 +105,10 @@ class RandomSlideshowWorker(QThread):
                                 img_path, target_width, target_height
                             )
                             final_array = np.array(final_pil)  # Convert PIL to NumPy array
-                            clip = ImageClip(final_array).set_duration(duration_per_image)
+                            clip = ImageClip(final_array).set_duration(duration_per_image).set_fps(30)
                         else:  # processing_mode == "letterbox" (for 16:9)
                             # Use the letterbox/pillarbox method
-                            clip = ImageClip(img_path).set_duration(duration_per_image).on_color(
+                            clip = ImageClip(img_path).set_duration(duration_per_image).set_fps(30).on_color(
                                 size=(target_width, target_height),
                                 color=(0, 0, 0),  # Black background
                                 col_opacity=1.0,
@@ -125,6 +132,16 @@ class RandomSlideshowWorker(QThread):
                 self.status_update.emit("Concatenating clips...")
                 final_clip = concatenate_videoclips(clips, method="compose")
                 actual_duration = final_clip.duration
+                
+                # Check if we should stop before writing
+                if not self._is_running:
+                    self.status_update.emit("Stopping...")
+                    # Clean up
+                    if final_clip:
+                        final_clip.close()
+                    for clip in clips:
+                        clip.close()
+                    return
 
                 # 8. Generate unique filename
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -140,10 +157,19 @@ class RandomSlideshowWorker(QThread):
                 final_clip.write_videofile(output_path, fps=30, logger=None, threads=num_threads)
 
                 # Close clips to release resources (MoviePy recommendation)
-                final_clip.close()
+                if final_clip:
+                    final_clip.close()
+                    final_clip = None
                 for clip in clips:
-                    clip.close()
+                    try:
+                        clip.close()
+                    except:
+                        pass  # Ignore errors during cleanup
                 clips = []  # Clear the list for the next iteration
+                
+                # Force garbage collection to free memory
+                import gc
+                gc.collect()
 
                 # Update generation count and status
                 self.generation_count += 1
@@ -158,15 +184,42 @@ class RandomSlideshowWorker(QThread):
                 # Emit error and stop the current worker run
                 self.error.emit(f"An error occurred during generation: {e}")
                 # Clean up potentially open clips from the failed iteration
-                if 'final_clip' in locals() and final_clip:
-                    final_clip.close()
-                for clip in clips:
-                    clip.close()
+                try:
+                    if final_clip:
+                        final_clip.close()
+                        final_clip = None
+                except:
+                    pass
+                    
+                try:
+                    for clip in clips:
+                        clip.close()
+                except:
+                    pass
+                    
+                clips = []  # Reset clips list
                 self._is_running = False  # Stop worker on major error
+                
+                # Force garbage collection
+                import gc
+                gc.collect()
                 return  # Exit run method
 
         # This message is shown when the loop exits gracefully (stop called)
         self.status_update.emit("Worker stopped.")
+        
+        # Final cleanup
+        try:
+            if final_clip:
+                final_clip.close()
+            for clip in clips:
+                clip.close()
+        except:
+            pass
+            
+        # Force final garbage collection
+        import gc
+        gc.collect()
 
     def stop(self):
         """Signals the worker thread to stop looping."""

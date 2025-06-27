@@ -98,32 +98,15 @@ class FileOrganizer:
     
     def randomize_timestamp(self, target_filepath, base_time=None):
         """
-        Apply a randomized timestamp to create dynamic presentation order.
+        Timestamp function disabled - no longer randomizes file timestamps.
         
         Args:
             target_filepath: Path to the file to modify
             base_time: Base timestamp (defaults to current time)
         """
-        try:
-            if base_time is None:
-                base_time = time.time()
-            
-            # Create random offset: ±30 days in seconds
-            max_offset = 30 * 24 * 60 * 60  # 30 days in seconds
-            random_offset = random.uniform(-max_offset, max_offset)
-            
-            # Apply randomized timestamp
-            new_timestamp = base_time + random_offset
-            
-            # Set both access and modification times
-            os.utime(target_filepath, (new_timestamp, new_timestamp))
-            
-            safe_print(f"[FILE_ORG] Applied randomized timestamp to: {os.path.basename(target_filepath)}")
-            return True
-            
-        except Exception as e:
-            safe_print(f"[FILE_ORG] Warning: Could not randomize timestamp for {target_filepath}: {e}")
-            return False
+        # Timestamp randomization has been disabled
+        safe_print(f"[FILE_ORG] Timestamp randomization disabled for: {os.path.basename(target_filepath)}")
+        return True
     
     def check_duplicate_exists(self, target_filepath, persona, release, reel_id):
         """
@@ -324,13 +307,14 @@ class FileOrganizer:
             safe_print(f"[FILE_ORG] {error_msg}")
             return False, error_msg, None
     
-    def organize_batch(self, reel_data_list, progress_callback=None):
+    def organize_batch(self, reel_data_list, progress_callback=None, csv_update_callback=None):
         """
         Organize multiple files in batch.
         
         Args:
             reel_data_list: List of reel data lists
             progress_callback: Optional callback function for progress updates
+            csv_update_callback: Optional callback for CSV updates after successful organization
             
         Returns:
             dict: Results summary with success/failure counts and details
@@ -369,6 +353,11 @@ class FileOrganizer:
                             "new_path": filepath,
                             "message": message
                         })
+                        
+                        # Trigger CSV update callback if provided
+                        if csv_update_callback:
+                            new_filename = os.path.basename(filepath)
+                            csv_update_callback(reel_data[0], filepath, new_filename)
                     elif result == "skipped":  # Skipped due to duplicate
                         skipped.append({
                             "reel_id": reel_data[0],
@@ -468,7 +457,7 @@ class FileOrganizer:
                     elif conflict_type == "pattern_match":
                         status_message = f"Similar file exists: {os.path.basename(existing_path)}"
                     else:
-                        status_message = "Duplicate detected"
+                        status_message = "Duplicate detected—this file will be skipped."
                 else:
                     status = "ready"
                     status_message = "Ready to organize"

@@ -15,13 +15,49 @@ import subprocess
 import platform
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QRadioButton,
-    QLabel, QPushButton, QLineEdit, QFileDialog, QMessageBox
+    QLabel, QPushButton, QLineEdit, QFileDialog, QMessageBox,
+    QTabWidget
 )
 from PyQt5.QtCore import Qt
 
-from config_manager import ConfigManager
-from slideshow_worker import RandomSlideshowWorker
-from image_processor import ImageProcessor
+# Import helper ensures paths are set correctly
+try:
+    from _import_helper import setup_imports
+    setup_imports()
+except ImportError:
+    pass
+
+# Use relative imports within the module with error handling
+import_errors = []
+
+try:
+    from config_manager import ConfigManager
+except ImportError as e:
+    import_errors.append(f"ConfigManager: {e}")
+    ConfigManager = None
+
+try:
+    from slideshow_worker import RandomSlideshowWorker
+except ImportError as e:
+    import_errors.append(f"RandomSlideshowWorker: {e}")
+    RandomSlideshowWorker = None
+
+try:
+    from image_processor import ImageProcessor
+except ImportError as e:
+    import_errors.append(f"ImageProcessor: {e}")
+    ImageProcessor = None
+
+try:
+    from batch_manager_widget import BatchManagerWidget
+except ImportError as e:
+    import_errors.append(f"BatchManagerWidget: {e}")
+    BatchManagerWidget = None
+
+if import_errors:
+    print("Import errors detected:")
+    for error in import_errors:
+        print(f"  - {error}")
 
 
 class RandomSlideshowEditor(QWidget):
@@ -32,24 +68,130 @@ class RandomSlideshowEditor(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Random Slideshow Generator")
-        self.resize(550, 400)  # Slightly larger for the new option
+        self.resize(700, 500)  # Larger for tab widget
         
-        # Initialize configuration manager
-        self.config_manager = ConfigManager()
-        self.total_generations = 0
-        self.worker_thread = None
+        # Flag to track initialization errors
+        self.initialization_error = None
+        
+        # Check for critical imports
+        if import_errors and ConfigManager is None:
+            self.initialization_error = "Critical modules could not be imported. Please install dependencies."
+            self.setup_error_ui()
+            return
+        
+        try:
+            # Initialize configuration manager
+            self.config_manager = ConfigManager()
+            self.total_generations = 0
+            self.worker_thread = None
 
-        # Load saved preferences or defaults
-        default_image_folder = self.config_manager.get_image_folder()
-        default_output_folder = self.config_manager.get_output_folder()
-        # Ensure default output exists
-        os.makedirs(default_output_folder, exist_ok=True)
-        default_aspect_ratio = self.config_manager.get_aspect_ratio()
+            # Load saved preferences or defaults
+            default_image_folder = self.config_manager.get_image_folder()
+            default_output_folder = self.config_manager.get_output_folder()
+            # Ensure default output exists
+            os.makedirs(default_output_folder, exist_ok=True)
+            default_aspect_ratio = self.config_manager.get_aspect_ratio()
 
-        self.setup_ui(default_image_folder, default_output_folder, default_aspect_ratio)
+            # Setup main UI with tabs
+            self.setup_main_ui(default_image_folder, default_output_folder, default_aspect_ratio)
+            
+        except Exception as e:
+            print(f"Error during RandomSlideshowEditor initialization: {e}")
+            import traceback
+            traceback.print_exc()
+            self.initialization_error = str(e)
+            self.setup_error_ui()
 
-    def setup_ui(self, default_image_folder, default_output_folder, default_aspect_ratio):
-        """Setup the user interface components."""
+    def setup_main_ui(self, default_image_folder, default_output_folder, default_aspect_ratio):
+        """Setup the main UI with tab widget."""
+        main_layout = QVBoxLayout()
+        
+        try:
+            # Create tab widget
+            self.tab_widget = QTabWidget()
+            
+            # Create single generation tab
+            self.single_gen_widget = QWidget()
+            self.setup_single_generation_tab(self.single_gen_widget, default_image_folder, 
+                                           default_output_folder, default_aspect_ratio)
+            self.tab_widget.addTab(self.single_gen_widget, "Single Generation")
+            
+            # Create batch processing tab with error handling
+            try:
+                self.batch_widget = BatchManagerWidget(self.config_manager)
+                self.tab_widget.addTab(self.batch_widget, "Batch Processing")
+            except Exception as e:
+                print(f"Error creating batch processing tab: {e}")
+                import traceback
+                traceback.print_exc()
+                # Create error tab instead
+                error_widget = QWidget()
+                error_layout = QVBoxLayout()
+                error_label = QLabel(f"<h3>Batch Processing Error</h3>\n<p>Failed to initialize batch processing: {e}</p>")
+                error_label.setWordWrap(True)
+                error_layout.addWidget(error_label)
+                error_widget.setLayout(error_layout)
+                self.tab_widget.addTab(error_widget, "Batch Processing (Error)")
+            
+            main_layout.addWidget(self.tab_widget)
+            self.setLayout(main_layout)
+            
+        except Exception as e:
+            print(f"Critical error setting up main UI: {e}")
+            import traceback
+            traceback.print_exc()
+            # Create minimal error UI
+            error_label = QLabel(f"<h2>Initialization Error</h2>\n<p>{e}</p>\n<p>Please check the console for details.</p>")
+            error_label.setWordWrap(True)
+            error_label.setAlignment(Qt.AlignCenter)
+            main_layout.addWidget(error_label)
+            self.setLayout(main_layout)
+    
+    def setup_error_ui(self):
+        """Setup an error UI when initialization fails."""
+        layout = QVBoxLayout()
+        
+        # Error message
+        error_label = QLabel(f"<h2>Random Slideshow Generator - Initialization Error</h2>")
+        error_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(error_label)
+        
+        # Detailed error
+        details_label = QLabel(f"<p><b>Error:</b> {self.initialization_error}</p>")
+        details_label.setWordWrap(True)
+        layout.addWidget(details_label)
+        
+        # Import errors if any
+        if import_errors:
+            import_label = QLabel("<p><b>Import Errors:</b></p>")
+            layout.addWidget(import_label)
+            for error in import_errors:
+                error_item = QLabel(f"  • {error}")
+                error_item.setWordWrap(True)
+                layout.addWidget(error_item)
+        
+        # Instructions
+        instructions = QLabel(
+            "<p><b>To fix this issue:</b></p>"
+            "<p>1. Make sure all dependencies are installed:</p>"
+            "<pre>   pip install -r requirements.txt</pre>"
+            "<p>2. Check that FFmpeg is installed and in your PATH</p>"
+            "<p>3. Restart the application</p>"
+        )
+        instructions.setWordWrap(True)
+        layout.addWidget(instructions)
+        
+        # Close button
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.close)
+        layout.addWidget(close_btn)
+        
+        layout.addStretch()
+        self.setLayout(layout)
+    
+    def setup_single_generation_tab(self, parent_widget, default_image_folder, 
+                                   default_output_folder, default_aspect_ratio):
+        """Setup the single generation tab interface."""
         # Layout Setup
         main_layout = QVBoxLayout()
 
@@ -125,7 +267,7 @@ class RandomSlideshowEditor(QWidget):
         self.toggle_button.clicked.connect(self.toggle_worker)
         main_layout.addWidget(self.toggle_button)
 
-        self.setLayout(main_layout)
+        parent_widget.setLayout(main_layout)
 
     def browse_image_folder(self):
         """Opens a dialog to select the image input folder."""
@@ -237,6 +379,15 @@ class RandomSlideshowEditor(QWidget):
 
     def toggle_worker(self):
         """Starts or stops the background worker thread."""
+        # Check if worker is available
+        if RandomSlideshowWorker is None:
+            QMessageBox.critical(self, "Import Error", 
+                               "Cannot start slideshow generation.\n\n"
+                               "The RandomSlideshowWorker module could not be imported.\n"
+                               "Please check that all dependencies are installed.")
+            self.toggle_button.setChecked(False)
+            return
+            
         if self.toggle_button.isChecked():  # User wants to start
             # --- Pre-flight checks ---
             image_folder = self.img_folder_input.text()
@@ -328,6 +479,16 @@ class RandomSlideshowEditor(QWidget):
 
     def on_worker_finished(self):
         """Called when the worker thread has completely finished execution."""
+        # Disconnect signals before clearing thread reference
+        if self.worker_thread:
+            try:
+                self.worker_thread.status_update.disconnect()
+                self.worker_thread.error.disconnect()
+                self.worker_thread.generation_count_updated.disconnect()
+                self.worker_thread.finished.disconnect()
+            except:
+                pass  # Ignore errors if signals already disconnected
+        
         # This ensures UI resets cleanly after stop or normal completion
         self.reset_ui_after_stop()
         self.worker_thread = None  # Clear the thread reference
@@ -343,16 +504,52 @@ class RandomSlideshowEditor(QWidget):
             self.status_label.setText("Status: Idle")
 
     def closeEvent(self, event):
-        """Ensure worker thread is stopped when closing the window."""
-        if self.worker_thread and self.worker_thread.isRunning():
-            reply = QMessageBox.question(self, 'Confirm Exit',
-                                       "Slideshow generation is in progress. Stop and exit?",
-                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.worker_thread.stop()
-                self.worker_thread.wait(5000)  # Wait up to 5 seconds for thread to finish gracefully
-                event.accept()
-            else:
-                event.ignore()
-        else:
+        """Ensure worker threads are stopped when closing the window."""
+        try:
+            # Check single generation worker
+            if self.worker_thread and self.worker_thread.isRunning():
+                reply = QMessageBox.question(self, 'Confirm Exit',
+                                           "Slideshow generation is in progress. Stop and exit?",
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    self.worker_thread.stop()
+                    self.worker_thread.wait(5000)  # Wait up to 5 seconds for thread to finish gracefully
+                    if self.worker_thread.isRunning():
+                        # Force terminate if still running
+                        self.worker_thread.terminate()
+                        self.worker_thread.wait(1000)
+                else:
+                    event.ignore()
+                    return
+            
+            # Check batch processing
+            if hasattr(self, 'batch_widget') and self.batch_widget:
+                try:
+                    active_workers = self.batch_widget.processor.get_active_worker_count()
+                    if active_workers > 0:
+                        reply = QMessageBox.question(self, 'Confirm Exit',
+                                                   f"Batch processing is active ({active_workers} jobs running). Stop and exit?",
+                                                   QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                        if reply == QMessageBox.Yes:
+                            self.batch_widget.processor.stop(wait=True)
+                        else:
+                            event.ignore()
+                            return
+                except Exception as e:
+                    print(f"Error checking batch processing status: {e}")
+                    # Continue with shutdown even if we can't check batch status
+            
+            # Clean up resource manager
+            try:
+                from resource_manager import get_resource_manager
+                resource_manager = get_resource_manager()
+                resource_manager.cleanup()
+            except:
+                pass  # Ignore cleanup errors
+                
+            event.accept()
+            
+        except Exception as e:
+            print(f"Error during closeEvent: {e}")
+            # Force close on error to prevent hanging
             event.accept()

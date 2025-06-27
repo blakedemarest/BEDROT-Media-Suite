@@ -13,16 +13,40 @@ import os
 import datetime
 from .utils import safe_print
 
+# Import centralized configuration system
+try:
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    from core.path_utils import resolve_config_path, resolve_output_path
+    from core.env_loader import get_env_var
+    CORE_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Could not import core configuration system: {e}")
+    CORE_AVAILABLE = False
+
 
 class ConfigManager:
     """
     Manages configuration for the Reel Tracker application.
     """
     
-    def __init__(self, config_file="config/reel_tracker_config.json"):
+    def __init__(self, config_file="reel_tracker_config.json"):
         try:
-            self.config_file = config_file
-            self.config_dir = os.path.dirname(config_file)
+            # Use centralized path resolution if available
+            if CORE_AVAILABLE:
+                try:
+                    self.config_file = str(resolve_config_path(config_file))
+                    self.config_dir = os.path.dirname(self.config_file)
+                except Exception as e:
+                    safe_print(f"Warning: Could not resolve config path, using fallback: {e}")
+                    # Fallback to original hardcoded path
+                    self.config_file = f"config/{config_file}"
+                    self.config_dir = os.path.dirname(self.config_file)
+            else:
+                # Fallback to original hardcoded path
+                self.config_file = f"config/{config_file}"
+                self.config_dir = os.path.dirname(self.config_file)
+            
             self.config = self.load_config()
             # Remove duplicate dropdown entries if any
             self.deduplicate_dropdowns()
@@ -94,7 +118,7 @@ class ConfigManager:
                 "caption_template": ""
             },
             "file_organization": {
-                "master_export_folder": "",
+                "master_export_folder": self._get_default_export_folder(),
                 "auto_organize_enabled": True,
                 "safe_testing_mode": True,
                 "overwrite_protection": True,
@@ -102,6 +126,17 @@ class ConfigManager:
             },
             "version_history": []
         }
+    
+    def _get_default_export_folder(self):
+        """Get default export folder using centralized configuration."""
+        if CORE_AVAILABLE:
+            try:
+                return str(resolve_output_path())
+            except Exception as e:
+                safe_print(f"Warning: Could not resolve default export folder: {e}")
+        
+        # Fallback to empty string (user will need to configure)
+        return ""
     
     def deduplicate_dropdowns(self):
         """Remove duplicate (case-insensitive) values from dropdown lists and save if changed."""

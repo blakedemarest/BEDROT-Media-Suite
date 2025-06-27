@@ -163,7 +163,7 @@ class ReelEntryDialog(QDialog):
         
         caption_label = QLabel("Caption:")
         self.caption_edit = QTextEdit()
-        self.caption_edit.setPlaceholderText("Enter your reel caption here...\\n\\nTips:\\n- Use hashtags\\n- Include call-to-action\\n- Keep it engaging")
+        self.caption_edit.setPlaceholderText("Enter your reel caption here...\n\nTips:\n- Use hashtags\n- Include call-to-action\n- Keep it engaging")
         self.caption_edit.setMaximumHeight(120)
         
         # Caption helpers
@@ -414,20 +414,20 @@ class ReelEntryDialog(QDialog):
             
             # Add persona-specific touches
             if persona == "Fitness Influencer":
-                selected_template += "\\n\\n#fitness #workout #motivation #fitlife"
+                selected_template += "\n\n#fitness #workout #motivation #fitlife"
             elif persona == "Tech Reviewer":
-                selected_template += "\\n\\n#tech #review #gadgets #technology"
+                selected_template += "\n\n#tech #review #gadgets #technology"
             elif persona == "Food Creator":
-                selected_template += "\\n\\n#food #recipe #cooking #foodie"
+                selected_template += "\n\n#food #recipe #cooking #foodie"
             else:
-                selected_template += "\\n\\n#content #creator #viral #trending"
+                selected_template += "\n\n#content #creator #viral #trending"
         else:
-            selected_template = "Amazing content coming your way! What do you think? 🔥\\n\\n#content #creator #viral #trending"
+            selected_template = "Amazing content coming your way! What do you think? 🔥\n\n#content #creator #viral #trending"
         
         # Set the generated caption
         current_text = self.caption_edit.toPlainText()
         if current_text.strip():
-            self.caption_edit.setPlainText(current_text + "\\n\\n---\\n\\nGenerated idea:\\n" + selected_template)
+            self.caption_edit.setPlainText(current_text + "\n\n---\n\nGenerated idea:\n" + selected_template)
         else:
             self.caption_edit.setPlainText(selected_template)
     
@@ -458,8 +458,8 @@ class ReelEntryDialog(QDialog):
             hashtags.extend(["#tips", "#tricks", "#hacks"])
         
         current_text = self.caption_edit.toPlainText()
-        if current_text and not current_text.endswith('\\n'):
-            current_text += '\\n\\n'
+        if current_text and not current_text.endswith('\n'):
+            current_text += '\n\n'
         elif not current_text:
             current_text = ""
         

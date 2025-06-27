@@ -312,22 +312,22 @@ class ReelTrackerApp(QMainWindow):
         for dropdown_type in ["persona", "release", "reel_type"]:
             values = self.config_manager.get_dropdown_values(dropdown_type)
             display_name = dropdown_type.replace('_', ' ').title()
-            config_info += f"**{display_name}:** ({len(values)} values)\\n"
+            config_info += f"**{display_name}:** ({len(values)} values)\n"
             for value in values[:10]:  # Show first 10 values
-                config_info += f"  • {value}\\n" if value else "  • (empty)\\n"
+                config_info += f"  • {value}\n" if value else "  • (empty)\n"
             if len(values) > 10:
-                config_info += f"  ... and {len(values) - 10} more\\n"
-            config_info += "\\n"
+                config_info += f"  ... and {len(values) - 10} more\n"
+            config_info += "\n"
         
         last_csv = self.config_manager.get_last_csv_path()
         # Add default metadata info
         defaults = self.config_manager.get_default_metadata()
-        config_info += f"**Default Metadata:**\\n"
-        config_info += f"  • Persona: {defaults.get('persona', 'None')}\\n"
-        config_info += f"  • Release: {defaults.get('release', 'None')}\\n"
-        config_info += f"  • Reel Type: {defaults.get('reel_type', 'None')}\\n\\n"
+        config_info += f"**Default Metadata:**\n"
+        config_info += f"  • Persona: {defaults.get('persona', 'None')}\n"
+        config_info += f"  • Release: {defaults.get('release', 'None')}\n"
+        config_info += f"  • Reel Type: {defaults.get('reel_type', 'None')}\n\n"
         
-        config_info += f"**Last CSV:** {last_csv or 'None'}\\n"
+        config_info += f"**Last CSV:** {last_csv or 'None'}\n"
         config_info += f"**Auto-load CSV:** {'Yes' if self.config_manager.should_auto_load_csv() else 'No'}"
         
         QMessageBox.information(self, "Dropdown Configuration", config_info)
@@ -385,7 +385,7 @@ class ReelTrackerApp(QMainWindow):
         config_path = os.path.abspath(self.config_manager.config_file)
         QMessageBox.information(
             self, "Configuration File Location",
-            f"Configuration file location:\\n\\n{config_path}\\n\\nYou can edit this file manually if needed."
+            f"Configuration file location:\n\n{config_path}\n\nYou can edit this file manually if needed."
         )
 
     def setup_table(self):
@@ -721,9 +721,52 @@ class ReelTrackerApp(QMainWindow):
             QMessageBox.information(self, "No Files", "No files with valid paths found to organize.")
             return
         
-        dialog = FileOrganizationDialog(self, self.config_manager, reel_data_list)
+        dialog = FileOrganizationDialog(self, self.config_manager, reel_data_list, self.update_csv_after_organization)
         if dialog.exec_() == QDialog.Accepted:
             self.statusBar().showMessage("File organization settings updated")
+    
+    def update_csv_after_organization(self, reel_id, new_filepath, new_filename):
+        """Update CSV after successful file organization."""
+        try:
+            # Find the row with matching Reel ID
+            reel_id_col = self.columns.index("Reel ID")
+            filepath_col = self.columns.index("FilePath")
+            filename_col = self.columns.index("Clip Filename")
+            
+            updated_rows = 0
+            for row in range(self.table.rowCount()):
+                reel_id_item = self.table.item(row, reel_id_col)
+                if reel_id_item and reel_id_item.text().strip() == reel_id:
+                    # Update FilePath
+                    filepath_item = self.table.item(row, filepath_col)
+                    if filepath_item:
+                        filepath_item.setText(new_filepath)
+                    else:
+                        filepath_item = QTableWidgetItem(new_filepath)
+                        filepath_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
+                        self.table.setItem(row, filepath_col, filepath_item)
+                    
+                    # Update Clip Filename
+                    filename_item = self.table.item(row, filename_col)
+                    if filename_item:
+                        filename_item.setText(new_filename)
+                    else:
+                        filename_item = QTableWidgetItem(new_filename)
+                        filename_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
+                        self.table.setItem(row, filename_col, filename_item)
+                    
+                    updated_rows += 1
+                    safe_print(f"[CSV_UPDATE] Updated row for reel {reel_id}: {new_filename} at {new_filepath}")
+            
+            if updated_rows > 0:
+                # Immediately save CSV after updates
+                self.auto_save_csv()
+                safe_print(f"[CSV_UPDATE] Successfully updated {updated_rows} row(s) for reel {reel_id}")
+            else:
+                safe_print(f"[CSV_UPDATE] Warning: No rows found for reel ID: {reel_id}")
+                
+        except Exception as e:
+            safe_print(f"[CSV_UPDATE] Error updating CSV for reel {reel_id}: {e}")
     
     def add_file_row(self, file_path):
         """Add a new row to the table with file information and default metadata."""
@@ -759,25 +802,30 @@ class ReelTrackerApp(QMainWindow):
         # Apply default metadata if available
         if self.config_manager:
             defaults = self.config_manager.get_default_metadata()
+            safe_print(f"[DEBUG] Retrieved defaults: {defaults}")
             
-            # Apply default persona
-            if defaults.get("persona"):
+            # Apply default persona (apply even if empty string)
+            if "persona" in defaults:
                 self.table.item(row_count, persona_col).setText(defaults["persona"])
+                safe_print(f"[DEBUG] Applied persona: '{defaults['persona']}'")
             
-            # Apply default release
-            if defaults.get("release"):
+            # Apply default release (apply even if empty string)
+            if "release" in defaults:
                 self.table.item(row_count, release_col).setText(defaults["release"])
+                safe_print(f"[DEBUG] Applied release: '{defaults['release']}'")
             
-            # Apply default reel type
-            if defaults.get("reel_type"):
+            # Apply default reel type (apply even if empty string)
+            if "reel_type" in defaults:
                 self.table.item(row_count, reel_type_col).setText(defaults["reel_type"])
+                safe_print(f"[DEBUG] Applied reel_type: '{defaults['reel_type']}'")
             
             # Apply default caption template
-            if defaults.get("caption_template"):
+            if "caption_template" in defaults and defaults["caption_template"]:
                 caption_template = defaults["caption_template"]
                 # Replace {filename} placeholder with actual filename
                 caption = caption_template.replace("{filename}", filename)
                 self.table.item(row_count, caption_col).setText(caption)
+                safe_print(f"[DEBUG] Applied caption: '{caption}'")
             
             safe_print(f"[OK] Applied default metadata to drag-dropped file: {filename}")
         
@@ -994,7 +1042,7 @@ class ReelTrackerApp(QMainWindow):
                 self.statusBar().showMessage(f"Loaded {len(filtered_df)} rows from CSV")
                 
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to load CSV file:\\n{str(e)}")
+                QMessageBox.critical(self, "Error", f"Failed to load CSV file:\n{str(e)}")
                 
     def save_csv(self):
         """Save current table contents to CSV file."""
@@ -1032,7 +1080,7 @@ class ReelTrackerApp(QMainWindow):
                 QMessageBox.information(self, "Success", "CSV file saved successfully!")
                 
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to save CSV file:\\n{str(e)}")
+                QMessageBox.critical(self, "Error", f"Failed to save CSV file:\n{str(e)}")
                 
     def populate_table_from_dataframe(self, df):
         """Populate table widget from pandas DataFrame."""

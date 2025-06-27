@@ -1,11 +1,10 @@
 {
-    "last_input_folder": "C:/Users/Earth/Videos/videos to chop up",
-    "output_folder": "C:/Users/Earth/Videos",
-    "output_filename": ".mp4",
-    "length_mode": "BPM",
-    "duration_seconds": 15.0,
-    "bpm": 172.0,
+    "last_input_folder": "E:/VIDEOS/REELS",
+    "output_folder": "E:/VIDEOS/RandomSlideshows",
+    "length_mode": "Seconds",
+    "duration_seconds": 17.0,
+    "bpm": 500.0,
     "bpm_unit": "Beat",
-    "num_units": 80,
+    "num_units": 180,
     "aspect_ratio": "9:16"
 }

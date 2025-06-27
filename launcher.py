@@ -9,19 +9,46 @@ import threading
 import time
 import datetime # Import datetime for timestamps
 
-# --- Configuration ---
-import os
-import sys
-# ... other imports
+# --- Add src to path for core module imports ---
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(SCRIPT_DIR, 'src'))
+
+# --- Import centralized configuration system ---
+try:
+    from core import get_config_manager, load_environment, resolve_path
+    from core.env_loader import get_env_var
+    from core.path_utils import get_path_resolver
+    
+    # Load environment variables
+    load_environment()
+    
+    # Get configuration manager
+    config_manager = get_config_manager()
+    path_resolver = get_path_resolver()
+    
+except ImportError as e:
+    print(f"Warning: Could not import core configuration system: {e}")
+    print("Falling back to hardcoded paths")
+    config_manager = None
+    path_resolver = None
 
 # --- Configuration ---
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # Directory of launcher.py (root)
+def get_script_path(script_key, fallback_path):
+    """Get script path with fallback to hardcoded path."""
+    if config_manager:
+        try:
+            return str(config_manager.get_script_path(script_key))
+        except Exception as e:
+            print(f"Warning: Could not resolve script path for {script_key}: {e}")
+    
+    # Fallback to hardcoded path
+    return os.path.join(SCRIPT_DIR, fallback_path)
 
-# Script paths (Use raw strings 'r' for Windows paths if needed, though os.path.join is better)
-SCRIPT_1_PATH = os.path.join(SCRIPT_DIR, 'src', 'media_download_app.py')
-SCRIPT_2_PATH = os.path.join(SCRIPT_DIR, 'src', 'snippet_remixer.py')
-SCRIPT_3_PATH = os.path.join(SCRIPT_DIR, 'src', 'random_slideshow.py')
-SCRIPT_4_PATH = os.path.join(SCRIPT_DIR, 'src', 'reel_tracker_modular.py')
+# Script paths with environment variable support and fallbacks
+SCRIPT_1_PATH = get_script_path('media_download', 'src/media_download_app.py')
+SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer.py') 
+SCRIPT_3_PATH = get_script_path('random_slideshow', 'src/random_slideshow/main.py')
+SCRIPT_4_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 

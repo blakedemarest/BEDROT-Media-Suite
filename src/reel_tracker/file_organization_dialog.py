@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (
     QSplitter
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QColor
 from .config_manager import ConfigManager
 from .file_organizer import FileOrganizer
 from .utils import safe_print
@@ -31,11 +31,13 @@ class FileOrganizationThread(QThread):
     
     progress_updated = pyqtSignal(int, int, str)  # current, total, message
     operation_completed = pyqtSignal(dict)  # results
+    csv_update_requested = pyqtSignal(str, str, str)  # reel_id, new_filepath, new_filename
     
-    def __init__(self, file_organizer, reel_data_list):
+    def __init__(self, file_organizer, reel_data_list, enable_csv_updates=False):
         super().__init__()
         self.file_organizer = file_organizer
         self.reel_data_list = reel_data_list
+        self.enable_csv_updates = enable_csv_updates
         self.results = {}
     
     def progress_callback(self, current, total, reel_data):
@@ -43,12 +45,18 @@ class FileOrganizationThread(QThread):
         message = f"Processing: {reel_data[0]} - {os.path.basename(reel_data[6])}"
         self.progress_updated.emit(current, total, message)
     
+    def csv_update_callback(self, reel_id, new_filepath, new_filename):
+        """Callback for CSV updates after successful file organization."""
+        if self.enable_csv_updates:
+            self.csv_update_requested.emit(reel_id, new_filepath, new_filename)
+    
     def run(self):
         """Run the file organization process."""
         try:
             self.results = self.file_organizer.organize_batch(
                 self.reel_data_list, 
-                self.progress_callback
+                self.progress_callback,
+                self.csv_update_callback if self.enable_csv_updates else None
             )
             self.operation_completed.emit(self.results)
         except Exception as e:
@@ -61,7 +69,7 @@ class FileOrganizationDialog(QDialog):
     Dialog for managing file organization settings and operations.
     """
     
-    def __init__(self, parent=None, config_manager=None, reel_data_list=None):
+    def __init__(self, parent=None, config_manager=None, reel_data_list=None, csv_update_callback=None):
         super().__init__(parent)
         self.setWindowTitle("File Organization Pipeline")
         self.setModal(True)
@@ -71,6 +79,7 @@ class FileOrganizationDialog(QDialog):
         self.config_manager = config_manager or ConfigManager()
         self.file_organizer = FileOrganizer(self.config_manager)
         self.reel_data_list = reel_data_list or []
+        self.csv_update_callback = csv_update_callback
         self.organization_thread = None
         
         self.setup_ui()
@@ -146,8 +155,8 @@ class FileOrganizationDialog(QDialog):
         settings_layout.addRow("", self.safe_mode_checkbox)
         
         # Overwrite protection
-        self.overwrite_protection_checkbox = QCheckBox("Overwrite Protection (Rename if file exists)")
-        self.overwrite_protection_checkbox.setToolTip("When enabled, existing files won't be overwritten")
+        self.overwrite_protection_checkbox = QCheckBox("Overwrite Protection (Skip if file exists)")
+        self.overwrite_protection_checkbox.setToolTip("When enabled, existing files are skipped to prevent overwrites")
         settings_layout.addRow("", self.overwrite_protection_checkbox)
         
         # Auto-organize enabled
@@ -169,8 +178,8 @@ class FileOrganizationDialog(QDialog):
             "• <code>FITNESSGURU_THESCALE_001.jpg</code><br><br>"
             "Folders will be created using: <b>PERSONA_RELEASE</b><br>"
             "Example: <code>ZONEA0_RENEGADEPIPELINE/</code><br><br>"
-            "<b>⏰ Dynamic Presentation:</b> File timestamps are randomized (±30 days) for dynamic playback order<br>"
-            "<b>🛡️ Duplicate Protection:</b> Files with identical names are automatically skipped (no overwrites)"
+            "<b>🛡️ Duplicate Protection:</b> Files with identical names are automatically skipped (no overwrites)<br>"
+            "<b>📊 CSV Updates:</b> FilePath and Clip Filename columns are automatically updated after organization"
         )
         naming_info.setWordWrap(True)
         naming_info.setStyleSheet("background: #f8f9fa; padding: 10px; border: 1px solid #dee2e6; border-radius: 4px;")
@@ -239,7 +248,10 @@ class FileOrganizationDialog(QDialog):
         controls_layout = QVBoxLayout()
         
         # Status info
-        self.organize_status_label = QLabel("Ready to organize files")
+        status_text = "Ready to organize files"
+        if self.csv_update_callback:
+            status_text += " (CSV updates enabled)"
+        self.organize_status_label = QLabel(status_text)
         self.organize_status_label.setStyleSheet("color: #27ae60; font-weight: bold;")
         controls_layout.addWidget(self.organize_status_label)
         
@@ -379,7 +391,8 @@ class FileOrganizationDialog(QDialog):
                 status_item.setBackground(Qt.green)
             elif status == "duplicate":
                 status_item = QTableWidgetItem("⚠️ Duplicate")
-                status_item.setBackground(Qt.yellow)
+                status_item.setBackground(QColor(72, 201, 176))  # Light teal
+                status_item.setToolTip("Duplicate detected—this file will be skipped.")
             elif status == "invalid_source":
                 status_item = QTableWidgetItem("❌ Error")
                 status_item.setBackground(Qt.red)
@@ -440,12 +453,24 @@ class FileOrganizationDialog(QDialog):
         safe_mode = self.safe_mode_checkbox.isChecked()
         operation_type = "copy" if safe_mode else "move"
         
+        # Get preview to count files that will actually be moved
+        preview_data = self.file_organizer.preview_organization(self.reel_data_list)
+        ready_count = sum(1 for d in preview_data if d.get("status") == "ready")
+        duplicate_count = sum(1 for d in preview_data if d.get("status") == "duplicate")
+        
+        # Create confirmation message
+        if duplicate_count > 0:
+            message = f"This will {operation_type} {ready_count} files to the export folder (skipping {duplicate_count} duplicates).\n\n"
+        else:
+            message = f"This will {operation_type} {ready_count} files to the export folder.\n\n"
+        
+        message += f"Safe mode: {'Enabled' if safe_mode else 'Disabled'}\n"
+        message += f"Export folder: {export_folder}\n\n"
+        message += "Continue?"
+        
         reply = QMessageBox.question(
             self, "Confirm Organization",
-            f"This will {operation_type} {len(self.reel_data_list)} files to the export folder.\\n\\n"
-            f"Safe mode: {'Enabled' if safe_mode else 'Disabled'}\\n"
-            f"Export folder: {export_folder}\\n\\n"
-            "Continue?",
+            message,
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
@@ -464,9 +489,15 @@ class FileOrganizationDialog(QDialog):
         self.results_text.clear()
         
         # Start organization thread
-        self.organization_thread = FileOrganizationThread(self.file_organizer, self.reel_data_list)
+        enable_csv_updates = self.csv_update_callback is not None
+        self.organization_thread = FileOrganizationThread(self.file_organizer, self.reel_data_list, enable_csv_updates)
         self.organization_thread.progress_updated.connect(self.on_progress_updated)
         self.organization_thread.operation_completed.connect(self.on_organization_completed)
+        
+        # Connect CSV update signal if callback is available
+        if self.csv_update_callback:
+            self.organization_thread.csv_update_requested.connect(self.on_csv_update_requested)
+        
         self.organization_thread.start()
     
     def cancel_organization(self):
@@ -483,6 +514,15 @@ class FileOrganizationDialog(QDialog):
         """Handle progress updates from the organization thread."""
         self.progress_bar.setValue(current)
         self.progress_details_label.setText(message)
+    
+    def on_csv_update_requested(self, reel_id, new_filepath, new_filename):
+        """Handle CSV update requests from the organization thread."""
+        if self.csv_update_callback:
+            try:
+                self.csv_update_callback(reel_id, new_filepath, new_filename)
+                safe_print(f"[FILE_ORG] CSV updated for reel: {reel_id}")
+            except Exception as e:
+                safe_print(f"[FILE_ORG] Error updating CSV for reel {reel_id}: {e}")
     
     def on_organization_completed(self, results):
         """Handle completion of the organization process."""
@@ -511,11 +551,16 @@ class FileOrganizationDialog(QDialog):
         result_text = []
         
         # Summary
-        result_text.append("=== FILE ORGANIZATION RESULTS ===\\n")
+        result_text.append("=== FILE ORGANIZATION RESULTS ===\n")
         result_text.append(f"Total files processed: {results.get('total_files', 0)}")
         result_text.append(f"Successfully organized: {results.get('successful_count', 0)}")
         result_text.append(f"Skipped (duplicates): {results.get('skipped_count', 0)}")
-        result_text.append(f"Failed: {results.get('failed_count', 0)}\\n")
+        result_text.append(f"Failed: {results.get('failed_count', 0)}")
+        
+        if self.csv_update_callback and results.get('successful_count', 0) > 0:
+            result_text.append(f"CSV automatically updated for {results.get('successful_count', 0)} file(s)")
+        
+        result_text.append("")
         
         # Successful files
         if results.get("successful_files"):
@@ -525,13 +570,13 @@ class FileOrganizationDialog(QDialog):
         
         # Skipped files
         if results.get("skipped_files"):
-            result_text.append("\\n⚠️ SKIPPED (DUPLICATES):")
+            result_text.append("\n⚠️ SKIPPED (DUPLICATES):")
             for file_info in results["skipped_files"]:
                 result_text.append(f"  • {file_info['reel_id']}: {file_info['reason']}")
         
         # Failed files
         if results.get("failed_files"):
-            result_text.append("\\n❌ FAILED FILES:")
+            result_text.append("\n❌ FAILED FILES:")
             for file_info in results["failed_files"]:
                 result_text.append(f"  • {file_info['reel_id']}: {file_info['error']}")
         
