@@ -6,5 +6,17 @@
     "bpm": 500.0,
     "bpm_unit": "Beat",
     "num_units": 180,
-    "aspect_ratio": "9:16"
+    "aspect_ratio": "1080x1920 (9:16 Portrait)",
+    "export_settings": {
+        "custom_width": null,
+        "custom_height": null,
+        "maintain_aspect_ratio": true,
+        "match_input_fps": false,
+        "frame_rate": "30",
+        "bitrate_mode": "crf",
+        "quality_crf": 23,
+        "bitrate": "5M",
+        "trim_start": "",
+        "trim_end": ""
+    }
 }

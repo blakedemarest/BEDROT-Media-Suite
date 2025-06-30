@@ -30,10 +30,19 @@ BPM_UNITS = {
     "1/2 Beat": 1.0/2.0, "Beat": 1.0, "Bar": 4.0
 }
 DEFAULT_BPM_UNIT = "Beat"
+
+# HD Aspect Ratio Presets (Height x Width format with smart detection)
 ASPECT_RATIOS = [
-    "Original", "16:9", "4:3", "1:1", "9:16", "21:9", "2.35:1", "1.85:1"
+    "Original", 
+    "1920x1080 (16:9 Landscape)", 
+    "1080x1920 (9:16 Portrait)", 
+    "1080x1080 (1:1 Square)", 
+    "1440x1080 (4:3 Classic)", 
+    "2560x1080 (21:9 Ultrawide)", 
+    "1920x817 (2.35:1 Cinema)", 
+    "1920x1038 (1.85:1 Film)"
 ]
-DEFAULT_ASPECT_RATIO = "Original"
+DEFAULT_ASPECT_RATIO = "1920x1080 (16:9 Landscape)"
 
 
 class ConfigManager:
@@ -42,6 +51,9 @@ class ConfigManager:
     """
     
     def __init__(self, config_file="video_remixer_settings.json"):
+        # Always set script_dir first for compatibility
+        self.script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
         # Use centralized path resolution if available
         if CORE_AVAILABLE:
             try:
@@ -50,12 +62,10 @@ class ConfigManager:
             except Exception as e:
                 safe_print(f"Warning: Could not resolve config path, using fallback: {e}")
                 # Fallback to original complex path navigation
-                self.script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 self.config_dir = os.path.join(self.script_dir, '..', 'config')
                 self.settings_file_path = os.path.join(self.config_dir, config_file)
         else:
             # Fallback to original complex path navigation
-            self.script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             self.config_dir = os.path.join(self.script_dir, '..', 'config')
             self.settings_file_path = os.path.join(self.config_dir, config_file)
         

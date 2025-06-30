@@ -23,8 +23,16 @@ INTERMEDIATE_EXTENSION = ".ts"
 TEMP_CONCAT_FILENAME = "_temp_concat.mp4"
 TEMP_DIR_NAME = "remixer_temp_snippets"
 
-# Common resolutions for different aspect ratios (1080p quality)
+# HD resolutions for aspect ratio presets (Height x Width format)
 ASPECT_RATIO_RESOLUTIONS = {
+    "1920x1080 (16:9 Landscape)": (1920, 1080),
+    "1080x1920 (9:16 Portrait)": (1080, 1920),
+    "1080x1080 (1:1 Square)": (1080, 1080),
+    "1440x1080 (4:3 Classic)": (1440, 1080),
+    "2560x1080 (21:9 Ultrawide)": (2560, 1080),
+    "1920x817 (2.35:1 Cinema)": (1920, 817),
+    "1920x1038 (1.85:1 Film)": (1920, 1038),
+    # Legacy format support for backward compatibility
     "16:9": (1920, 1080),
     "9:16": (1080, 1920),
     "1:1": (1080, 1080),

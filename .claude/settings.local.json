@@ -11,7 +11,9 @@
       "Bash(cp:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(claude --version)",
+      "Bash(where claude)"
     ],
     "deny": []
   }

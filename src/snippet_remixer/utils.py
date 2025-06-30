@@ -22,16 +22,26 @@ def safe_print(message):
 
 def parse_aspect_ratio(ratio_str):
     """
-    Parse aspect ratio string to numeric value.
+    Parse aspect ratio string to numeric value. Supports both new HD format and legacy format.
     
     Args:
-        ratio_str (str): Aspect ratio string like "16:9" or "Original"
+        ratio_str (str): Aspect ratio string like "1920x1080 (16:9 Landscape)" or "16:9" or "Original"
         
     Returns:
         float or None: Numeric aspect ratio value or None for "Original"
     """
     if ratio_str == "Original":
         return None
+    
+    # Try to extract from new HD format (e.g., "1920x1080 (16:9 Landscape)")
+    hd_match = re.match(r'(\d+)x(\d+)', ratio_str)
+    if hd_match:
+        w, h = int(hd_match.group(1)), int(hd_match.group(2))
+        if h == 0:
+            return None
+        return w / h
+    
+    # Fall back to legacy format (e.g., "16:9")
     try:
         w_str, h_str = ratio_str.split(':')
         w, h = float(w_str), float(h_str)

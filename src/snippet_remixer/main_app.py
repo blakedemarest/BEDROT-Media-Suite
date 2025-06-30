@@ -163,7 +163,7 @@ class VideoRemixerApp:
             textvariable=self.aspect_ratio_var, 
             values=self.config_manager.get_aspect_ratios(), 
             state="readonly", 
-            width=15
+            width=25
         )
         self.ar_combobox.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
         
@@ -175,7 +175,7 @@ class VideoRemixerApp:
         )
         self.export_settings_button.grid(row=1, column=2, padx=5, pady=5)
         
-        ttk.Label(output_frame, text="(Crop if wider, Pad if narrower)").grid(row=1, column=3, padx=5, pady=5, sticky=tk.W)
+        ttk.Label(output_frame, text="(All videos will be HD quality)").grid(row=1, column=3, padx=5, pady=5, sticky=tk.W)
 
     def create_length_section(self, parent):
         """Create the length control section."""
