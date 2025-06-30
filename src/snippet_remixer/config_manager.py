@@ -96,6 +96,9 @@ class ConfigManager:
             "bpm_unit": DEFAULT_BPM_UNIT,
             "num_units": 16,
             "aspect_ratio": get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', DEFAULT_ASPECT_RATIO) if CORE_AVAILABLE else DEFAULT_ASPECT_RATIO,
+            "continuous_mode": False,
+            "jitter_enabled": False,
+            "jitter_intensity": 50,
             "export_settings": {
                 "custom_width": None,
                 "custom_height": None,

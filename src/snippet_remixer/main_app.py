@@ -44,17 +44,27 @@ class VideoRemixerApp:
         self.num_units_var = tk.StringVar(value=str(self.settings["num_units"]))
         self.aspect_ratio_var = tk.StringVar(value=self.settings["aspect_ratio"])
         self.status_var = tk.StringVar(value="Ready")
+        self.continuous_mode_var = tk.BooleanVar(value=self.settings.get("continuous_mode", False))
 
         # Internal state
         self.last_input_folder = self.settings["last_input_folder"]
+        self.continuous_processing = False
+        self.continuous_count = 0
 
         # Bindings
         self.length_mode_var.trace_add("write", self.toggle_length_mode_ui)
+        
+        # Add bindings for BPM duration estimate updates
+        self.bpm_var.trace_add("write", self.update_duration_estimate)
+        self.bpm_unit_var.trace_add("write", self.update_duration_estimate)
+        self.num_units_var.trace_add("write", self.update_duration_estimate)
 
         # Window Setup
         self.root.geometry("700x650")
         self.create_widgets()
         self.toggle_length_mode_ui()
+        # Initialize duration estimate if in BPM mode
+        self.root.after(100, self.update_duration_estimate)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # Show dependency warnings
@@ -234,18 +244,93 @@ class VideoRemixerApp:
             width=6
         )
         self.num_units_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Add duration estimate label
+        self.duration_estimate_label = ttk.Label(
+            self.bpm_input_frame, 
+            text="",
+            foreground="blue"
+        )
+        self.duration_estimate_label.pack(side=tk.LEFT, padx=(15, 5))
+        
+        # Jitter controls frame
+        jitter_frame = ttk.Frame(length_frame)
+        jitter_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Jitter checkbox
+        self.jitter_enabled_var = tk.BooleanVar(value=self.settings.get("jitter_enabled", False))
+        self.jitter_check = ttk.Checkbutton(
+            jitter_frame,
+            text="Jitter",
+            variable=self.jitter_enabled_var,
+            command=self.toggle_jitter_ui
+        )
+        self.jitter_check.pack(side=tk.LEFT, padx=5)
+        
+        # Jitter intensity slider
+        self.jitter_intensity_var = tk.IntVar(value=self.settings.get("jitter_intensity", 50))
+        self.jitter_slider_label = ttk.Label(jitter_frame, text="Intensity:")
+        self.jitter_slider_label.pack(side=tk.LEFT, padx=(10, 5))
+        
+        self.jitter_slider = ttk.Scale(
+            jitter_frame,
+            from_=0,
+            to=100,
+            orient=tk.HORIZONTAL,
+            variable=self.jitter_intensity_var,
+            length=200
+        )
+        self.jitter_slider.pack(side=tk.LEFT, padx=5)
+        
+        self.jitter_value_label = ttk.Label(jitter_frame, text="50%")
+        self.jitter_value_label.pack(side=tk.LEFT, padx=5)
+        
+        # Bind slider changes to update the value label
+        self.jitter_intensity_var.trace_add("write", self.update_jitter_value_label)
+        
+        # Initialize jitter UI state
+        self.toggle_jitter_ui()
 
     def create_process_section(self, parent):
         """Create the process button section."""
         process_button_frame = ttk.Frame(parent, padding=(0, 10, 0, 0))
         process_button_frame.pack(fill=tk.X)
         
+        # Continuous mode toggle
+        continuous_frame = ttk.Frame(process_button_frame)
+        continuous_frame.pack(pady=(0, 10))
+        
+        self.continuous_check = ttk.Checkbutton(
+            continuous_frame,
+            text="[Continuous Mode] Keep making videos",
+            variable=self.continuous_mode_var,
+            command=self.toggle_continuous_mode
+        )
+        self.continuous_check.pack()
+        
+        # Counter display for continuous mode
+        self.continuous_label = ttk.Label(
+            continuous_frame,
+            text="",
+            foreground="blue"
+        )
+        self.continuous_label.pack(pady=(5, 0))
+        
+        # Generate button
         self.generate_button = ttk.Button(
             process_button_frame, 
             text="Generate Remix", 
             command=self.start_processing_thread
         )
         self.generate_button.pack(pady=10)
+        
+        # Stop button (initially hidden)
+        self.stop_button = ttk.Button(
+            process_button_frame,
+            text="[STOP] Stop Continuous Mode",
+            command=self.stop_continuous_mode
+        )
+        # Don't pack initially
 
     def create_status_section(self, parent):
         """Create the status bar section."""
@@ -268,9 +353,72 @@ class VideoRemixerApp:
             elif mode == "BPM":
                 self.seconds_input_frame.pack_forget()
                 self.bpm_input_frame.pack(fill=tk.X, pady=5)
+                # Update duration estimate when switching to BPM mode
+                self.update_duration_estimate()
             else:
                 self.seconds_input_frame.pack_forget()
                 self.bpm_input_frame.pack_forget()
+    
+    def toggle_jitter_ui(self):
+        """Toggle jitter slider visibility based on checkbox state."""
+        if self.jitter_enabled_var.get():
+            self.jitter_slider_label.config(state=tk.NORMAL)
+            self.jitter_slider.config(state=tk.NORMAL)
+            self.jitter_value_label.config(state=tk.NORMAL)
+            self.update_jitter_value_label()
+        else:
+            self.jitter_slider_label.config(state=tk.DISABLED)
+            self.jitter_slider.config(state=tk.DISABLED)
+            self.jitter_value_label.config(state=tk.DISABLED)
+    
+    def update_jitter_value_label(self, *args):
+        """Update the jitter intensity value label."""
+        value = self.jitter_intensity_var.get()
+        self.jitter_value_label.config(text=f"{value}%")
+    
+    def update_duration_estimate(self, *args):
+        """Update the duration estimate label when BPM settings change."""
+        if not hasattr(self, 'duration_estimate_label'):
+            return
+            
+        # Only show estimate in BPM mode
+        if self.length_mode_var.get() != "BPM":
+            self.duration_estimate_label.configure(text="")
+            return
+        
+        try:
+            bpm = float(self.bpm_var.get())
+            num_units = int(self.num_units_var.get())
+            bpm_unit_name = self.bpm_unit_var.get()
+            
+            # Import BPM_UNITS from config_manager
+            from .config_manager import BPM_UNITS
+            
+            if bpm <= 0 or num_units <= 0 or bpm_unit_name not in BPM_UNITS:
+                self.duration_estimate_label.configure(text="")
+                return
+            
+            # Calculate duration
+            seconds_per_beat = 60.0 / bpm
+            snippet_duration_sec = seconds_per_beat * BPM_UNITS[bpm_unit_name]
+            total_duration_sec = snippet_duration_sec * num_units
+            
+            # Format duration nicely
+            if total_duration_sec >= 60:
+                minutes = int(total_duration_sec // 60)
+                seconds = total_duration_sec % 60
+                if seconds == 0:
+                    duration_text = f"Estimated duration: {minutes} minute{'s' if minutes != 1 else ''}"
+                else:
+                    duration_text = f"Estimated duration: {minutes} minute{'s' if minutes != 1 else ''} {seconds:.1f} seconds"
+            else:
+                duration_text = f"Estimated duration: {total_duration_sec:.1f} seconds"
+            
+            self.duration_estimate_label.configure(text=duration_text)
+            
+        except (ValueError, KeyError):
+            # Invalid input, hide the estimate
+            self.duration_estimate_label.configure(text="")
 
     def browse_input_files(self):
         """Browse for input video files."""
@@ -374,6 +522,19 @@ class VideoRemixerApp:
             safe_print("Generate button state change ignored (window closing?).")
 
     def start_processing_thread(self):
+        """Enhanced processing thread starter with continuous mode support."""
+        # Check if starting continuous mode
+        if self.continuous_mode_var.get() and not self.continuous_processing:
+            self.continuous_processing = True
+            self.continuous_count = 0
+            self.stop_button.pack(pady=(0, 10))
+            self.generate_button.pack_forget()
+            self.update_continuous_counter()
+        
+        # Original processing logic
+        self._original_start_processing_thread()
+    
+    def _original_start_processing_thread(self):
         """Validates inputs, generates filename, and launches processing thread."""
         if self.processing_worker.is_processing():
             messagebox.showwarning("Busy", "Processing is already in progress.")
@@ -409,7 +570,9 @@ class VideoRemixerApp:
                 "duration_seconds": self.duration_seconds_var.get(),
                 "bpm": self.bpm_var.get(),
                 "num_units": self.num_units_var.get(),
-                "bpm_unit": self.bpm_unit_var.get()
+                "bpm_unit": self.bpm_unit_var.get(),
+                "jitter_enabled": self.jitter_enabled_var.get(),
+                "jitter_intensity": self.jitter_intensity_var.get()
             }
             
             target_total_duration_sec, snippet_duration_sec = self.processing_worker.calculate_durations(
@@ -434,10 +597,10 @@ class VideoRemixerApp:
 
         # Small delay before starting, so user sees the name
         self.root.after(500, self._start_thread_delayed, input_files, final_output_path, 
-                       target_total_duration_sec, snippet_duration_sec, aspect_ratio_selection)
+                       target_total_duration_sec, snippet_duration_sec, aspect_ratio_selection, settings)
 
     def _start_thread_delayed(self, input_files, final_output_path, target_total_duration_sec, 
-                             snippet_duration_sec, aspect_ratio_selection):
+                             snippet_duration_sec, aspect_ratio_selection, settings):
         """Helper to start the thread after a short GUI delay."""
         self.update_status("Starting processing...")
         
@@ -452,14 +615,28 @@ class VideoRemixerApp:
                 self.root.after(0, messagebox.showerror, title, message)
         
         def completion_callback(success, output_path):
-            self.enable_generate_button(True)
             if success:
-                self.update_status(f"Success! Remix saved: {os.path.basename(output_path)}")
+                self.continuous_count += 1
+                self.update_status(f"Success! Remix #{self.continuous_count} saved: {os.path.basename(output_path)}")
+                self.update_continuous_counter()
+                
+                # If continuous mode is enabled, start next remix
+                if self.continuous_processing and self.continuous_mode_var.get():
+                    self.root.after(2000, self.start_next_continuous_remix)  # 2 second delay
+                else:
+                    self.enable_generate_button(True)
+                    self.continuous_processing = False
             else:
                 self.update_status("Processing failed. Check console for details.")
+                self.enable_generate_button(True)
+                self.continuous_processing = False
 
         # Get export settings from config
         export_settings = self.config_manager.get_export_settings()
+        
+        # Add jitter settings to export settings
+        export_settings["jitter_enabled"] = settings.get("jitter_enabled", False)
+        export_settings["jitter_intensity"] = settings.get("jitter_intensity", 50)
         
         # Start processing
         self.processing_worker.start_processing_thread(
@@ -500,10 +677,52 @@ class VideoRemixerApp:
             self.settings["num_units"] = int(self.num_units_var.get())
         except ValueError:
             safe_print("Warning: Invalid units value not saved.")
+            
+        # Save continuous mode setting
+        self.settings["continuous_mode"] = self.continuous_mode_var.get()
+        
+        # Save jitter settings
+        self.settings["jitter_enabled"] = self.jitter_enabled_var.get()
+        self.settings["jitter_intensity"] = self.jitter_intensity_var.get()
 
         self.config_manager.save_config(self.settings)
         safe_print("Settings saved. Exiting.")
         self.root.destroy()
+    
+    def toggle_continuous_mode(self):
+        """Toggle continuous mode on/off."""
+        if self.continuous_mode_var.get():
+            self.update_status("Continuous mode enabled - will keep generating remixes")
+            if not self.continuous_processing:
+                self.continuous_count = 0
+                self.update_continuous_counter()
+        else:
+            self.update_status("Continuous mode disabled")
+            self.continuous_processing = False
+            self.stop_button.pack_forget()
+            self.generate_button.pack(pady=10)
+    
+    def start_next_continuous_remix(self):
+        """Start the next remix in continuous mode."""
+        if self.continuous_processing and self.continuous_mode_var.get():
+            self.update_status(f"Starting remix #{self.continuous_count + 1}...")
+            self._original_start_processing_thread()
+    
+    def stop_continuous_mode(self):
+        """Stop continuous mode."""
+        self.continuous_processing = False
+        self.continuous_mode_var.set(False)
+        self.stop_button.pack_forget()
+        self.generate_button.pack(pady=10)
+        self.enable_generate_button(True)
+        self.update_status(f"Continuous mode stopped. Created {self.continuous_count} remixes.")
+    
+    def update_continuous_counter(self):
+        """Update the continuous mode counter display."""
+        if self.continuous_mode_var.get():
+            self.continuous_label.configure(text=f"Remixes created: {self.continuous_count}")
+        else:
+            self.continuous_label.configure(text="")
 
 
 def main():

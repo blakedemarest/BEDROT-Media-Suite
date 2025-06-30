@@ -13,7 +13,8 @@
       "Bash(git commit:*)",
       "Bash(git config:*)",
       "Bash(claude --version)",
-      "Bash(where claude)"
+      "Bash(where claude)",
+      "mcp__Context7__resolve-library-id"
     ],
     "deny": []
   }

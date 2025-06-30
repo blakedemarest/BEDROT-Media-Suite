@@ -15,5 +15,5 @@ but with clean separation of concerns:
 """
 
 if __name__ == "__main__":
-    from snippet_remixer.main_app import main
+    from snippet_remixer.main import main
     main()

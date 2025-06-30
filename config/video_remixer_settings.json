@@ -1,11 +1,11 @@
 {
     "last_input_folder": "E:/VIDEOS/REELS",
     "output_folder": "E:/VIDEOS/RandomSlideshows",
-    "length_mode": "Seconds",
-    "duration_seconds": 17.0,
-    "bpm": 500.0,
+    "length_mode": "BPM",
+    "duration_seconds": 15.0,
+    "bpm": 270.0,
     "bpm_unit": "Beat",
-    "num_units": 180,
+    "num_units": 69,
     "aspect_ratio": "1080x1920 (9:16 Portrait)",
     "export_settings": {
         "custom_width": null,
@@ -18,5 +18,6 @@
         "bitrate": "5M",
         "trim_start": "",
         "trim_end": ""
-    }
+    },
+    "continuous_mode": false
 }

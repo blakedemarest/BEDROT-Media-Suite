@@ -211,7 +211,7 @@ class VideoProcessor:
         
         return valid_inputs, files_too_short
     
-    def generate_snippet_definitions(self, valid_inputs, target_total_duration_sec, snippet_duration_sec):
+    def generate_snippet_definitions(self, valid_inputs, target_total_duration_sec, snippet_duration_sec, jitter_settings=None):
         """
         Generate random snippet definitions from valid input videos.
         
@@ -219,6 +219,7 @@ class VideoProcessor:
             valid_inputs (dict): Dictionary of filepath -> duration
             target_total_duration_sec (float): Target total duration
             snippet_duration_sec (float): Duration per snippet
+            jitter_settings (dict): Optional jitter settings with 'enabled' and 'intensity' keys
             
         Returns:
             list: List of (filepath, start_time, duration) tuples
@@ -229,16 +230,50 @@ class VideoProcessor:
             
         snippet_definitions = []
         available_files = list(valid_inputs.keys())
-        safe_print(f"Need {num_snippets_needed} snippets of {snippet_duration_sec:.3f}s each.")
         
-        for _ in range(num_snippets_needed):
+        # Extract jitter settings
+        jitter_enabled = False
+        jitter_intensity = 50
+        if jitter_settings:
+            jitter_enabled = jitter_settings.get("jitter_enabled", False)
+            jitter_intensity = jitter_settings.get("jitter_intensity", 50)
+        
+        # Calculate jitter range (0-100% maps to 0-50% variation)
+        jitter_factor = (jitter_intensity / 100.0) * 0.5  # Max 50% variation
+        
+        safe_print(f"Need {num_snippets_needed} snippets of {snippet_duration_sec:.3f}s each.")
+        if jitter_enabled:
+            safe_print(f"Jitter enabled with intensity {jitter_intensity}% (±{jitter_factor*100:.1f}% variation)")
+        
+        for i in range(num_snippets_needed):
             if not available_files:
                 raise ValueError("Ran out of source material unexpectedly.")
                 
             chosen_file = random.choice(available_files)
-            max_start_time = max(0, valid_inputs[chosen_file] - snippet_duration_sec)
-            random_start = random.uniform(0, max_start_time)
-            snippet_definitions.append((chosen_file, random_start, snippet_duration_sec))
+            
+            # Apply jitter to duration if enabled
+            actual_duration = snippet_duration_sec
+            if jitter_enabled and jitter_factor > 0:
+                # Random variation between -jitter_factor and +jitter_factor
+                duration_variation = random.uniform(-jitter_factor, jitter_factor)
+                actual_duration = snippet_duration_sec * (1 + duration_variation)
+                # Ensure minimum duration of 0.1 seconds
+                actual_duration = max(0.1, actual_duration)
+            
+            # Calculate max start time based on actual duration
+            max_start_time = max(0, valid_inputs[chosen_file] - actual_duration)
+            
+            # Apply jitter to start time if enabled
+            if jitter_enabled and jitter_factor > 0 and max_start_time > 0:
+                # Add some randomness to the start time selection
+                # Instead of pure uniform distribution, add some jitter
+                base_start = random.uniform(0, max_start_time)
+                start_jitter = random.uniform(-jitter_factor, jitter_factor) * min(5.0, max_start_time * 0.2)
+                random_start = max(0, min(max_start_time, base_start + start_jitter))
+            else:
+                random_start = random.uniform(0, max_start_time) if max_start_time > 0 else 0
+            
+            snippet_definitions.append((chosen_file, random_start, actual_duration))
         
         return snippet_definitions
     

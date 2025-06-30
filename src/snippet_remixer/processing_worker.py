@@ -141,9 +141,17 @@ class ProcessingWorker:
             # Stage 2: Generate Snippet List
             if progress_callback:
                 progress_callback("Generating random snippet list...")
+            
+            # Extract jitter settings from export_settings
+            jitter_settings = None
+            if export_settings:
+                jitter_settings = {
+                    "jitter_enabled": export_settings.get("jitter_enabled", False),
+                    "jitter_intensity": export_settings.get("jitter_intensity", 50)
+                }
                 
             snippet_definitions = self.video_processor.generate_snippet_definitions(
-                valid_inputs, target_total_duration_sec, snippet_duration_sec
+                valid_inputs, target_total_duration_sec, snippet_duration_sec, jitter_settings
             )
             
             # Stage 3: Create Temp Dir & Cut Snippets
