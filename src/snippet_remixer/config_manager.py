@@ -31,7 +31,7 @@ BPM_UNITS = {
 }
 DEFAULT_BPM_UNIT = "Beat"
 
-# HD Aspect Ratio Presets (Height x Width format with smart detection)
+# HD Aspect Ratio Presets (Width x Height format with smart detection)
 ASPECT_RATIOS = [
     "Original", 
     "1920x1080 (16:9 Landscape)", 
@@ -99,6 +99,7 @@ class ConfigManager:
             "continuous_mode": False,
             "jitter_enabled": False,
             "jitter_intensity": 50,
+            "aspect_ratio_mode": "Crop to Fill",
             "export_settings": {
                 "custom_width": None,
                 "custom_height": None,
@@ -154,6 +155,9 @@ class ConfigManager:
                         elif key == "aspect_ratio" and settings[key] not in ASPECT_RATIOS:
                             safe_print(f"Warning: Invalid aspect_ratio '{settings[key]}', using default.")
                             settings[key] = default_settings["aspect_ratio"]
+                        elif key == "aspect_ratio_mode" and settings[key] not in ["Crop to Fill", "Pad to Fit"]:
+                            safe_print(f"Warning: Invalid aspect_ratio_mode '{settings[key]}', using default.")
+                            settings[key] = default_settings["aspect_ratio_mode"]
                         elif key in ["duration_seconds", "bpm"]:
                             if isinstance(settings[key], (int, float)) and settings[key] <= 0:
                                 settings[key] = default_settings[key]
@@ -201,6 +205,8 @@ class ConfigManager:
                 settings_dict["bpm_unit"] = DEFAULT_BPM_UNIT
             if settings_dict.get("aspect_ratio") not in ASPECT_RATIOS:
                 settings_dict["aspect_ratio"] = DEFAULT_ASPECT_RATIO
+            if settings_dict.get("aspect_ratio_mode") not in ["Crop to Fill", "Pad to Fit"]:
+                settings_dict["aspect_ratio_mode"] = "Crop to Fill"
             
             try:
                 settings_dict["duration_seconds"] = float(settings_dict.get("duration_seconds", 15.0))

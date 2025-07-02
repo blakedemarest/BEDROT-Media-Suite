@@ -16,8 +16,19 @@ from datetime import datetime
 
 
 def safe_print(message):
-    """Thread-safe print function."""
-    print(message)
+    """Thread-safe print function with Unicode encoding handling."""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        # Fall back to ASCII-safe version if Unicode fails
+        try:
+            # Try encoding to ASCII, replacing problematic characters
+            ascii_message = message.encode('ascii', 'replace').decode('ascii')
+            print(ascii_message)
+        except Exception:
+            # Last resort: print without special characters
+            safe_message = ''.join(c if ord(c) < 128 else '?' for c in str(message))
+            print(safe_message)
 
 
 def parse_aspect_ratio(ratio_str):

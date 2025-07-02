@@ -15,7 +15,10 @@ import subprocess
 import math
 import random
 import shutil
+import time
+import logging
 from .utils import safe_print, parse_aspect_ratio
+from .logging_config import get_logger, log_ffmpeg_command, log_video_info, LoggingContext
 
 # Constants
 DEFAULT_INTERMEDIATE_FPS = "30"
@@ -23,7 +26,7 @@ INTERMEDIATE_EXTENSION = ".ts"
 TEMP_CONCAT_FILENAME = "_temp_concat.mp4"
 TEMP_DIR_NAME = "remixer_temp_snippets"
 
-# HD resolutions for aspect ratio presets (Height x Width format)
+# HD resolutions for aspect ratio presets (Width x Height format)
 ASPECT_RATIO_RESOLUTIONS = {
     "1920x1080 (16:9 Landscape)": (1920, 1080),
     "1080x1920 (9:16 Portrait)": (1080, 1920),
@@ -48,8 +51,10 @@ class VideoProcessor:
     Core video processing functionality for the Video Snippet Remixer.
     """
     
-    def __init__(self, script_dir):
+    def __init__(self, script_dir, video_filter=None):
         self.script_dir = script_dir
+        self.video_filter = video_filter
+        self.logger = get_logger("video_processor")
         self.temp_snippet_dir = os.path.join(script_dir, TEMP_DIR_NAME)
         self.ffmpeg_path = None
         self.ffprobe_path = None
@@ -337,7 +342,7 @@ class VideoProcessor:
             safe_print(f"Error: Could not create temp dir: {e}")
             return False
     
-    def cut_video_snippets(self, snippet_definitions, aspect_ratio="16:9", export_settings=None, progress_callback=None):
+    def cut_video_snippets(self, snippet_definitions, aspect_ratio="16:9", export_settings=None, progress_callback=None, aspect_ratio_mode="crop"):
         """
         Cut video snippets from source files.
         
@@ -346,6 +351,7 @@ class VideoProcessor:
             aspect_ratio (str): Target aspect ratio
             export_settings (dict): Optional export settings
             progress_callback (callable): Optional progress callback
+            aspect_ratio_mode (str): How to handle aspect ratio - "crop" or "pad"
             
         Returns:
             list: List of successfully created snippet file paths
@@ -381,12 +387,20 @@ class VideoProcessor:
             vf_parts = []
             if export_settings and export_settings.get("match_input_fps"):
                 # Don't change FPS if matching input
-                vf_parts.append(f"scale={resolution_str}:force_original_aspect_ratio=decrease")
+                pass
             else:
                 vf_parts.append(f"fps={fps}")
-                vf_parts.append(f"scale={resolution_str}:force_original_aspect_ratio=decrease")
             
-            vf_parts.append(f"pad={resolution_str}:-1:-1:color=black")
+            # Apply aspect ratio mode
+            if aspect_ratio_mode == "pad":
+                # Scale to fit within frame (may have black bars) then pad to exact size
+                vf_parts.append(f"scale={resolution_str}:force_original_aspect_ratio=decrease")
+                vf_parts.append(f"pad={resolution_str}:(ow-iw)/2:(oh-ih)/2:black")
+            else:
+                # Default to crop mode
+                # Scale to fill frame (may overflow) then crop to exact size
+                vf_parts.append(f"scale={resolution_str}:force_original_aspect_ratio=increase")
+                vf_parts.append(f"crop={resolution_str}")
             vf_filter = ",".join(vf_parts)
             
             # Handle trim if specified in export settings
@@ -410,9 +424,14 @@ class VideoProcessor:
                 "-y", temp_snippet_path
             ]
             
+            # Log the full command
+            with LoggingContext(self.video_filter, video_file=filepath):
+                log_ffmpeg_command(self.logger, cut_command)
+                
             try:
+                start_time = time.time()
                 creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
-                subprocess.run(
+                proc = subprocess.run(
                     cut_command, 
                     capture_output=True, 
                     text=True, 
@@ -421,14 +440,43 @@ class VideoProcessor:
                     errors='ignore', 
                     creationflags=creationflags
                 )
-                snippet_files.append(temp_snippet_path)
+                elapsed = time.time() - start_time
+                
+                # Verify output and log results
+                if os.path.exists(temp_snippet_path):
+                    output_width, output_height, output_duration = self.get_video_info(temp_snippet_path)
+                    if output_width and output_height:
+                        with LoggingContext(self.video_filter, 
+                                          video_file=filepath,
+                                          dimensions=f"{output_width}x{output_height}",
+                                          aspect_ratio=f"{output_width/output_height:.3f}"):
+                            self.logger.info(f"Snippet {i+1} created successfully in {elapsed:.2f}s")
+                            self.logger.debug(f"Output: {output_width}x{output_height}, duration: {output_duration:.2f}s")
+                    snippet_files.append(temp_snippet_path)
+                    
+                    # Optionally verify snippet dimensions
+                    if export_settings and export_settings.get("verify_snippets", False):
+                        actual_w, actual_h, _ = self.verify_output_dimensions(
+                            temp_snippet_path, width, height, False
+                        )
+                        if actual_w != width or actual_h != height:
+                            self.logger.warning(f"Snippet {i+1} dimension mismatch! Expected: {width}x{height}, Actual: {actual_w}x{actual_h}")
+                            safe_print(f"Warning: Snippet {i+1} dimension mismatch! Expected: {width}x{height}, Actual: {actual_w}x{actual_h}")
+                else:
+                    raise Exception(f"Output file not created: {temp_snippet_path}")
+                    
             except subprocess.CalledProcessError as e:
+                self.logger.error(f"FFmpeg error cutting snippet {i+1}: {e}")
+                if e.stderr:
+                    self.logger.error(f"FFmpeg stderr: {e.stderr}")
                 safe_print(f"Error cutting snippet {i+1}:\nCMD: {' '.join(e.cmd)}\nStderr:\n{e.stderr}")
                 raise Exception(f"Error cutting snippet {i+1}")
             except Exception as e:
+                self.logger.error(f"Unexpected error cutting snippet {i+1}: {e}", exc_info=True)
                 safe_print(f"Unexpected error cutting snippet {i+1}: {e}")
                 raise Exception(f"Unexpected error cutting snippet {i+1}")
         
+        self.logger.info(f"Successfully created {len(snippet_files)} snippets")
         return snippet_files
     
     def concatenate_snippets(self, snippet_files, progress_callback=None):
@@ -492,7 +540,7 @@ class VideoProcessor:
             
         return temp_concat_path
     
-    def adjust_aspect_ratio(self, temp_concat_path, final_output_path, aspect_ratio_selection, export_settings=None, progress_callback=None):
+    def adjust_aspect_ratio(self, temp_concat_path, final_output_path, aspect_ratio_selection, export_settings=None, progress_callback=None, aspect_ratio_mode="crop"):
         """
         Adjust aspect ratio and create final output file.
         
@@ -502,6 +550,7 @@ class VideoProcessor:
             aspect_ratio_selection (str): Target aspect ratio
             export_settings (dict): Optional export settings
             progress_callback (callable): Optional progress callback
+            aspect_ratio_mode (str): How to handle aspect ratio - "crop" or "pad"
             
         Returns:
             bool: True if successful, False otherwise
@@ -524,71 +573,74 @@ class VideoProcessor:
             
             if width and height and target_ar_val:
                 source_ar_val = width / height
-                tolerance = 0.01
                 
-                if abs(source_ar_val - target_ar_val) < tolerance:
-                    if progress_callback:
-                        progress_callback("Intermediate matches target AR. Finalizing...")
-                    try:
-                        shutil.move(temp_concat_path, final_output_path)
-                        return True
-                    except (IOError, OSError) as e:
-                        safe_print(f"Error moving temp concat file: {e}")
-                        return False
+                # Calculate target dimensions
+                if aspect_ratio_selection in ASPECT_RATIO_RESOLUTIONS:
+                    target_width, target_height = ASPECT_RATIO_RESOLUTIONS[aspect_ratio_selection]
                 else:
-                    if source_ar_val > target_ar_val:
-                        ar_filter_vf = f"crop=w=ih*{target_ar_val:.4f}:h=ih"
+                    # Use current height and calculate width for custom aspect ratios
+                    target_height = height
+                    target_width = int(target_height * target_ar_val)
+                    # Ensure even dimensions
+                    if target_width % 2 != 0:
+                        target_width += 1
+                
+                # Build filter based on aspect ratio mode
+                if aspect_ratio_mode == "pad":
+                    # Scale to fit and pad with black bars
+                    ar_filter_vf = f"scale={target_width}:{target_height}:force_original_aspect_ratio=decrease,pad={target_width}:{target_height}:(ow-iw)/2:(oh-ih)/2:black"
+                else:
+                    # Default to crop mode - scale to fill and crop excess
+                    ar_filter_vf = f"scale={target_width}:{target_height}:force_original_aspect_ratio=increase,crop={target_width}:{target_height}"
+                
+                safe_print(f"AR Filter ({aspect_ratio_mode} mode): {ar_filter_vf}")
+                
+                # Get quality settings from export_settings
+                quality_params = ["-preset", "fast", "-crf", "23"]
+                if export_settings:
+                    if export_settings.get("bitrate_mode") == "crf":
+                        crf = export_settings.get("quality_crf", 23)
+                        quality_params = ["-preset", "fast", "-crf", str(crf)]
                     else:
-                        ar_filter_vf = f"pad=w=ih*{target_ar_val:.4f}:h=ih:x=(ow-iw)/2:y=0:color=black"
+                        bitrate = export_settings.get("bitrate", "5M")
+                        quality_params = ["-b:v", bitrate]
+                
+                ar_command = [
+                    self.ffmpeg_path or "ffmpeg", 
+                    "-hide_banner", "-loglevel", "error", 
+                    "-i", temp_concat_path,
+                    "-vf", ar_filter_vf, 
+                    "-c:v", "libx264"] + quality_params + [
+                    "-c:a", "copy",
+                    "-y", final_output_path
+                ]
+                
+                try:
+                    safe_print(f"Running FFmpeg AR Adjust: {' '.join(ar_command)}")
+                    creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                    subprocess.run(
+                        ar_command, 
+                        capture_output=True, 
+                        text=True, 
+                        check=True, 
+                        encoding='utf-8', 
+                        errors='ignore', 
+                        creationflags=creationflags
+                    )
                     
-                    safe_print(f"AR Filter: {ar_filter_vf}")
-                    
-                    # Get quality settings from export_settings
-                    quality_params = ["-preset", "fast", "-crf", "23"]
-                    if export_settings:
-                        if export_settings.get("bitrate_mode") == "crf":
-                            crf = export_settings.get("quality_crf", 23)
-                            quality_params = ["-preset", "fast", "-crf", str(crf)]
-                        else:
-                            bitrate = export_settings.get("bitrate", "5M")
-                            quality_params = ["-b:v", bitrate]
-                    
-                    ar_command = [
-                        self.ffmpeg_path or "ffmpeg", 
-                        "-hide_banner", "-loglevel", "error", 
-                        "-i", temp_concat_path,
-                        "-vf", ar_filter_vf, 
-                        "-c:v", "libx264"] + quality_params + [
-                        "-c:a", "copy",
-                        "-y", final_output_path
-                    ]
-                    
+                    # Clean up intermediate after success
                     try:
-                        safe_print(f"Running FFmpeg AR Adjust: {' '.join(ar_command)}")
-                        creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
-                        subprocess.run(
-                            ar_command, 
-                            capture_output=True, 
-                            text=True, 
-                            check=True, 
-                            encoding='utf-8', 
-                            errors='ignore', 
-                            creationflags=creationflags
-                        )
-                        
-                        # Clean up intermediate after success
-                        try:
-                            os.remove(temp_concat_path)
-                        except OSError as e:
-                            safe_print(f"Warning: Could not remove temp concat file after AR adjust: {e}")
-                        
-                        return True
-                    except subprocess.CalledProcessError as e:
-                        safe_print(f"Error adjusting AR:\nCMD: {' '.join(e.cmd)}\nStderr:\n{e.stderr}")
-                        return False
-                    except Exception as e:
-                        safe_print(f"Unexpected error adjusting AR: {e}")
-                        return False
+                        os.remove(temp_concat_path)
+                    except OSError as e:
+                        safe_print(f"Warning: Could not remove temp concat file after AR adjust: {e}")
+                    
+                    return True
+                except subprocess.CalledProcessError as e:
+                    safe_print(f"Error adjusting AR:\nCMD: {' '.join(e.cmd)}\nStderr:\n{e.stderr}")
+                    return False
+                except Exception as e:
+                    safe_print(f"Unexpected error adjusting AR: {e}")
+                    return False
             else:
                 safe_print("Error: Cannot adjust AR (invalid info/target). Saving intermediate.")
                 try:
@@ -623,3 +675,144 @@ class VideoProcessor:
             tuple: (ffmpeg_found, ffprobe_found)
         """
         return self.ffmpeg_found, self.ffprobe_found
+    
+    def verify_output_dimensions(self, video_path, expected_width=None, expected_height=None, check_black_bars=False):
+        """
+        Verify the actual output dimensions of a video file and optionally check for black bars.
+        
+        Args:
+            video_path (str): Path to the video file to verify
+            expected_width (int): Expected width (optional)
+            expected_height (int): Expected height (optional)
+            check_black_bars (bool): Whether to check for black bars using blackdetect filter
+            
+        Returns:
+            tuple: (actual_width, actual_height, has_black_bars)
+                   Returns (None, None, None) if verification fails
+        """
+        if not self.ffprobe_found or not os.path.exists(video_path):
+            self.logger.debug(f"ffprobe not found or path invalid for verification: {video_path}")
+            safe_print(f"Debug: ffprobe not found or path invalid for verification: {video_path}")
+            return None, None, None
+        
+        # Get video dimensions using ffprobe with JSON output
+        with LoggingContext(self.video_filter, video_file=video_path):
+            self.logger.debug("Verifying output dimensions")
+            
+        try:
+            # Use ffprobe to get stream information in JSON format
+            command = [
+                self.ffprobe_path if self.ffprobe_path else "ffprobe",
+                "-v", "quiet",
+                "-print_format", "json",
+                "-show_streams",
+                "-select_streams", "v:0",
+                video_path
+            ]
+            
+            log_ffmpeg_command(self.logger, command, level=logging.DEBUG)
+            
+            creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+            proc = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                encoding='utf-8',
+                errors='ignore',
+                creationflags=creationflags
+            )
+            
+            import json
+            data = json.loads(proc.stdout)
+            
+            # Extract dimensions from the first video stream
+            if data.get("streams") and len(data["streams"]) > 0:
+                stream = data["streams"][0]
+                actual_width = stream.get("width")
+                actual_height = stream.get("height")
+                
+                if actual_width is None or actual_height is None:
+                    safe_print(f"Warning: Could not extract dimensions from video stream")
+                    return None, None, None
+                
+                # Log dimension verification
+                if expected_width and expected_height:
+                    if actual_width != expected_width or actual_height != expected_height:
+                        safe_print(f"Warning: Output dimensions mismatch! Expected: {expected_width}x{expected_height}, Actual: {actual_width}x{actual_height}")
+                    else:
+                        safe_print(f"Info: Output dimensions verified: {actual_width}x{actual_height}")
+                else:
+                    safe_print(f"Info: Video dimensions: {actual_width}x{actual_height}")
+                
+            else:
+                safe_print(f"Error: No video streams found in {video_path}")
+                return None, None, None
+                
+        except subprocess.CalledProcessError as e:
+            safe_print(f"Error getting dimensions for '{os.path.basename(video_path)}': {e}")
+            return None, None, None
+        except json.JSONDecodeError as e:
+            safe_print(f"Error parsing ffprobe JSON output: {e}")
+            return None, None, None
+        except Exception as e:
+            safe_print(f"Unexpected error verifying dimensions: {e}")
+            return None, None, None
+        
+        # Check for black bars if requested
+        has_black_bars = False
+        if check_black_bars and self.ffmpeg_found:
+            try:
+                # Use ffmpeg with blackdetect filter
+                # d=0.1: black duration threshold (0.1 seconds)
+                # pix_th=0.10: pixel threshold (10% deviation from pure black)
+                command = [
+                    self.ffmpeg_path if self.ffmpeg_path else "ffmpeg",
+                    "-i", video_path,
+                    "-vf", "blackdetect=d=0.1:pix_th=0.10",
+                    "-an",  # Disable audio processing
+                    "-f", "null",
+                    "-"  # Null output
+                ]
+                
+                proc = subprocess.run(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='ignore',
+                    creationflags=creationflags
+                )
+                
+                # blackdetect outputs to stderr
+                stderr_output = proc.stderr.lower()
+                
+                # Check if blackdetect found any black areas
+                if "black_start" in stderr_output or "blackdetect" in stderr_output:
+                    # Parse blackdetect output to check if bars span the entire video
+                    lines = proc.stderr.split('\n')
+                    black_detections = []
+                    
+                    for line in lines:
+                        if "black_start" in line:
+                            # Extract black detection info
+                            black_detections.append(line)
+                    
+                    # If we have consistent black areas throughout the video, likely black bars
+                    if len(black_detections) > 0:
+                        # Get video duration for comparison
+                        _, _, duration = self.get_video_info(video_path)
+                        if duration and len(black_detections) > int(duration * 0.8):  # Black detected in 80%+ of video
+                            has_black_bars = True
+                            safe_print(f"Warning: Black bars detected in output video!")
+                        else:
+                            safe_print(f"Info: Some black frames detected but not consistent black bars ({len(black_detections)} detections)")
+                else:
+                    safe_print(f"Info: No black bars detected in output video")
+                    
+            except subprocess.CalledProcessError as e:
+                safe_print(f"Warning: Could not check for black bars (non-critical): {e}")
+            except Exception as e:
+                safe_print(f"Warning: Error during black bar detection (non-critical): {e}")
+        
+        return actual_width, actual_height, has_black_bars

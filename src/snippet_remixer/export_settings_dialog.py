@@ -31,7 +31,7 @@ class ExportSettingsDialog:
         # Create dialog window
         self.dialog = tk.Toplevel(parent)
         self.dialog.title("Export Settings")
-        self.dialog.geometry("500x600")
+        self.dialog.geometry("500x700")
         self.dialog.transient(parent)
         self.dialog.grab_set()
         
@@ -78,6 +78,10 @@ class ExportSettingsDialog:
         self.enable_trim_var = tk.BooleanVar(value=False)
         self.trim_start_var = tk.StringVar()
         self.trim_end_var = tk.StringVar()
+        
+        # Verification variables
+        self.check_black_bars_var = tk.BooleanVar(value=False)
+        self.verify_snippets_var = tk.BooleanVar(value=False)
     
     def create_ui(self):
         """Create the dialog UI."""
@@ -96,6 +100,9 @@ class ExportSettingsDialog:
         
         # Trim Section
         self.create_trim_section(main_frame)
+        
+        # Verification Section
+        self.create_verification_section(main_frame)
         
         # Buttons
         self.create_buttons(main_frame)
@@ -297,6 +304,36 @@ class ExportSettingsDialog:
         )
         hint_label.grid(row=2, column=0, columnspan=4, pady=(5, 0))
     
+    def create_verification_section(self, parent):
+        """Create verification settings section."""
+        verify_frame = ttk.LabelFrame(parent, text="Output Verification", padding="10")
+        verify_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        # Check black bars
+        black_bars_check = ttk.Checkbutton(
+            verify_frame,
+            text="Check for black bars in output (uses blackdetect filter)",
+            variable=self.check_black_bars_var
+        )
+        black_bars_check.grid(row=0, column=0, sticky=tk.W, pady=5)
+        
+        # Verify snippets
+        snippets_check = ttk.Checkbutton(
+            verify_frame,
+            text="Verify dimensions of individual snippets (slower)",
+            variable=self.verify_snippets_var
+        )
+        snippets_check.grid(row=1, column=0, sticky=tk.W, pady=5)
+        
+        # Info label
+        info_label = ttk.Label(
+            verify_frame,
+            text="Note: Verification helps ensure output quality but may increase processing time",
+            font=("TkDefaultFont", 8),
+            foreground="gray"
+        )
+        info_label.grid(row=2, column=0, pady=(5, 0))
+    
     def create_buttons(self, parent):
         """Create dialog buttons."""
         button_frame = ttk.Frame(parent)
@@ -451,6 +488,10 @@ class ExportSettingsDialog:
             self.trim_start_var.set(settings.get("trim_start", ""))
             self.trim_end_var.set(settings.get("trim_end", ""))
         
+        # Verification
+        self.check_black_bars_var.set(settings.get("check_black_bars", False))
+        self.verify_snippets_var.set(settings.get("verify_snippets", False))
+        
         # Update UI states
         self.toggle_resolution_mode()
         self.toggle_fps_mode()
@@ -556,6 +597,10 @@ class ExportSettingsDialog:
             settings["trim_start"] = ""
             settings["trim_end"] = ""
         
+        # Verification
+        settings["check_black_bars"] = self.check_black_bars_var.get()
+        settings["verify_snippets"] = self.verify_snippets_var.get()
+        
         # Save to config
         self.config_manager.set_export_settings(settings)
         
@@ -585,6 +630,10 @@ class ExportSettingsDialog:
         self.enable_trim_var.set(False)
         self.trim_start_var.set("")
         self.trim_end_var.set("")
+        
+        # Verification
+        self.check_black_bars_var.set(False)
+        self.verify_snippets_var.set(False)
         
         # Update UI states
         self.toggle_resolution_mode()

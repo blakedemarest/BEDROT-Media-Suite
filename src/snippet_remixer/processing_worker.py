@@ -12,8 +12,10 @@ Handles background video processing operations including:
 import threading
 import os
 import math
+import time
 from .video_processor import VideoProcessor
 from .utils import safe_print, generate_unique_suffix
+from .logging_config import get_logger, setup_logging, log_processing_summary
 
 
 class ProcessingWorker:
@@ -21,9 +23,11 @@ class ProcessingWorker:
     Worker class for handling video processing in a separate thread.
     """
     
-    def __init__(self, script_dir):
+    def __init__(self, script_dir, video_filter=None):
         self.script_dir = script_dir
-        self.video_processor = VideoProcessor(script_dir)
+        self.logger = get_logger("processing_worker")
+        self.video_filter = video_filter
+        self.video_processor = VideoProcessor(script_dir, video_filter)
         self.processing_active = False
         self.thread = None
     
@@ -115,11 +119,22 @@ class ProcessingWorker:
             completion_callback (callable): Completion callback
         """
         processing_failed = False
+        start_time = time.time()
+        
+        self.logger.info("="*80)
+        self.logger.info("Starting video processing")
+        self.logger.info(f"Input files: {len(input_files)}")
+        self.logger.info(f"Output path: {final_output_path}")
+        self.logger.info(f"Target duration: {target_total_duration_sec:.2f}s")
+        self.logger.info(f"Snippet duration: {snippet_duration_sec:.2f}s")
+        self.logger.info(f"Aspect ratio: {aspect_ratio_selection}")
+        self.logger.info("="*80)
         
         try:
             # Check tools availability
             ffmpeg_found, ffprobe_found = self.video_processor.are_tools_available()
             if not ffmpeg_found or not ffprobe_found:
+                self.logger.error("FFmpeg/FFprobe not found in system PATH")
                 raise Exception("FFmpeg/FFprobe not found")
             
             # Stage 1: Analyze Durations
@@ -136,6 +151,7 @@ class ProcessingWorker:
                              "\\n".join(files_too_short))
             
             if not valid_inputs:
+                self.logger.error(f"No valid input videos found with duration >= {snippet_duration_sec:.2f}s")
                 raise Exception("No valid input videos found or none are long enough.")
             
             # Stage 2: Generate Snippet List
@@ -158,8 +174,11 @@ class ProcessingWorker:
             if not self.video_processor.prepare_temp_directory():
                 raise Exception("Temp dir creation failed.")
             
+            # Get aspect ratio mode from export_settings
+            aspect_ratio_mode = export_settings.get("aspect_ratio_mode", "crop") if export_settings else "crop"
+            
             snippet_files = self.video_processor.cut_video_snippets(
-                snippet_definitions, aspect_ratio_selection, export_settings, progress_callback
+                snippet_definitions, aspect_ratio_selection, export_settings, progress_callback, aspect_ratio_mode
             )
             
             if not snippet_files:
@@ -172,17 +191,52 @@ class ProcessingWorker:
             
             # Stage 5: Aspect Ratio Adjustment and Final Output
             success = self.video_processor.adjust_aspect_ratio(
-                temp_concat_path, final_output_path, aspect_ratio_selection, export_settings, progress_callback
+                temp_concat_path, final_output_path, aspect_ratio_selection, export_settings, progress_callback, aspect_ratio_mode
             )
             
             if not success:
                 raise Exception("Aspect ratio adjustment failed")
+            
+            # Stage 6: Verify Output Dimensions
+            if os.path.exists(final_output_path):
+                # Calculate expected dimensions based on aspect ratio
+                expected_width, expected_height = self.video_processor.calculate_intermediate_resolution(
+                    aspect_ratio_selection, export_settings
+                )
+                
+                # Verify dimensions and optionally check for black bars
+                check_black_bars = export_settings.get("check_black_bars", False) if export_settings else False
+                actual_width, actual_height, has_black_bars = self.video_processor.verify_output_dimensions(
+                    final_output_path, expected_width, expected_height, check_black_bars
+                )
+                
+                if has_black_bars:
+                    self.logger.warning("Black bars detected in final output!")
+                    safe_print(f"Warning: Black bars detected in final output!")
+                    if error_callback:
+                        error_callback("warning", "Black Bars Detected", 
+                                     "The output video contains black bars. This may indicate an issue with aspect ratio processing.")
+            
+            # Calculate processing time and log summary
+            elapsed_time = time.time() - start_time
+            
+            # Get final video info for summary
+            final_width, final_height, final_duration = self.video_processor.get_video_info(final_output_path)
+            if final_width and final_height and final_duration:
+                log_processing_summary(
+                    self.logger,
+                    len(input_files),
+                    final_output_path,
+                    final_duration,
+                    elapsed_time
+                )
             
             # Final success message
             if progress_callback:
                 progress_callback(f"Success! Remix saved: {os.path.basename(final_output_path)}")
                 
         except Exception as e:
+            self.logger.error(f"Processing failed: {e}", exc_info=True)
             safe_print(f"Processing stopped due to error: {e}")
             processing_failed = True
             
@@ -193,8 +247,10 @@ class ProcessingWorker:
             if processing_failed and os.path.exists(final_output_path):
                 try:
                     os.remove(final_output_path)
+                    self.logger.info(f"Cleaned up failed output file: {final_output_path}")
                     safe_print(f"Cleaned up potentially failed final output file: {final_output_path}")
                 except OSError as e:
+                    self.logger.warning(f"Could not delete failed output file: {e}")
                     safe_print(f"Warning: Could not delete potentially failed final output file: {e}")
         
         finally:

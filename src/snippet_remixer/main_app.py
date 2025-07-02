@@ -12,9 +12,11 @@ This module contains the main application window and GUI functionality for:
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
+import logging
 from .config_manager import ConfigManager
 from .processing_worker import ProcessingWorker
 from .utils import safe_print, validate_directory_path
+from .logging_config import setup_logging, get_logger
 
 
 class VideoRemixerApp:
@@ -26,9 +28,18 @@ class VideoRemixerApp:
         self.root = root
         self.root.title("Video Snippet Remixer")
         
+        # Set up logging
+        log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+        self.logger, self.video_filter = setup_logging(
+            log_dir=log_dir,
+            log_level=logging.DEBUG,
+            console_level=logging.INFO
+        )
+        self.logger.info("Video Snippet Remixer starting up")
+        
         # Initialize components
         self.config_manager = ConfigManager()
-        self.processing_worker = ProcessingWorker(self.config_manager.get_script_dir())
+        self.processing_worker = ProcessingWorker(self.config_manager.get_script_dir(), self.video_filter)
         self.settings = self.config_manager.config
         
         # Check FFmpeg tools
@@ -43,6 +54,7 @@ class VideoRemixerApp:
         self.bpm_unit_var = tk.StringVar(value=self.settings["bpm_unit"])
         self.num_units_var = tk.StringVar(value=str(self.settings["num_units"]))
         self.aspect_ratio_var = tk.StringVar(value=self.settings["aspect_ratio"])
+        self.aspect_ratio_mode_var = tk.StringVar(value=self.settings.get("aspect_ratio_mode", "Crop to Fill"))
         self.status_var = tk.StringVar(value="Ready")
         self.continuous_mode_var = tk.BooleanVar(value=self.settings.get("continuous_mode", False))
 
@@ -186,6 +198,29 @@ class VideoRemixerApp:
         self.export_settings_button.grid(row=1, column=2, padx=5, pady=5)
         
         ttk.Label(output_frame, text="(All videos will be HD quality)").grid(row=1, column=3, padx=5, pady=5, sticky=tk.W)
+        
+        # Aspect Ratio Mode
+        ttk.Label(output_frame, text="Aspect Ratio Mode:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
+        
+        # Radio buttons frame
+        mode_frame = ttk.Frame(output_frame)
+        mode_frame.grid(row=2, column=1, columnspan=2, padx=5, pady=5, sticky=tk.W)
+        
+        self.crop_radio = ttk.Radiobutton(
+            mode_frame,
+            text="Crop to Fill",
+            variable=self.aspect_ratio_mode_var,
+            value="Crop to Fill"
+        )
+        self.crop_radio.pack(side=tk.LEFT, padx=(0, 20))
+        
+        self.pad_radio = ttk.Radiobutton(
+            mode_frame,
+            text="Pad to Fit",
+            variable=self.aspect_ratio_mode_var,
+            value="Pad to Fit"
+        )
+        self.pad_radio.pack(side=tk.LEFT)
 
     def create_length_section(self, parent):
         """Create the length control section."""
@@ -333,15 +368,41 @@ class VideoRemixerApp:
         # Don't pack initially
 
     def create_status_section(self, parent):
-        """Create the status bar section."""
+        """Create the status display section."""
+        # Create a simple frame for the status area
+        status_frame = ttk.LabelFrame(parent, text="Status", padding="10")
+        status_frame.pack(fill=tk.BOTH, expand=True, pady=(10,0))
+        
+        # Create a simple text widget for status messages
+        import tkinter.scrolledtext as scrolledtext
+        self.status_text = scrolledtext.ScrolledText(
+            status_frame, 
+            height=8, 
+            wrap=tk.WORD, 
+            state=tk.NORMAL,  # Start as normal so we can add initial text
+            font=('Courier', 9),
+            bg='white',
+            fg='black'
+        )
+        self.status_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Add initial message directly
+        self.status_text.insert(tk.END, "=== Snippet Remixer Status ===\n")
+        self.status_text.insert(tk.END, "Ready to process videos\n")
+        self.status_text.config(state=tk.DISABLED)
+        
+        # Simple status bar at bottom
         self.status_bar = ttk.Label(
-            parent, 
+            status_frame, 
             textvariable=self.status_var, 
             relief=tk.SUNKEN, 
             anchor=tk.W, 
             padding=5
         )
-        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X, pady=(5,0))
+        self.status_bar.pack(fill=tk.X, pady=(5,0))
+        
+        # Set initial status
+        self.status_var.set("Ready to process videos")
 
     def toggle_length_mode_ui(self, *args):
         """Toggle between seconds and BPM input modes."""
@@ -505,12 +566,54 @@ class VideoRemixerApp:
             self.update_status("Export settings updated.")
 
     def update_status(self, message):
-        """Update the status bar message."""
+        """Update the status display with message."""
         try:
-            if self.root.winfo_exists():
-                self.root.after(0, self.status_var.set, message)
+            # Update the status bar
+            self.status_var.set(message)
+            # Also add to the status text area
+            self._append_to_status_text(message)
         except tk.TclError:
             safe_print(f"Status update ignored (window closing?): {message}")
+    
+    def _append_to_status_text(self, message, msg_type="INFO"):
+        """Append message to the status text area."""
+        try:
+            if hasattr(self, 'status_text'):
+                from datetime import datetime
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                
+                # Format message based on type
+                if msg_type == "ERROR":
+                    formatted_message = f"[{timestamp}] ERROR: {message}\n"
+                elif msg_type == "WARNING":
+                    formatted_message = f"[{timestamp}] WARNING: {message}\n"
+                elif msg_type == "SUCCESS":
+                    formatted_message = f"[{timestamp}] SUCCESS: {message}\n"
+                else:
+                    formatted_message = f"[{timestamp}] {message}\n"
+                
+                self.status_text.config(state=tk.NORMAL)
+                self.status_text.insert(tk.END, formatted_message)
+                self.status_text.see(tk.END)  # Auto-scroll to bottom
+                self.status_text.config(state=tk.DISABLED)
+                self.status_text.update()  # Force update
+        except (tk.TclError, AttributeError):
+            pass  # Ignore if widget is destroyed or doesn't exist
+    
+    def update_status_error(self, message):
+        """Update status with an error message."""
+        self.status_var.set(f"ERROR: {message}")
+        self._append_to_status_text(message, "ERROR")
+    
+    def update_status_warning(self, message):
+        """Update status with a warning message."""
+        self.status_var.set(f"WARNING: {message}")
+        self._append_to_status_text(message, "WARNING")
+    
+    def update_status_success(self, message):
+        """Update status with a success message."""
+        self.status_var.set(f"SUCCESS: {message}")
+        self._append_to_status_text(message, "SUCCESS")
 
     def enable_generate_button(self, enable=True):
         """Enable or disable the generate button."""
@@ -593,7 +696,11 @@ class VideoRemixerApp:
 
         # Setup UI for processing
         self.enable_generate_button(False)
-        self.update_status(f"Output: {os.path.basename(final_output_path)}")
+        output_msg = f"Output: {os.path.basename(final_output_path)}"
+        self.update_status(output_msg)
+        # Log output file for launcher log area
+        safe_print(f"[VIDEO] {output_msg}")
+        self.logger.info(f"Starting video processing - {output_msg}")
 
         # Small delay before starting, so user sees the name
         self.root.after(500, self._start_thread_delayed, input_files, final_output_path, 
@@ -602,22 +709,41 @@ class VideoRemixerApp:
     def _start_thread_delayed(self, input_files, final_output_path, target_total_duration_sec, 
                              snippet_duration_sec, aspect_ratio_selection, settings):
         """Helper to start the thread after a short GUI delay."""
-        self.update_status("Starting processing...")
+        start_msg = "Starting processing..."
+        self.update_status(start_msg)
+        # Log start for launcher log area
+        safe_print(f"[START] {start_msg}")
+        self.logger.info(f"Processing started: {len(input_files)} input files, target duration: {target_total_duration_sec:.1f}s")
         
         # Define callbacks
         def progress_callback(message):
             self.update_status(message)
+            # Also log to stdout so it appears in launcher log area
+            safe_print(f"Progress: {message}")
+            # And log through the logging system
+            self.logger.info(f"Progress: {message}")
         
         def error_callback(error_type, title, message):
+            # Log error/warning to stdout for launcher log area
             if error_type == "warning":
+                safe_print(f"[WARNING] {title}: {message}")
+                self.logger.warning(f"{title}: {message}")
+                self.update_status_warning(f"{title}: {message}")
                 self.root.after(0, messagebox.showwarning, title, message)
             else:
+                safe_print(f"[ERROR] {title}: {message}")
+                self.logger.error(f"{title}: {message}")
+                self.update_status_error(f"{title}: {message}")
                 self.root.after(0, messagebox.showerror, title, message)
         
         def completion_callback(success, output_path):
             if success:
                 self.continuous_count += 1
-                self.update_status(f"Success! Remix #{self.continuous_count} saved: {os.path.basename(output_path)}")
+                success_msg = f"Remix #{self.continuous_count} saved: {os.path.basename(output_path)}"
+                self.update_status_success(success_msg)
+                # Log success to stdout for launcher log area
+                safe_print(f"[SUCCESS] {success_msg}")
+                self.logger.info(success_msg)
                 self.update_continuous_counter()
                 
                 # If continuous mode is enabled, start next remix
@@ -627,7 +753,11 @@ class VideoRemixerApp:
                     self.enable_generate_button(True)
                     self.continuous_processing = False
             else:
-                self.update_status("Processing failed. Check console for details.")
+                failure_msg = "Processing failed. Check console for details."
+                self.update_status_error(failure_msg)
+                # Log failure to stdout for launcher log area
+                safe_print(f"[FAILED] {failure_msg}")
+                self.logger.error(failure_msg)
                 self.enable_generate_button(True)
                 self.continuous_processing = False
 
@@ -637,6 +767,9 @@ class VideoRemixerApp:
         # Add jitter settings to export settings
         export_settings["jitter_enabled"] = settings.get("jitter_enabled", False)
         export_settings["jitter_intensity"] = settings.get("jitter_intensity", 50)
+        
+        # Add aspect ratio mode to export settings
+        export_settings["aspect_ratio_mode"] = self.aspect_ratio_mode_var.get()
         
         # Start processing
         self.processing_worker.start_processing_thread(
@@ -660,6 +793,7 @@ class VideoRemixerApp:
         self.settings["output_folder"] = self.output_folder_var.get()
         self.settings["length_mode"] = self.length_mode_var.get()
         self.settings["aspect_ratio"] = self.aspect_ratio_var.get()
+        self.settings["aspect_ratio_mode"] = self.aspect_ratio_mode_var.get()
         
         try:
             self.settings["duration_seconds"] = float(self.duration_seconds_var.get())
