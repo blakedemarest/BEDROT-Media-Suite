@@ -38,4 +38,31 @@ dist/
 
 # Your slideshow video output (optional, if you don't want to commit large files)
 *.mp4
+*.ts
+*.avi
+*.mov
+*.mkv
+*.webm
+*.flv
+*.wmv
+
+# Temporary processing directories
+**/remixer_temp_snippets/
+**/temp_snippets/
+**/*_temp*/
+temp/
+logs/
+
+# Environment files
 .env
+
+# Large test files and images (over 1MB)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+
+# Log files
+*.log
