@@ -18,6 +18,15 @@ from .processing_worker import ProcessingWorker
 from .utils import safe_print, validate_directory_path
 from .logging_config import setup_logging, get_logger
 
+# Import drag and drop support
+try:
+    from tkinterdnd2 import DND_FILES, TkinterDnD
+    DND_AVAILABLE = True
+except ImportError:
+    DND_AVAILABLE = False
+    print("[WARNING] tkinterdnd2 not available. Drag and drop functionality will be disabled.")
+    print("[TIP] Install tkinterdnd2 for drag and drop: pip install tkinterdnd2")
+
 
 class VideoRemixerApp:
     """
@@ -27,6 +36,11 @@ class VideoRemixerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Video Snippet Remixer")
+        
+        # Initialize drag and drop support if available
+        self.dnd_available = DND_AVAILABLE and hasattr(root, 'drop_target_register')
+        if not self.dnd_available and DND_AVAILABLE:
+            print("[WARNING] Root window doesn't support drag and drop")
         
         # Set up logging
         log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
@@ -62,6 +76,7 @@ class VideoRemixerApp:
         self.last_input_folder = self.settings["last_input_folder"]
         self.continuous_processing = False
         self.continuous_count = 0
+        self._last_continuous_settings = {}
 
         # Bindings
         self.length_mode_var.trace_add("write", self.toggle_length_mode_ui)
@@ -70,6 +85,13 @@ class VideoRemixerApp:
         self.bpm_var.trace_add("write", self.update_duration_estimate)
         self.bpm_unit_var.trace_add("write", self.update_duration_estimate)
         self.num_units_var.trace_add("write", self.update_duration_estimate)
+        
+        # Add bindings for continuous mode counter updates
+        self.bpm_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.bpm_unit_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.num_units_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.duration_seconds_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.length_mode_var.trace_add("write", self.update_continuous_counter_on_change)
 
         # Window Setup
         self.root.geometry("700x650")
@@ -128,6 +150,10 @@ class VideoRemixerApp:
         )
         self.queue_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
+        # Configure drag and drop for the listbox
+        if self.dnd_available:
+            self.setup_drag_and_drop()
+        
         scrollbar = ttk.Scrollbar(input_list_frame, orient=tk.VERTICAL, command=self.queue_listbox.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.queue_listbox.config(yscrollcommand=scrollbar.set)
@@ -155,6 +181,115 @@ class VideoRemixerApp:
             command=self.clear_all
         )
         clear_all_button.pack(side=tk.LEFT, padx=5)
+
+    def setup_drag_and_drop(self):
+        """Set up drag and drop functionality for the input listbox."""
+        if not self.dnd_available:
+            return
+            
+        try:
+            # Register the listbox as a drop target for files
+            self.queue_listbox.drop_target_register(DND_FILES)
+            
+            # Bind the drop event
+            self.queue_listbox.dnd_bind('<<Drop>>', self.on_file_drop)
+            
+            # Visual feedback during drag operations
+            self.queue_listbox.dnd_bind('<<DragEnter>>', self.on_drag_enter)
+            self.queue_listbox.dnd_bind('<<DragLeave>>', self.on_drag_leave)
+            
+            # Update the listbox background color to indicate drag and drop support
+            original_bg = self.queue_listbox.cget('bg')
+            self.original_listbox_bg = original_bg
+            
+            # Add a subtle hint that drag and drop is supported
+            self.add_drag_drop_hint()
+            
+        except Exception as e:
+            print(f"[WARNING] Failed to setup drag and drop: {e}")
+
+    def add_drag_drop_hint(self):
+        """Add a visual hint that the listbox supports drag and drop."""
+        if self.queue_listbox.size() == 0:
+            # Add a placeholder message when the listbox is empty
+            self.queue_listbox.insert(0, "🎬 Drag and drop video files here or use Browse Files...")
+            self.queue_listbox.configure(fg='gray')
+            self.queue_listbox.bind('<Button-1>', self.on_listbox_click)
+            self._has_placeholder = True
+        else:
+            self._has_placeholder = False
+
+    def remove_drag_drop_hint(self):
+        """Remove the drag and drop hint if present."""
+        if hasattr(self, '_has_placeholder') and self._has_placeholder:
+            if self.queue_listbox.size() > 0:
+                first_item = self.queue_listbox.get(0)
+                if first_item.startswith("🎬 Drag and drop"):
+                    self.queue_listbox.delete(0)
+                    self.queue_listbox.configure(fg='black')
+                    self._has_placeholder = False
+
+    def on_listbox_click(self, event):
+        """Handle clicks on the listbox to remove placeholder and browse files."""
+        if hasattr(self, '_has_placeholder') and self._has_placeholder:
+            self.remove_drag_drop_hint()
+            # Automatically open file browser when clicking on empty listbox
+            self.browse_input_files()
+
+    def on_file_drop(self, event):
+        """Handle file drop events on the listbox."""
+        try:
+            # Get the list of dropped files
+            files = self.root.tk.splitlist(event.data)
+            
+            # Filter for video files and validate
+            video_extensions = {'.mp4', '.avi', '.mov', '.mkv', '.webm', '.flv', '.wmv', '.m4v', '.3gp', '.mpg', '.mpeg'}
+            valid_files = []
+            
+            for file_path in files:
+                # Clean up the file path (remove extra quotes/spaces)
+                file_path = file_path.strip().strip('"').strip("'")
+                
+                if os.path.isfile(file_path):
+                    _, ext = os.path.splitext(file_path.lower())
+                    if ext in video_extensions:
+                        valid_files.append(file_path)
+                    else:
+                        print(f"[WARNING] Skipping non-video file: {os.path.basename(file_path)}")
+                elif os.path.isdir(file_path):
+                    # If a directory is dropped, scan for video files
+                    for root, dirs, files in os.walk(file_path):
+                        for filename in files:
+                            _, ext = os.path.splitext(filename.lower())
+                            if ext in video_extensions:
+                                valid_files.append(os.path.join(root, filename))
+            
+            if valid_files:
+                # Remove placeholder hint if present
+                self.remove_drag_drop_hint()
+                
+                # Add the valid files to the queue
+                self.add_files_to_queue(valid_files)
+                
+                # Show success message
+                count = len(valid_files)
+                self.update_status_success(f"Added {count} video file{'s' if count > 1 else ''} via drag and drop")
+            else:
+                self.update_status_warning("No valid video files found in dropped items")
+                
+        except Exception as e:
+            print(f"[ERROR] Error processing dropped files: {e}")
+            self.update_status_error(f"Error processing dropped files: {str(e)}")
+
+    def on_drag_enter(self, event):
+        """Visual feedback when files are dragged over the listbox."""
+        if hasattr(self, 'original_listbox_bg'):
+            self.queue_listbox.configure(bg='#e6f3ff')  # Light blue background
+
+    def on_drag_leave(self, event):
+        """Reset visual feedback when drag leaves the listbox."""
+        if hasattr(self, 'original_listbox_bg'):
+            self.queue_listbox.configure(bg=self.original_listbox_bg)
 
     def create_output_section(self, parent):
         """Create the output settings section."""
@@ -256,11 +391,19 @@ class VideoRemixerApp:
         )
         self.seconds_entry.pack(side=tk.LEFT, padx=5)
         
+        # Bind events for immediate updates on Enter or focus loss
+        self.seconds_entry.bind('<Return>', self.on_entry_update)
+        self.seconds_entry.bind('<FocusOut>', self.on_entry_update)
+        
         # BPM input frame
         self.bpm_input_frame = ttk.Frame(length_frame)
         ttk.Label(self.bpm_input_frame, text="BPM:").pack(side=tk.LEFT, padx=5)
         self.bpm_entry = ttk.Entry(self.bpm_input_frame, textvariable=self.bpm_var, width=6)
         self.bpm_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Bind events for immediate updates on Enter or focus loss
+        self.bpm_entry.bind('<Return>', self.on_entry_update)
+        self.bpm_entry.bind('<FocusOut>', self.on_entry_update)
         
         ttk.Label(self.bpm_input_frame, text="Snippet Unit:").pack(side=tk.LEFT, padx=(15,5))
         self.bpm_unit_combo = ttk.Combobox(
@@ -279,6 +422,10 @@ class VideoRemixerApp:
             width=6
         )
         self.num_units_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Bind events for immediate updates on Enter or focus loss
+        self.num_units_entry.bind('<Return>', self.on_entry_update)
+        self.num_units_entry.bind('<FocusOut>', self.on_entry_update)
         
         # Add duration estimate label
         self.duration_estimate_label = ttk.Label(
@@ -502,7 +649,15 @@ class VideoRemixerApp:
 
     def add_files_to_queue(self, filepaths):
         """Add files to the processing queue."""
+        # Remove placeholder hint if present
+        self.remove_drag_drop_hint()
+        
         current_items = set(self.queue_listbox.get(0, tk.END))
+        
+        # Filter out placeholder hint from current items if present
+        if hasattr(self, '_has_placeholder') and self._has_placeholder:
+            current_items = {item for item in current_items if not item.startswith("🎬 Drag and drop")}
+        
         new_items_count = 0
         
         for fp in filepaths:
@@ -537,12 +692,20 @@ class VideoRemixerApp:
         
         for i in sorted(selected_indices, reverse=True):
             self.queue_listbox.delete(i)
+        
+        # Add drag and drop hint back if queue becomes empty
+        if self.queue_listbox.size() == 0 and self.dnd_available:
+            self.add_drag_drop_hint()
+            
         self.update_status("Selected items removed.")
 
     def clear_all(self):
         """Clear all items from the queue."""
         if self.queue_listbox.size() > 0:
             self.queue_listbox.delete(0, tk.END)
+                    # Add drag and drop hint back when queue is empty
+        if self.dnd_available:
+            self.add_drag_drop_hint()
             self.update_status("Queue cleared.")
         else:
             self.update_status("Queue is already empty.")
@@ -650,6 +813,11 @@ class VideoRemixerApp:
             return
 
         input_files = list(self.queue_listbox.get(0, tk.END))
+        
+        # Filter out placeholder hint if present
+        if hasattr(self, '_has_placeholder') and self._has_placeholder and input_files:
+            input_files = [f for f in input_files if not f.startswith("🎬 Drag and drop")]
+        
         if not input_files:
             messagebox.showwarning("Input Required", "Please add video files to the queue.")
             return
@@ -744,6 +912,8 @@ class VideoRemixerApp:
                 # Log success to stdout for launcher log area
                 safe_print(f"[SUCCESS] {success_msg}")
                 self.logger.info(success_msg)
+                
+                # Update counter display with latest settings 
                 self.update_continuous_counter()
                 
                 # If continuous mode is enabled, start next remix
@@ -826,7 +996,24 @@ class VideoRemixerApp:
     def toggle_continuous_mode(self):
         """Toggle continuous mode on/off."""
         if self.continuous_mode_var.get():
-            self.update_status("Continuous mode enabled - will keep generating remixes")
+            # Capture initial settings when starting continuous mode
+            self._last_continuous_settings = self._get_current_settings()
+            
+            # Enhanced status message showing current settings
+            if self.length_mode_var.get() == "BPM":
+                bpm = self._last_continuous_settings.get("bpm", "N/A")
+                units = self._last_continuous_settings.get("num_units", "N/A")
+                unit_type = self._last_continuous_settings.get("bpm_unit", "N/A")
+                settings_info = f"BPM: {bpm}, {units} {unit_type}s"
+            else:
+                duration = self._last_continuous_settings.get("duration_seconds", "N/A")
+                settings_info = f"Duration: {duration}s"
+            
+            status_msg = f"Continuous mode enabled ({settings_info}) - will keep generating remixes"
+            self.update_status(status_msg)
+            safe_print(f"[CONTINUOUS] {status_msg}")
+            self.logger.info(f"Continuous mode started with settings: {settings_info}")
+            
             if not self.continuous_processing:
                 self.continuous_count = 0
                 self.update_continuous_counter()
@@ -837,10 +1024,85 @@ class VideoRemixerApp:
             self.generate_button.pack(pady=10)
     
     def start_next_continuous_remix(self):
-        """Start the next remix in continuous mode."""
+        """Start the next remix in continuous mode with dynamic settings update."""
         if self.continuous_processing and self.continuous_mode_var.get():
-            self.update_status(f"Starting remix #{self.continuous_count + 1}...")
+            # Capture current settings to detect changes
+            current_settings = self._get_current_settings()
+            
+            # Log current settings for next remix
+            if hasattr(self, '_last_continuous_settings'):
+                changes = self._detect_setting_changes(self._last_continuous_settings, current_settings)
+                if changes:
+                    change_msg = f"Settings updated for remix #{self.continuous_count + 1}: {', '.join(changes)}"
+                    self.update_status(change_msg)
+                    safe_print(f"[CONTINUOUS] {change_msg}")
+                    self.logger.info(f"Continuous mode - {change_msg}")
+            
+            # Store current settings for next comparison
+            self._last_continuous_settings = current_settings.copy()
+            
+            # Create enhanced status message with current settings
+            if self.length_mode_var.get() == "BPM":
+                bpm = current_settings.get("bpm", "N/A")
+                units = current_settings.get("num_units", "N/A")
+                unit_type = current_settings.get("bpm_unit", "N/A")
+                status_msg = f"Starting remix #{self.continuous_count + 1} (BPM: {bpm}, {units} {unit_type}s)..."
+            else:
+                duration = current_settings.get("duration_seconds", "N/A")
+                status_msg = f"Starting remix #{self.continuous_count + 1} (Duration: {duration}s)..."
+            
+            self.update_status(status_msg)
+            safe_print(f"[CONTINUOUS] {status_msg}")
+            
+            # Start the actual processing with fresh settings
             self._original_start_processing_thread()
+    
+    def _get_current_settings(self):
+        """Get current settings from GUI controls."""
+        return {
+            "duration_seconds": self.duration_seconds_var.get(),
+            "bpm": self.bpm_var.get(),
+            "num_units": self.num_units_var.get(),
+            "bpm_unit": self.bpm_unit_var.get(),
+            "jitter_enabled": self.jitter_enabled_var.get(),
+            "jitter_intensity": self.jitter_intensity_var.get(),
+            "length_mode": self.length_mode_var.get(),
+            "aspect_ratio": self.aspect_ratio_var.get(),
+            "aspect_ratio_mode": self.aspect_ratio_mode_var.get()
+        }
+    
+    def _detect_setting_changes(self, old_settings, new_settings):
+        """Detect and describe changes between settings."""
+        changes = []
+        
+        # Check for important setting changes
+        if old_settings.get("bpm") != new_settings.get("bpm"):
+            changes.append(f"BPM {old_settings.get('bpm')} → {new_settings.get('bpm')}")
+        
+        if old_settings.get("num_units") != new_settings.get("num_units"):
+            changes.append(f"Units {old_settings.get('num_units')} → {new_settings.get('num_units')}")
+        
+        if old_settings.get("bpm_unit") != new_settings.get("bpm_unit"):
+            changes.append(f"Unit type {old_settings.get('bpm_unit')} → {new_settings.get('bpm_unit')}")
+        
+        if old_settings.get("duration_seconds") != new_settings.get("duration_seconds"):
+            changes.append(f"Duration {old_settings.get('duration_seconds')}s → {new_settings.get('duration_seconds')}s")
+        
+        if old_settings.get("jitter_enabled") != new_settings.get("jitter_enabled"):
+            jitter_state = "enabled" if new_settings.get("jitter_enabled") else "disabled"
+            changes.append(f"Jitter {jitter_state}")
+        
+        if (old_settings.get("jitter_enabled") and new_settings.get("jitter_enabled") and 
+            old_settings.get("jitter_intensity") != new_settings.get("jitter_intensity")):
+            changes.append(f"Jitter intensity {old_settings.get('jitter_intensity')}% → {new_settings.get('jitter_intensity')}%")
+        
+        if old_settings.get("aspect_ratio") != new_settings.get("aspect_ratio"):
+            changes.append(f"Aspect ratio {old_settings.get('aspect_ratio')} → {new_settings.get('aspect_ratio')}")
+        
+        if old_settings.get("length_mode") != new_settings.get("length_mode"):
+            changes.append(f"Mode {old_settings.get('length_mode')} → {new_settings.get('length_mode')}")
+        
+        return changes
     
     def stop_continuous_mode(self):
         """Stop continuous mode."""
@@ -852,16 +1114,89 @@ class VideoRemixerApp:
         self.update_status(f"Continuous mode stopped. Created {self.continuous_count} remixes.")
     
     def update_continuous_counter(self):
-        """Update the continuous mode counter display."""
+        """Update the continuous mode counter display with current settings."""
         if self.continuous_mode_var.get():
-            self.continuous_label.configure(text=f"Remixes created: {self.continuous_count}")
+            # Basic counter info
+            counter_text = f"Remixes created: {self.continuous_count}"
+            
+            # Always show current live values from GUI widgets, not cached settings
+            if self.length_mode_var.get() == "BPM":
+                # Read current values directly from GUI
+                bpm = self.bpm_var.get()
+                units = self.num_units_var.get()
+                unit_type = self.bpm_unit_var.get()
+                settings_info = f" | Current: {bpm} BPM, {units} {unit_type}s"
+            else:
+                # Read current duration directly from GUI
+                duration = self.duration_seconds_var.get()
+                settings_info = f" | Current: {duration}s"
+            
+            counter_text += settings_info
+            self.continuous_label.configure(text=counter_text)
         else:
             self.continuous_label.configure(text="")
+
+    def update_continuous_counter_on_change(self, *args):
+        """Update the continuous mode counter display when any relevant setting changes."""
+        if self.continuous_mode_var.get():
+            self.update_continuous_counter()
+
+    def on_entry_update(self, event=None):
+        """Handle immediate updates when user finishes editing input fields (Enter or focus loss)."""
+        # Update duration estimate if in BPM mode
+        self.update_duration_estimate()
+        
+        # Update continuous counter display if continuous mode is active
+        if self.continuous_mode_var.get():
+            self.update_continuous_counter()
+            
+            # Provide subtle feedback that the change was registered
+            if hasattr(self, '_last_continuous_settings'):
+                current_settings = self._get_current_settings()
+                changes = self._detect_setting_changes(self._last_continuous_settings, current_settings)
+                if changes:
+                    # Brief status update to show change was registered
+                    widget = event.widget if event else None
+                    if widget == self.bpm_entry:
+                        self.update_status(f"BPM updated to {self.bpm_var.get()} - will apply to next remix")
+                    elif widget == self.num_units_entry:
+                        self.update_status(f"Units updated to {self.num_units_var.get()} - will apply to next remix")
+                    elif widget == self.seconds_entry:
+                        self.update_status(f"Duration updated to {self.duration_seconds_var.get()}s - will apply to next remix")
+                    else:
+                        self.update_status("Settings updated - will apply to next remix")
+                    
+                    # Log the change for debugging
+                    safe_print(f"[ENTRY_UPDATE] User finished editing: {', '.join(changes)}")
+                    self.logger.info(f"Real-time update: {', '.join(changes)}")
+        
+        # Return focus handling for Enter key (moves to next widget or removes focus)
+        if event and event.keysym == 'Return':
+            # For better UX, move focus to next logical field or remove focus
+            widget = event.widget
+            if widget == self.bpm_entry:
+                self.num_units_entry.focus()
+            elif widget == self.num_units_entry:
+                # Clear focus after units entry to apply the change
+                self.root.focus()
+            elif widget == self.seconds_entry:
+                # Clear focus after seconds entry to apply the change
+                self.root.focus()
+            else:
+                event.widget.tk_focusNext().focus()
 
 
 def main():
     """Main entry point for the application."""
-    root = tk.Tk()
+    # Create the appropriate root window based on drag and drop availability
+    if DND_AVAILABLE:
+        try:
+            root = TkinterDnD.Tk()
+        except Exception:
+            root = tk.Tk()
+    else:
+        root = tk.Tk()
+    
     app = VideoRemixerApp(root)
     root.mainloop()
 

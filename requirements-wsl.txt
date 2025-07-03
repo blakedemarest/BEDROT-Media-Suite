@@ -1,0 +1,16 @@
+certifi
+charset-normalizer
+colorama
+decorator
+idna
+moviepy
+Pillow
+pyyaml
+requests
+requests-oauthlib
+six
+urllib3
+yt-dlp
+customtkinter
+pandas
+tkinterdnd2

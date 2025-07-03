@@ -242,3 +242,82 @@ Potential improvements:
 3. GPU acceleration support
 4. Batch processing multiple outputs
 5. Preview before final render
+
+# Enhanced Continuous Mode with Dynamic Settings
+
+## Overview
+The Continuous Mode in Snippet Remixer now supports real-time dynamic updates of all remix settings including BPM, duration, aspect ratio, and jitter settings. When you change any setting while continuous mode is running, the next generated clip will immediately use the new values without requiring a restart.
+
+## Features
+
+### Real-Time Setting Updates
+- **BPM Changes**: Modify BPM from 225 to 230 and the next remix uses the new BPM instantly
+- **Unit Changes**: Switch between beats, bars, measures without interruption
+- **Duration Changes**: Adjust total duration in seconds mode
+- **Aspect Ratio**: Change aspect ratios on-the-fly
+- **Jitter Settings**: Enable/disable jitter or adjust intensity in real-time
+- **Immediate Input Response**: Type new values and press Enter or click elsewhere - changes apply instantly
+
+### Visual Feedback
+- **Status Updates**: Clear messages when settings change between remixes
+- **Current Settings Display**: Live counter shows active BPM/duration settings
+- **Change Detection**: Explicit notifications when settings are updated
+- **Logging**: Detailed logs of all setting changes for debugging
+
+### Enhanced User Experience
+- **No Restart Required**: Change settings without stopping continuous mode
+- **Immediate Application**: Next remix uses new settings automatically
+- **Visual Confirmation**: See exactly what settings are being used
+- **Seamless Workflow**: Experiment with different settings while generating
+
+## Usage Example
+
+1. Start continuous mode with BPM 120, 4 bars
+2. While running, change BPM to 140
+3. Status shows: "Settings updated for remix #3: BPM 120.0 → 140.0"
+4. Next remix automatically uses BPM 140
+5. Counter displays: "Remixes created: 3 | Current: 140.0 BPM, 4 bars"
+
+## Input Field Responsiveness
+
+### Problem Solved
+Previously, typed changes in input fields (BPM: 230, Units: 28) wouldn't register until you clicked another control. This caused confusion as the next remix would use outdated settings.
+
+### Solution Implemented
+- **Enter Key Binding**: Press Enter after typing to immediately apply changes
+- **Focus Loss Detection**: Click elsewhere or tab away to trigger updates  
+- **Instant Feedback**: Status shows "BPM updated to 230 - will apply to next remix"
+- **Smart Focus Flow**: Enter moves BPM → Units → clears focus for smooth workflow
+
+### Technical Details
+- Added `<Return>` and `<FocusOut>` event bindings to all critical Entry widgets
+- Real-time validation and feedback without requiring secondary interactions
+- Immediate continuous counter updates reflecting new settings
+- Blue status counter now reads live GUI values instead of cached settings
+
+### Real-Time Blue Status Counter
+**Issue Fixed**: The blue status text "Remixes created: 0 | Current: 225.0 BPM, 57 Beats" would not update in real-time when typing new values in BPM or Units fields.
+
+**Solution**: Modified `update_continuous_counter()` to always read current live values from GUI widgets instead of cached settings. Now:
+- Type "150" in BPM field → Press Enter → Status immediately shows "Current: 150 BPM"  
+- Type "28" in Units field → Click elsewhere → Status immediately shows "28 Beats"
+- Change dropdown from "Beat" to "Bar" → Status immediately shows "Bars"
+- No more stale cached values - always shows what will be used for next remix
+
+## Implementation Details
+
+### Core Components
+- `start_next_continuous_remix()`: Enhanced to detect and log setting changes
+- `_get_current_settings()`: Captures live GUI values
+- `_detect_setting_changes()`: Compares old vs new settings
+- `update_continuous_counter()`: Shows real-time setting information
+- Real-time trace callbacks update display as settings change
+
+### Logging
+All setting changes are logged with timestamps and details:
+```
+[CONTINUOUS] Settings updated for remix #2: BPM 225.0 → 230.0, Units 8 → 6
+[CONTINUOUS] Starting remix #2 (BPM: 230.0, 6 bars)...
+```
+
+This enhancement makes continuous mode much more interactive and efficient for users who want to experiment with different settings while generating multiple remixes.
