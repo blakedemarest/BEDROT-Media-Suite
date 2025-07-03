@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The **Bedrot Productions Media Tool Suite** is a sophisticated Python-based collection of multimedia processing tools designed for content creation, video downloading, editing, and automated slideshow generation. The suite has evolved from monolithic scripts to a modern modular architecture with centralized process orchestration.
 
+
 ## Quick Start Commands
 
 ### Running the Application
