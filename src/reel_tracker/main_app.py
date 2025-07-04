@@ -508,21 +508,22 @@ class ReelTrackerApp(QMainWindow):
             reel_count = total_count if total_count is not None else self.table.rowCount()
             counter_text = f"All Reels: {reel_count}"
         
-        if reel_count >= goal:
-            # Goal achieved - change styling and add achievement badge
+        # Only apply goal achievement styling for individual releases, not global count
+        if self.current_release_filter and reel_count >= goal:
+            # Goal achieved for specific release - change styling and add achievement badge
             self.release_counter_button.setText(f"🎉 {counter_text} - GOAL ACHIEVED! 🎉")
             self.release_counter_button.setStyleSheet(
                 "font-weight: bold; color: white; background-color: #27ae60; "
                 "padding: 4px 8px; border: 2px solid #27ae60; border-radius: 4px;"
             )
-        elif reel_count >= goal * 0.9:  # 90% of goal
+        elif self.current_release_filter and reel_count >= goal * 0.9:  # 90% of goal for specific release
             # Close to goal - orange styling
             self.release_counter_button.setText(f"🔥 {counter_text}")
             self.release_counter_button.setStyleSheet(
                 "font-weight: bold; color: white; background-color: #f39c12; "
                 "padding: 4px 8px; border: 1px solid #f39c12; border-radius: 4px;"
             )
-        elif reel_count >= goal * 0.75:  # 75% of goal
+        elif self.current_release_filter and reel_count >= goal * 0.75:  # 75% of goal for specific release
             # Good progress - yellow styling
             self.release_counter_button.setText(f"⚡ {counter_text}")
             self.release_counter_button.setStyleSheet(
@@ -530,7 +531,7 @@ class ReelTrackerApp(QMainWindow):
                 "padding: 4px 8px; border: 1px solid #f39c12; border-radius: 4px; background: transparent;"
             )
         else:
-            # Normal progress - blue styling
+            # Normal progress - blue styling (for both global count and individual releases)
             self.release_counter_button.setText(counter_text)
             self.release_counter_button.setStyleSheet(
                 "font-weight: bold; color: #3498db; "

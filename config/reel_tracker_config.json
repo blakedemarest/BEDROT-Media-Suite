@@ -38,489 +38,12 @@
         "show_file_stats": true
     },
     "default_metadata": {
-        "persona": "ZONE A0",
-        "release": "ICONIC BETA",
+        "persona": "PIG1987",
+        "release": "THE SCALE",
         "reel_type": "GLITCH VISUAL",
         "caption_template": ""
     },
     "version_history": [
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Story Time",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks",
-                "Unboxing",
-                "Comparison",
-                "Story Time"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks",
-                "Unboxing",
-                "Comparison"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Comparison",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks",
-                "Unboxing",
-                "Comparison"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks",
-                "Unboxing"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Unboxing",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks",
-                "Unboxing"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Tips & Tricks",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life",
-                "Tips & Tricks"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Day in Life",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation",
-                "Day in Life"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Transformation",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A",
-                "Transformation"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Q&A",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes",
-                "Q&A"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Behind the Scenes",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review",
-                "Behind the Scenes"
-            ],
-            "new_values": [
-                "",
-                "Tutorial",
-                "Product Review"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Product Review",
-            "previous_values": [
-                "",
-                "Tutorial",
-                "Product Review"
-            ],
-            "new_values": [
-                "",
-                "Tutorial"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:16",
-            "action": "dropdown_removed",
-            "dropdown_type": "reel_type",
-            "changed_value": "Tutorial",
-            "previous_values": [
-                "",
-                "Tutorial"
-            ],
-            "new_values": [
-                ""
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:21",
-            "action": "dropdown_added",
-            "dropdown_type": "reel_type",
-            "changed_value": "GLITCH VISUAL",
-            "previous_values": [
-                ""
-            ],
-            "new_values": [
-                "",
-                "GLITCH VISUAL"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:29",
-            "action": "dropdown_added",
-            "dropdown_type": "persona",
-            "changed_value": "Test Creator",
-            "previous_values": [
-                "",
-                "ZONE A0",
-                "PIG1987"
-            ],
-            "new_values": [
-                "",
-                "ZONE A0",
-                "PIG1987",
-                "Test Creator"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:29",
-            "action": "dropdown_added",
-            "dropdown_type": "reel_type",
-            "changed_value": "Tutorial",
-            "previous_values": [
-                "",
-                "GLITCH VISUAL"
-            ],
-            "new_values": [
-                "",
-                "GLITCH VISUAL",
-                "Tutorial"
-            ]
-        },
-        {
-            "timestamp": "2025-06-30 12:58:29",
-            "action": "default_metadata_updated",
-            "previous": {
-                "persona": "Test Creator",
-                "release": "RENEGADE PIPELINE",
-                "reel_type": "Tutorial",
-                "caption_template": "Check out {filename}! #content #creator"
-            },
-            "new": {
-                "persona": "Test Creator",
-                "release": "RENEGADE PIPELINE",
-                "reel_type": "Tutorial",
-                "caption_template": ""
-            }
-        },
-        {
-            "timestamp": "2025-06-30 12:59:10",
-            "action": "default_metadata_updated",
-            "previous": {
-                "persona": "Test Creator",
-                "release": "RENEGADE PIPELINE",
-                "reel_type": "Tutorial",
-                "caption_template": ""
-            },
-            "new": {
-                "persona": "ZONE A0",
-                "release": "ICONIC BETA",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            }
-        },
-        {
-            "timestamp": "2025-06-30 12:59:13",
-            "action": "default_metadata_updated",
-            "previous": {
-                "persona": "ZONE A0",
-                "release": "ICONIC BETA",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            },
-            "new": {
-                "persona": "ZONE A0",
-                "release": "ICONIC BETA",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            }
-        },
-        {
-            "timestamp": "2025-06-30 12:59:25",
-            "action": "default_metadata_updated",
-            "previous": {
-                "persona": "ZONE A0",
-                "release": "ICONIC BETA",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            },
-            "new": {
-                "persona": "ZONE A0",
-                "release": "ICONIC BETA",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            }
-        },
-        {
-            "timestamp": "2025-06-30 12:59:51",
-            "action": "export_folder_updated",
-            "previous": "C:\\Users\\Earth\\Videos\\RandomSlideshows",
-            "new": ""
-        },
-        {
-            "timestamp": "2025-06-30 12:59:51",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 12:59:51",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 12:59:51",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:00:22",
-            "action": "export_folder_updated",
-            "previous": "",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-06-30 13:00:22",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": true,
-            "new": false
-        },
-        {
-            "timestamp": "2025-06-30 13:00:22",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:00:22",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:00:41",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-06-30 13:00:41",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
-        {
-            "timestamp": "2025-06-30 13:00:41",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:00:41",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:00:59",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-06-30 13:00:59",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
-        {
-            "timestamp": "2025-06-30 13:00:59",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:00:59",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:01:01",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-06-30 13:01:01",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
-        {
-            "timestamp": "2025-06-30 13:01:01",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:01:01",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-06-30 13:01:02",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-06-30 13:01:02",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
         {
             "timestamp": "2025-06-30 13:01:02",
             "action": "file_org_setting_updated",
@@ -762,6 +285,189 @@
         },
         {
             "timestamp": "2025-07-02 19:41:44",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:03:31",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "ZONE A0",
+                "release": "ICONIC BETA",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "ZONE A0",
+                "release": "ICONIC BETA",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            }
+        },
+        {
+            "timestamp": "2025-07-04 08:03:57",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-07-04 08:03:57",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-07-04 08:03:57",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:03:57",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:04:46",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-07-04 08:04:46",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-07-04 08:04:46",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:04:46",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:07:09",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-07-04 08:07:09",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-07-04 08:07:09",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:07:09",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:10:50",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "ZONE A0",
+                "release": "ICONIC BETA",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "ZONE A0",
+                "release": "THE SCALE",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            }
+        },
+        {
+            "timestamp": "2025-07-04 08:12:13",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "ZONE A0",
+                "release": "THE SCALE",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "PIG1987",
+                "release": "THE SCALE",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            }
+        },
+        {
+            "timestamp": "2025-07-04 08:12:23",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-07-04 08:12:23",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-07-04 08:12:23",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:12:23",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:16:16",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-07-04 08:16:16",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-07-04 08:16:16",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-07-04 08:16:16",
             "action": "file_org_setting_updated",
             "setting": "auto_organize_enabled",
             "previous": true,

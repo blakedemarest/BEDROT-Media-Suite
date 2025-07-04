@@ -4,7 +4,7 @@ Display detailed information about the active requirement.
 
 ## Instructions:
 
-1. Read requirements/.current-requirement
+1. Read .claude/requirements/.current-requirement
 2. If no active requirement:
    - Show "No active requirement"
    - Display last 3 completed requirements

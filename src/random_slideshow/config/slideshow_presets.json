@@ -55,7 +55,21 @@
             "created_at": "2025-06-27T08:17:08.144750",
             "modified_at": "2025-06-27T08:17:08.144770",
             "is_default": false
+        },
+        "THE SCALE": {
+            "image_folder": "",
+            "output_folder": "",
+            "aspect_ratio": "16:9",
+            "batch_settings": {
+                "max_workers": 2,
+                "auto_start": false
+            },
+            "name": "THE SCALE",
+            "description": "New preset",
+            "created_at": "2025-07-04T07:30:36.964228",
+            "modified_at": "2025-07-04T07:30:36.964234",
+            "is_default": false
         }
     },
-    "last_used": "RENEGADEPIPELINE"
+    "last_used": "THE SCALE"
 }

@@ -4,8 +4,8 @@ Display all requirements with their status and summaries.
 
 ## Instructions:
 
-1. Check requirements/.current-requirement for active requirement
-2. List all folders in requirements/ directory
+1. Check .claude/requirements/.current-requirement for active requirement
+2. List all folders in .claude/requirements/ directory
 3. For each requirement folder:
    - Read metadata.json
    - Extract key information

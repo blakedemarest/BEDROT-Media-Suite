@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
     QGroupBox, QFormLayout, QLineEdit, QCheckBox, QTextEdit, 
     QDialogButtonBox, QFileDialog, QMessageBox, QProgressBar,
     QTableWidget, QTableWidgetItem, QHeaderView, QTabWidget,
-    QSplitter
+    QSplitter, QAbstractItemView
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QFont, QColor
@@ -219,6 +219,8 @@ class FileOrganizationDialog(QDialog):
         
         self.preview_table.setAlternatingRowColors(True)
         self.preview_table.setSortingEnabled(True)
+        self.preview_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select entire rows
+        self.preview_table.setSelectionMode(QAbstractItemView.MultiSelection)  # Allow multiple row selection
         
         layout.addWidget(self.preview_table)
         
@@ -228,6 +230,12 @@ class FileOrganizationDialog(QDialog):
         self.refresh_preview_btn = QPushButton("🔄 Refresh Preview")
         self.refresh_preview_btn.clicked.connect(self.update_preview)
         preview_actions.addWidget(self.refresh_preview_btn)
+        
+        self.delete_selected_btn = QPushButton("🗑️ Delete Selected")
+        self.delete_selected_btn.clicked.connect(self.delete_selected_rows)
+        self.delete_selected_btn.setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; padding: 5px;")
+        self.delete_selected_btn.setToolTip("Delete selected rows from the organization list")
+        preview_actions.addWidget(self.delete_selected_btn)
         
         preview_actions.addStretch()
         
@@ -418,6 +426,56 @@ class FileOrganizationDialog(QDialog):
             count_text += f", {error_count} errors"
         
         self.preview_count_label.setText(count_text)
+    
+    def delete_selected_rows(self):
+        """Delete selected rows from the preview table and reel data list."""
+        if not self.reel_data_list:
+            QMessageBox.information(self, "No Data", "No files are available to delete.")
+            return
+        
+        # Get selected rows
+        selected_rows = set()
+        for item in self.preview_table.selectedItems():
+            selected_rows.add(item.row())
+        
+        if not selected_rows:
+            QMessageBox.information(self, "No Selection", "Please select one or more rows to delete.")
+            return
+        
+        # Confirm deletion
+        row_count = len(selected_rows)
+        message = f"Are you sure you want to delete {row_count} selected file(s) from the organization list?\n\n"
+        message += "This will remove them from the current session only - original files will not be affected."
+        
+        reply = QMessageBox.question(
+            self, "Confirm Deletion",
+            message,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply != QMessageBox.Yes:
+            return
+        
+        # Sort rows in descending order to avoid index shifting issues
+        sorted_rows = sorted(selected_rows, reverse=True)
+        
+        # Remove corresponding entries from reel_data_list
+        for row_index in sorted_rows:
+            if 0 <= row_index < len(self.reel_data_list):
+                removed_item = self.reel_data_list.pop(row_index)
+                safe_print(f"[FILE_ORG] Removed reel from organization list: {removed_item[0]}")
+        
+        # Refresh the preview to show updated list
+        self.update_preview()
+        
+        # Show result message
+        remaining_count = len(self.reel_data_list)
+        QMessageBox.information(
+            self, "Files Removed",
+            f"Successfully removed {row_count} file(s) from the organization list.\n"
+            f"{remaining_count} file(s) remaining."
+        )
     
     def save_current_settings(self):
         """Save current settings to config."""

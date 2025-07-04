@@ -4,7 +4,7 @@ Show current requirement gathering progress and continue.
 
 ## Instructions:
 
-1. Read requirements/.current-requirement
+1. Read .claude/requirements/.current-requirement
 2. If no active requirement:
    - Show message: "No active requirement gathering"
    - Suggest /requirements-start or /requirements-list

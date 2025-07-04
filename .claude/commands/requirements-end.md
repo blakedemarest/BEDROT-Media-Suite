@@ -4,7 +4,7 @@ Finalize the current requirement gathering session.
 
 ## Instructions:
 
-1. Read requirements/.current-requirement
+1. Read .claude/requirements/.current-requirement
 2. If no active requirement:
    - Show "No active requirement to end"
    - Exit
@@ -70,5 +70,5 @@ Status: [Complete with X assumptions / Partial]
 [Testable criteria for completion]
 ```
 
-5. Clear .current-requirement
-6. Update requirements/index.md
+5. Clear .claude/requirements/.current-requirement
+6. Update .claude/requirements/index.md
