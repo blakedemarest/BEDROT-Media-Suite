@@ -66,3 +66,8 @@ logs/
 
 # Log files
 *.log
+
+# Claude AI assistant files
+.claude/
+CLAUDE.md
+claude.md
