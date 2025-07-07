@@ -111,7 +111,7 @@ class ConfigManager:
                 },
                 'version_history': []
             },
-            'slideshow_editor': {
+            'bedrot_media_suite': {
                 'output_directory': str(self.path_resolver.resolve_output_path()),
                 'aspect_ratio': get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', '16:9'),
                 'duration_per_image': 3.0,
@@ -238,7 +238,7 @@ class ConfigManager:
             'reel_tracker': {
                 'file_organization.master_export_folder': 'SLIDESHOW_DEFAULT_EXPORTS_DIR'
             },
-            'slideshow_editor': {
+            'bedrot_media_suite': {
                 'output_directory': 'SLIDESHOW_DEFAULT_OUTPUT_DIR',
                 'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO'
             }

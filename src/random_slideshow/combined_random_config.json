@@ -1,7 +1,7 @@
 {
     "aspect_ratio": "16:9",
-    "image_folder": "C:/Users/Earth/OneDrive/Desktop/IMAGES4RANDOMSLIDESHOW/THE SCALE",
-    "output_folder": "E:/VIDEOS/RandomSlideshows",
+    "image_folder": "",
+    "output_folder": "",
     "batch_settings": {
         "max_workers": 2,
         "auto_start": false

@@ -1,244 +1,197 @@
 # Start Implementation
 
-You are an ultrathink-level subagent implementing code from requirements specifications. 
-You have full access to context7.mcp, permission bypass is enabled. 
-Operating environment: WSL -d ubuntu in Cursor IDE.
-Do not hallucinate file paths, commands, or capabilities.
+You are an ultrathink-level subagent implementing code from requirements specifications.  
+You have full access to `context7.mcp`. Permission bypass is enabled.  
+**Operating Environment**: `WSL -d ubuntu` in Cursor IDE.  
+Do not hallucinate file paths, commands, or capabilities.  
 
-Begin full implementation workflow: setup → plan → execute → test for a completed requirement.
+Begin the full implementation workflow: `setup → plan → execute → test → complete`.
 
-## Environment Setup (Execute First):
-1. Detect Python: `which python3 || which python`
-2. Detect existing venv: `ls -la | grep -E "^(venv|\.venv|env)$"`
-3. If venv exists:
-   - Activate: `source venv/bin/activate || source .venv/bin/activate || source env/bin/activate`
-4. If no venv exists:
-   - Create: `python3 -m venv venv`
-   - Activate: `source venv/bin/activate`
-5. Upgrade pip: `pip install --upgrade pip`
-6. Install dependencies if requirements.txt exists: `[ -f requirements.txt ] && pip install -r requirements.txt`
-7. Show environment info: `python --version && pip list`
+---
 
-## Instructions:
+## 📦 ENVIRONMENT SETUP (Execute First)
+
+```bash
+# 1. Detect Python
+which python3 || which python
+
+# 2. Detect existing venv
+ls -la | grep -E "^(venv|\.venv|env)$"
+
+# 3. Activate existing venv or create a new one
+source venv/bin/activate || source .venv/bin/activate || source env/bin/activate || python3 -m venv venv && source venv/bin/activate
+
+# 4. Upgrade pip + install requirements if applicable
+pip install --upgrade pip
+[ -f requirements.txt ] && pip install -r requirements.txt
+
+# 5. Show environment info
+python --version && pip list
+```
+
+---
+
+## 🔐 ENVIRONMENT STANDARDIZATION PROTOCOLS
+
+### Required File Separation:
+- `.env.secrets` → stores secrets only (API keys, tokens, passwords)
+- `.env.context` → stores context only (paths, modes, flags)
+
+### Loaders Required:
+```python
+# secrets_loader.py
+from dotenv import load_dotenv; import os
+load_dotenv(dotenv_path=".env.secrets", override=True)
+def get_secret(k): return os.getenv(k)
+
+# context_loader.py
+from dotenv import load_dotenv; import os
+load_dotenv(dotenv_path=".env.context", override=False)
+def get_context_var(k): return os.getenv(k)
+```
+
+🚫 Do NOT hardcode secrets, paths, tokens, or static values.  
+✅ You MUST use `get_secret()` and `get_context_var()` for all environment-based access.
+
+---
+
+## 🧠 FUNCTION REGISTRY ENFORCEMENT
+
+### Registry Location:
+```python
+import os
+PROJECT_ROOT = os.getenv("PROJECT_ROOT")
+PROJECT_NAME = os.path.basename(PROJECT_ROOT)
+FUNCTION_REGISTRY_PATH = os.path.join(PROJECT_ROOT, f"__{PROJECT_NAME}__function_registry.json")
+```
+
+- This is the one and only registry for the current project.
+- Before defining any function, check this file for similar logic.
+- If duplicates are found, refactor or extend instead of creating new.
+
+If a new function is still required:
+```
+Rationale for New Function: [explanation]  
+Overlap Risk Score: [1–10]
+```
+
+---
+
+## 🧪 IMPLEMENTATION RULES
+
+- ✅ You are cleared to proceed without further confirmation.
+- 🚫 Do NOT ask "Are you ready?"
+- 🚫 Do NOT create placeholders or speculative functions.
+- ✅ Your code must be clean, complete, modular, and production-grade.
+
+---
+
+## 🧰 IMPLEMENTATION PHASES
 
 ### Phase 1: Select Requirement
-1. List all folders in `.claude/requirements/` directory
-2. Filter for folders with `06-requirements-spec.md` (completed requirements)
-3. Display available requirements:
+1. List folders in `.claude/requirements/`
+2. Filter for folders containing `06-requirements-spec.md`
+3. Display available completed requirements:
    ```
-   📋 Available Requirements for Implementation:
-   
-   1. user-authentication (2025-01-27)
-      Status: Complete
-      Summary: Email/password auth with verification
-   
-   2. export-reports (2025-01-26)
-      Status: Complete
-      Summary: PDF/CSV export functionality
-   
-   Select requirement to implement (number):
-   ```
+   📋 Available Requirements:
 
-4. If no completed requirements found:
-   - Show message: "No completed requirements found. Run /requirements-start first."
+   1. [slug-name] (YYYY-MM-DD)
+      Status: Complete
+      Summary: [short summary extracted from spec]
+   ```
+4. Prompt: "Select requirement to implement (number):"
+5. If none found:
+   - Display: "No completed requirements found. Run /requirements-start first."
    - Exit
 
-### Phase 2: Initialize Implementation
-5. Create timestamp-based folder: `.claude/implementation/YYYY-MM-DD-HHMM-[slug]-impl`
-6. Create initial tracking files:
-   - `metadata.json` with implementation tracking
-   - `00-requirements-ref.md` with link to source requirement
-   - `01-environment.md` with environment setup details
 
-7. Update `.claude/implementation/.current-implementation` with folder name
+---
+
+### Phase 2: Initialize Implementation
+- Create folder: `.claude/implementation/YYYY-MM-DD-HHMM-[slug]-impl`
+- Generate:
+  - `metadata.json`
+  - `00-requirements-ref.md`
+  - `01-environment.md`
+- Update `.current-implementation` tracker
+
+---
 
 ### Phase 3: Load Requirements
-8. Read the selected `06-requirements-spec.md`
-9. Extract key information:
-   - Functional requirements
-   - Technical requirements
-   - File structure suggestions
-   - Acceptance criteria
-   - Dependencies mentioned
+- Read `06-requirements-spec.md`
+- Extract:
+  - Functional & technical requirements
+  - Acceptance criteria
+  - Suggested file structure
+- Display summary:
+  ```
+  🚀 Starting Implementation: [feature name]
+  Requirements Summary:
+  - [key points]
+  Suggested Structure:
+  - [files...]
+  ```
 
-10. Display implementation overview:
-    ```
-    🚀 Starting Implementation: [name]
-    
-    Requirements Summary:
-    - [Key functional points]
-    - [Key technical points]
-    
-    Suggested Structure:
-    - [File structure from requirements]
-    
-    Ready to begin implementation!
-    ```
+---
 
 ### Phase 4: Create Implementation Plan
-11. Analyze requirements comprehensively using ultrathink mode:
-    - Break down functional requirements into tasks
-    - Map technical requirements to files
-    - Identify dependencies
-    - Determine implementation order
-    
-12. Use context7.mcp to scan codebase for:
-    - Similar patterns to follow
-    - Reusable components
-    - Integration points
-    - Project conventions
+- Break requirements into tasks
+- Map features to files
+- Scan codebase via `context7.mcp` for:
+  - Patterns
+  - Reusable logic
+  - Integration points
+- Write plan to `02-plan.md`
 
-13. Generate detailed plan in `02-plan.md` with:
-    - Task breakdown by component (backend, frontend, database, etc.)
-    - Specific file paths for each task
-    - Dependencies to install
-    - Implementation order with reasoning
-    - Risk mitigation strategies
-
-14. Update metadata.json with task counts and plan details
+---
 
 ### Phase 5: Execute Implementation
-15. Begin implementing tasks in planned order:
-    - Create/modify files according to plan
-    - Follow existing code patterns
-    - Implement with security and performance in mind
-    - Add proper error handling
-    - Include logging where appropriate
+- Follow `02-plan.md` step-by-step
+- For each task:
+  - Implement using project conventions
+  - Log results to `03-progress.md`
+  - Update `metadata.json`
+  - Commit changes with clear messages
 
-16. For each completed task:
-    - Update `03-progress.md` with what was done
-    - Mark task complete in plan
-    - Update metadata.json progress counts
-    - Commit changes with descriptive messages
-
-17. Handle any issues that arise:
-    - Document blockers or deviations
-    - Adjust plan if needed
-    - Keep progress tracking current
+---
 
 ### Phase 6: Test Implementation
-18. Run existing tests to ensure nothing broke:
-    ```bash
-    # Detect and run test framework
-    pytest || npm test || go test || cargo test
-    ```
+- Run all existing tests:  
+  ```bash
+  pytest || npm test || go test || cargo test
+  ```
+- Add new tests (unit, integration, UI)
+- Validate against `acceptance criteria`
+- Log results in `04-tests.md`
 
-19. Create tests for new functionality:
-    - Unit tests for business logic
-    - Integration tests for APIs
-    - UI tests for frontend components
-    - Follow project's testing patterns
-
-20. Validate against acceptance criteria:
-    - Check each criterion from requirements
-    - Document test results in `04-tests.md`
-    - Update metadata.json with test counts
+---
 
 ### Phase 7: Final Summary
-21. Generate implementation summary:
-    ```
-    ✅ Implementation Complete: [feature name]
-    
-    Tasks Completed: X/Y
-    Tests Passing: A/B
-    Coverage: XX%
-    
-    Files Created/Modified:
-    - [list of files]
-    
-    Next Steps:
-    - Run /implementation-review for final validation
-    - Run /implementation-end to finalize
-    ```
+```
+✅ Implementation Complete: [feature name]
 
-## Metadata Structure:
-```json
-{
-  "id": "feature-name-impl",
-  "requirementId": "feature-name",
-  "requirementPath": "../requirements/YYYY-MM-DD-HHMM-feature-name",
-  "started": "ISO-8601-timestamp",
-  "lastUpdated": "ISO-8601-timestamp",
-  "status": "active",
-  "phase": "setup|planning|executing|testing|complete",
-  "environment": {
-    "python": "3.x.x",
-    "venv": "venv",
-    "platform": "WSL Ubuntu",
-    "ide": "Cursor"
-  },
-  "progress": {
-    "tasksTotal": 0,
-    "tasksCompleted": 0,
-    "testsTotal": 0,
-    "testsPassed": 0
-  }
-}
+Tasks Completed: X/Y
+Tests Passing: A/B
+Coverage: XX%
+
+Files Created/Modified:
+- [list]
+
+Next Steps:
+- Run /implementation-review
+- Run /implementation-end
 ```
 
-## File Templates:
+---
 
-### 00-requirements-ref.md:
-```markdown
-# Requirements Reference
+## ✅ FINAL IMPLEMENTATION CHECKLIST
 
-This implementation is based on the requirements specification at:
-`[relative path to requirements spec]`
+- [ ] Environment properly set up and tracked?
+- [ ] Used `.env.context` and `.env.secrets` appropriately?
+- [ ] No redundant functions — registry consulted?
+- [ ] Used `get_secret()` and `get_context_var()`?
+- [ ] All tasks in plan executed and logged?
+- [ ] Tests created and validated?
+- [ ] Summary and metadata complete?
 
-## Original Request:
-[Copy initial request from requirements]
-
-## Key Requirements:
-[List main requirements being implemented]
-
-## Acceptance Criteria:
-[Copy acceptance criteria for easy reference]
-```
-
-### 01-environment.md:
-```markdown
-# Environment Setup
-
-## Platform
-- OS: WSL Ubuntu
-- IDE: Cursor
-- Python: [version]
-- Venv: [path]
-
-## Dependencies Installed
-[List from pip freeze]
-
-## Setup Commands Run
-[List all environment setup commands executed]
-
-## Environment Variables
-[Any env vars set or required]
-```
-
-## Important Notes:
-- This is a FULL implementation workflow in one command
-- Always validate environment before proceeding
-- Use context7.mcp for full codebase awareness when available
-- Create implementation folder parallel to requirements folder
-- Maintain clear link between requirements and implementation
-- Track all progress in metadata.json
-- Commit code changes at logical milestones
-- Run tests frequently during implementation
-- If resuming, check `.current-implementation` first
-
-## Error Handling:
-- If environment setup fails, document error and suggest fixes
-- If no Python found, provide installation instructions for WSL Ubuntu
-- If permission errors, remind about bypass permissions mode
-- If tests fail, fix issues before proceeding
-- Document any deviations from original plan
-- Always show clear status and next steps
-
-## Workflow Summary:
-1. **Setup**: Select requirement, create tracking, setup environment
-2. **Plan**: Analyze requirements, create detailed task breakdown
-3. **Execute**: Implement code following the plan
-4. **Test**: Validate implementation meets requirements
-5. **Complete**: Summarize work done and next steps
-
-This command handles the entire implementation lifecycle to transform requirements into working, tested code.
+> Begin now. Operate at full ultrathink capacity. Comply with all protocols.

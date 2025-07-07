@@ -139,7 +139,7 @@ Continuously generates short, randomized video slideshows from images.
 
 ## 6. Other Included Tools
 
-* **Slideshow Editor (`src/slideshow_editor.py`):** A PyQt5 tool for creating single slideshow videos from dragged-and-dropped images with specific duration and aspect ratio settings. Uses `config/config.json` for output folder history. (Can be launched via the launcher).
+* **Slideshow Editor (`tools/slideshow_editor.py`):** A PyQt5 tool for creating single slideshow videos from dragged-and-dropped images with specific duration and aspect ratio settings. Uses `config/config.json` for output folder history. (Can be launched via the launcher).
 * **XY Image Scaler (`tools/xyimagescaler.py`):** A simple Tkinter utility to scale and crop an image to a target width and height (defaults to 1632x2912). This needs to be run separately (`python tools/xyimagescaler.py`).
 
 ---

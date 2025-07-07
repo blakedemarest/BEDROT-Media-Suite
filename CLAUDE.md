@@ -146,7 +146,7 @@ class ProcessingWorker(QThread):
 ### Key Configuration Variables
 ```bash
 # Project structure (auto-detected if not set)
-SLIDESHOW_PROJECT_ROOT=/path/to/slideshow_editor
+SLIDESHOW_PROJECT_ROOT=/path/to/bedrot_media_suite
 SLIDESHOW_CONFIG_DIR=config
 SLIDESHOW_SRC_DIR=src
 SLIDESHOW_TOOLS_DIR=tools

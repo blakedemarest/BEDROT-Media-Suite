@@ -5,20 +5,24 @@ Begin gathering requirements for: $ARGUMENTS
 ## Full Workflow:
 
 ### Phase 1: Initial Setup & Codebase Analysis
-1. Create timestamp-based folder: .claude/requirements/YYYY-MM-DD-HHMM-[slug]
-2. Extract slug from $ARGUMENTS (e.g., "add user profile" → "user-profile")
-3. Create initial files:
+1. Ensure .claude/requirements/ directory exists (create if needed)
+2. Create timestamp-based folder: .claude/requirements/YYYY-MM-DD-HHMM-[slug]
+3. Extract slug from $ARGUMENTS (e.g., "add user profile" → "user-profile")
+4. IMMEDIATELY create/update .claude/requirements/.current-requirement with folder name:
+   ```
+   echo "YYYY-MM-DD-HHMM-[slug]" > .claude/requirements/.current-requirement
+   ```
+5. Create initial files in the new folder:
    - 00-initial-request.md with the user's request
    - metadata.json with status tracking
-4. Read and update .claude/requirements/.current-requirement with folder name
-5. Use mcp__RepoPrompt__get_file_tree (if available) to understand overall structure:
+6. Use mcp__RepoPrompt__get_file_tree (if available) to understand overall structure:
    - Get high-level architecture overview
    - Identify main components and services
    - Understand technology stack
    - Note patterns and conventions
 
 ### Phase 2: Context Discovery Questions
-6. Generate the five most important yes/no questions to understand the problem space:
+7. Generate the five most important yes/no questions to understand the problem space:
    - Questions informed by codebase structure
    - Questions about user interactions and workflows
    - Questions about similar features users currently use
@@ -30,7 +34,7 @@ Begin gathering requirements for: $ARGUMENTS
    - Only after all questions are asked, record answers in 02-discovery-answers.md as received and update metadata.json. Not before.
 
 ### Phase 3: Targeted Context Gathering (Autonomous)
-7. After all discovery questions answered:
+8. After all discovery questions answered:
    - Use mcp__RepoPrompt__search (if available) to find specific files based on discovery answers
    - Use mcp__RepoPrompt__set_selection and read_selected_files (if available) to batch read relevant code
    - Deep dive into similar features and patterns
@@ -44,7 +48,7 @@ Begin gathering requirements for: $ARGUMENTS
      - Integration points identified
 
 ### Phase 4: Expert Requirements Questions
-8. Now ask questions like a senior developer who knows the codebase:
+9. Now ask questions like a senior developer who knows the codebase:
    - Write the top 5 most pressing unanswered detailed yes/no questions to 04-detail-questions.md
    - Questions should be as if you were speaking to the product manager who knows nothing of the code
    - These questions are meant to to clarify expected system behavior now that you have a deep understanding of the code
@@ -53,7 +57,7 @@ Begin gathering requirements for: $ARGUMENTS
    - Only after all questions are asked, record answers in 05-detail-answers.md as received
 
 ### Phase 5: Requirements Documentation
-9. Generate comprehensive requirements spec in 06-requirements-spec.md:
+10. Generate comprehensive requirements spec in 06-requirements-spec.md:
    - Problem statement and solution overview
    - Functional requirements based on all answers
    - Technical requirements with specific file paths
