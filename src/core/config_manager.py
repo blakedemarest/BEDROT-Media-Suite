@@ -117,6 +117,15 @@ class ConfigManager:
                 'duration_per_image': 3.0,
                 'transition_duration': 0.5,
                 'recent_folders': []
+            },
+            'video_caption_generator': {
+                'output_directory': str(self.path_resolver.resolve_output_path()),
+                'model_size': 'base',
+                'language': 'en',
+                'export_formats': ['srt', 'vtt'],
+                'transcription_api': 'whisper',
+                'api_key': get_env_var('ELEVENLABS_API_KEY', ''),
+                'audio_temp_directory': str(self.path_resolver.get_temp_directory())
             }
         }
         
@@ -241,6 +250,11 @@ class ConfigManager:
             'bedrot_media_suite': {
                 'output_directory': 'SLIDESHOW_DEFAULT_OUTPUT_DIR',
                 'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO'
+            },
+            'video_caption_generator': {
+                'output_directory': 'SLIDESHOW_DEFAULT_EXPORTS_DIR',
+                'audio_temp_directory': 'SLIDESHOW_TEMP_DIR',
+                'api_key': 'ELEVENLABS_API_KEY'
             }
         }
         

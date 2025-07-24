@@ -49,6 +49,7 @@ SCRIPT_1_PATH = get_script_path('media_download', 'src/media_download_app.py')
 SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer.py') 
 SCRIPT_3_PATH = get_script_path('random_slideshow', 'src/random_slideshow/main.py')
 SCRIPT_4_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
+SCRIPT_5_PATH = get_script_path('video_caption_generator', 'src/video_caption_generator/main_app.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -295,7 +296,7 @@ def clear_log():
 root = tk.Tk()
 root.title("Script Launcher")
 # Increased height slightly for the new tab potentially
-root.geometry("600x550") # Adjust size as needed
+root.geometry("700x600") # Adjust size as needed
 
 style = ttk.Style()
 try:
@@ -386,6 +387,21 @@ run_button4 = ttk.Button(
 )
 run_button4.pack(pady=20)
 # --- END OF REEL TRACKER TAB ---
+
+# --- Tab 5: Video Caption Generator ---
+tab5 = ttk.Frame(notebook, padding="10")
+notebook.add(tab5, text='Caption Generator')
+label5 = ttk.Label(tab5, text="Generate time-synchronized captions for videos using AI speech recognition.")
+label5.pack(pady=10)
+status_label5 = ttk.Label(tab5, text="Status: Idle", width=50, anchor="w")
+status_label5.pack(pady=5)
+run_button5 = ttk.Button(
+    tab5,
+    text="Run Caption Generator",
+    command=lambda: run_script(SCRIPT_5_PATH, status_label5, log_area)
+)
+run_button5.pack(pady=20)
+# --- END OF VIDEO CAPTION GENERATOR TAB ---
 
 
 notebook.pack(expand=True, fill='both') # Pack notebook after adding all tabs

@@ -8,6 +8,7 @@ venv/
 .venv/
 ENV/
 env/
+venv_caption
 # If you use conda:
 .conda/
 .condarc
