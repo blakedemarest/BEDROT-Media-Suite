@@ -1,0 +1,83 @@
+{
+    "artists": {
+        "ZONE A0": {
+            "emoji": "[CD]",
+            "genre": "Electronic/Experimental",
+            "singles_per_year": 8,
+            "ep_per_year": 1,
+            "album_per_year": 1
+        },
+        "PIG1987": {
+            "emoji": "[PIG]",
+            "genre": "TBD",
+            "singles_per_year": 8,
+            "ep_per_year": 1,
+            "album_per_year": 1
+        }
+    },
+    "deliverables": {
+        "single": {
+            "distributor_submission": -21,
+            "final_master": -21,
+            "album_artwork": -21,
+            "spotify_canvas": -21,
+            "reels_124": -14,
+            "carousel_posts_25": -14,
+            "music_video": -7,
+            "ad_creatives_5": -3,
+            "release_day_campaign": 0
+        },
+        "ep": {
+            "distributor_submission": -28,
+            "final_master": -28,
+            "album_artwork": -28,
+            "spotify_canvas": -28,
+            "reels_248": -21,
+            "carousel_posts_50": -21,
+            "music_video": -14,
+            "visualizers": -7,
+            "ad_creatives_10": -7,
+            "release_day_campaign": 0,
+            "listening_party": -1
+        },
+        "album": {
+            "distributor_submission": -42,
+            "final_master": -42,
+            "album_artwork": -42,
+            "spotify_canvas": -42,
+            "reels_496": -35,
+            "carousel_posts_100": -35,
+            "music_videos_3": -21,
+            "visualizers": -14,
+            "ad_creatives_20": -14,
+            "release_day_campaign": 0,
+            "listening_party": -1,
+            "behind_the_scenes": -7,
+            "press_kit": -28
+        }
+    },
+    "release_frequencies": {
+        "single_weeks": [5, 6],
+        "ep_months": 12,
+        "album_months": 12
+    },
+    "content_requirements": {
+        "reels_per_single": 124,
+        "carousel_posts_per_single": 25,
+        "ad_creatives_per_single": 5,
+        "reels_per_ep": 248,
+        "carousel_posts_per_ep": 50,
+        "ad_creatives_per_ep": 10,
+        "reels_per_album": 496,
+        "carousel_posts_per_album": 100,
+        "ad_creatives_per_album": 20
+    },
+    "default_settings": {
+        "default_artist": "ZONE A0",
+        "highlight_fridays": true,
+        "show_deliverable_badges": true,
+        "enable_conflict_detection": true,
+        "backup_on_save": true,
+        "max_backups": 10
+    }
+}

@@ -14,11 +14,18 @@ The codebase is organized as follows:
     * `video_remixer_settings.json`: Settings for the Snippet Remixer.
     * `combined_random_config.json`: Settings for the Random Slideshow Generator.
     * `config.json`: Settings for the Slideshow Editor.
+    * `reel_tracker_config.json`: Settings for the Reel Tracker.
+    * `video_caption_generator_config.json`: Settings for the Video Caption Generator.
+    * `release_calendar_config.json`: Settings for the Release Calendar.
+    * `calendar_data.json`: Data storage for the Release Calendar.
 * `src/`: Contains the core Python source code for the tools.
     * `media_download_app.py`: Media Downloader tool.
-    * `snippet_remixer.py`: Snippet Remixer tool.
-    * `random_slideshow.py`: Random Slideshow Generator tool.
-    * `slideshow_editor.py`: A separate tool for creating single slideshows.
+    * `snippet_remixer.py` & `snippet_remixer/`: Snippet Remixer tool (modular).
+    * `random_slideshow/`: Random Slideshow Generator tool (modular).
+    * `reel_tracker/`: Reel Tracker tool (modular).
+    * `video_caption_generator/`: Video Caption Generator tool (modular).
+    * `release_calendar/`: Release Calendar tool (modular).
+    * `core/`: Centralized configuration and utilities.
 * `tools/`: Contains utility scripts.
     * `xyimagescaler.py`: A simple image scaling/cropping utility.
 
@@ -26,8 +33,11 @@ The codebase is organized as follows:
 
 1.  **Launcher (`launcher.py`):** A Tkinter GUI to run and monitor the other tools located in the `src/` directory.
 2.  **Media Downloader (`src/media_download_app.py`):** Downloads video/audio using `yt-dlp` with post-processing options. Uses settings from `config/yt_downloader_gui_settings.json`.
-3.  **Snippet Remixer (`src/snippet_remixer.py`):** Creates new videos by randomly combining short snippets. Uses settings from `config/video_remixer_settings.json`.
-4.  **Random Slideshow Generator (`src/random_slideshow.py`):** Continuously generates short, randomized video slideshows. Uses settings from `config/combined_random_config.json`.
+3.  **Snippet Remixer (`src/snippet_remixer/`):** Creates new videos by randomly combining short snippets. Uses settings from `config/video_remixer_settings.json`.
+4.  **Random Slideshow Generator (`src/random_slideshow/`):** Continuously generates short, randomized video slideshows. Uses settings from `config/combined_random_config.json`.
+5.  **Reel Tracker (`src/reel_tracker/`):** CSV-based content tracking and management system with PyQt5 interface.
+6.  **Video Caption Generator (`src/video_caption_generator/`):** AI-powered caption generation with real-time preview and MP4 output.
+7.  **Release Calendar (`src/release_calendar/`):** Music release scheduling system with multi-artist support and deliverable tracking (requires PyQt6).
 
 ---
 
@@ -94,7 +104,7 @@ Follow these steps to set up the entire suite:
 ## 4. Using the Suite
 
 1.  **Run the Launcher:** Start `launcher.py` from the project root as described above.
-2.  **Select a Tool:** Click the tab corresponding to the tool you want to use (e.g., "MP4 downloader/MP3 Converter", "Snippet Remixer", "Random Slideshow").
+2.  **Select a Tool:** Click the tab corresponding to the tool you want to use (e.g., "MP4 downloader/MP3 Converter", "Snippet Remixer", "Random Slideshow", "Reel Tracker", "Caption Generator", "Release Calendar").
 3.  **Launch the Tool:** Click the "Run..." button on the selected tab. This will open the chosen tool's window.
 4.  **Use the Tool:** Interact with the specific tool's GUI as needed (see detailed guides below). Settings are loaded from/saved to the corresponding JSON file in the `config/` directory.
 5.  **Monitor Status & Logs:**
@@ -136,6 +146,20 @@ Continuously generates short, randomized video slideshows from images.
 * **Troubleshooting:** Ensure dependencies are installed (`pip install -r requirements.txt`). Requires valid image files. Processing can be resource-intensive. Check permissions for input/output folders specified in the tool's GUI or `config/combined_random_config.json`.
 
 ---
+
+### 5.6 Release Calendar (`src/release_calendar/`)
+
+The Release Calendar is a comprehensive music release management system with visual scheduling and deliverable tracking.
+
+**Key Features:**
+* Visual calendar with drag-and-drop release scheduling
+* Multi-artist support (ZONE A0, PIG1987) with conflict detection
+* 9+ deliverable checklist per release
+* Waterfall release strategy (8 singles, 1 EP, 1 album per artist/year)
+* Excel and iCal export capabilities
+* Automatic deadline calculations and overdue alerts
+
+**Note:** This module requires PyQt6, which is separate from PyQt5 used by other modules. Both can coexist when run through the launcher.
 
 ## 6. Other Included Tools
 

@@ -15,7 +15,8 @@
       "Bash(claude --version)",
       "Bash(where claude)",
       "mcp__Context7__resolve-library-id",
-      "Bash(cmd.exe:*)"
+      "Bash(cmd.exe:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

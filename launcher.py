@@ -50,6 +50,7 @@ SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer.py')
 SCRIPT_3_PATH = get_script_path('random_slideshow', 'src/random_slideshow/main.py')
 SCRIPT_4_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
 SCRIPT_5_PATH = get_script_path('video_caption_generator', 'src/video_caption_generator/main_app.py')
+SCRIPT_6_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -402,6 +403,24 @@ run_button5 = ttk.Button(
 )
 run_button5.pack(pady=20)
 # --- END OF VIDEO CAPTION GENERATOR TAB ---
+
+# --- Tab 6: Release Calendar ---
+tab6 = ttk.Frame(notebook, padding="10")
+notebook.add(tab6, text='Release Calendar')
+label6 = ttk.Label(tab6, text="Manage music release schedules with comprehensive deliverable tracking.")
+label6.pack(pady=10)
+status_label6 = ttk.Label(tab6, text="Status: Idle", width=50, anchor="w")
+status_label6.pack(pady=5)
+run_button6 = ttk.Button(
+    tab6,
+    text="Run Release Calendar",
+    command=lambda: run_script(SCRIPT_6_PATH, status_label6, log_area)
+)
+run_button6.pack(pady=20)
+# Note: Release Calendar requires PyQt6
+req_label6 = ttk.Label(tab6, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", foreground="gray")
+req_label6.pack(pady=5)
+# --- END OF RELEASE CALENDAR TAB ---
 
 
 notebook.pack(expand=True, fill='both') # Pack notebook after adding all tabs

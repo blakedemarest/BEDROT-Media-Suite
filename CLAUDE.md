@@ -45,6 +45,9 @@ python src/snippet_remixer_modular.py
 # Random slideshow (modular)
 python src/random_slideshow/main.py
 
+# Release calendar (modular) - requires PyQt6
+python src/release_calendar_modular.py
+
 # Standalone tools
 python tools/slideshow_editor.py
 python tools/xyimagescaler.py
@@ -63,6 +66,8 @@ src/
 ├── reel_tracker/          # Advanced CSV-based content tracking
 ├── snippet_remixer/       # Video remixing with worker threads  
 ├── random_slideshow/      # Automated slideshow generation
+├── release_calendar/      # Music release management system (PyQt6)
+├── video_caption_generator/  # AI-powered caption generation
 ├── media_download_app.py  # yt-dlp based media downloader
 └── MODULARIZATION_GUIDELINES.md  # Development standards
 ```
@@ -88,6 +93,29 @@ src/
 - **pandas**: CSV data management (reel tracker)
 - **MoviePy**: High-level video operations
 - **Pillow**: Image processing
+- **PyQt6**: GUI framework (Release Calendar only)
+
+## Module Overview
+
+### Release Calendar Module (NEW)
+The release calendar module is a comprehensive music release management system ported from bedrot-release-calendar:
+
+**Features:**
+- Visual calendar with drag-and-drop release scheduling
+- Multi-artist support with conflict detection
+- 9+ deliverable checklist per release
+- Waterfall release strategy (8 singles, 1 EP, 1 album per artist/year)
+- Excel and iCal export capabilities
+- Automatic deadline calculations
+- Progress tracking and overdue alerts
+
+**Technical Details:**
+- Uses PyQt6 (separate from PyQt5 used by other modules)
+- Stores data in `config/calendar_data.json`
+- Configuration in `config/release_calendar_config.json`
+- Automatic timestamped backups
+
+**Location:** `src/release_calendar/`
 
 ## Development Guidelines
 
@@ -135,6 +163,9 @@ class ProcessingWorker(QThread):
 - `video_remixer_settings.json`: Snippet Remixer settings
 - `combined_random_config.json`: Random Slideshow settings
 - `reel_tracker_config.json`: Advanced configuration with version history
+- `release_calendar_config.json`: Release calendar settings with artist profiles
+- `video_caption_generator_config.json`: Caption generator settings
+- `calendar_data.json`: Release calendar data storage
 
 ### Important Development Files
 - `ARCHITECTURE_DOCUMENTATION.md`: Comprehensive architecture analysis
