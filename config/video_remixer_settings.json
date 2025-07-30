@@ -1,12 +1,12 @@
 {
-    "last_input_folder": "E:/VIDEOS/MIDJOURNEY VIDZ/MIDJOURNEY VIDEOS - PIG1987",
-    "output_folder": "E:/VIDEOS/RandomSlideshows",
+    "last_input_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src",
+    "output_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src",
     "length_mode": "BPM",
     "duration_seconds": 132.0,
     "bpm": 180.0,
     "bpm_unit": "1/4 Beat",
     "num_units": 150,
-    "aspect_ratio": "1920x1080 (16:9 Landscape)",
+    "aspect_ratio": "Original",
     "export_settings": {
         "custom_width": null,
         "custom_height": null,

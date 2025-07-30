@@ -11,6 +11,11 @@ import datetime  # For timestamp
 import random    # For random string
 import string    # For random string characters
 
+# --- Define base paths ---
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config')
+SETTINGS_FILENAME = "yt_downloader_gui_settings.json"
+
 # --- Import centralized configuration system ---
 try:
     from core import get_config_manager, load_app_config, save_app_config
@@ -27,9 +32,6 @@ except ImportError as e:
     print("Falling back to hardcoded paths")
     
     # --- Fallback: Define Settings File Path ---
-    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-    CONFIG_DIR = os.path.join(SCRIPT_DIR, '..', 'config')
-    SETTINGS_FILENAME = "yt_downloader_gui_settings.json"
     SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
     
     if not os.path.exists(CONFIG_DIR): # Create config dir if it doesn't exist
@@ -386,6 +388,11 @@ class MediaDownloaderApp:
         self.download_queue = []
         self.download_path = tk.StringVar(value=initial_path)
         self.download_format = tk.StringVar(value="mp4")
+        
+        # Abort functionality
+        self.abort_flag = threading.Event()
+        self.current_process = None
+        self.is_downloading = False
 
         # Option Variables
         self.video_only_var = tk.BooleanVar(value=self.settings.get("video_only", False))
@@ -495,6 +502,8 @@ class MediaDownloaderApp:
         action_frame.pack(fill=tk.X)
         self.download_button = ttk.Button(action_frame, text="Download Queue", command=self.start_download_thread)
         self.download_button.pack(side=tk.LEFT, padx=5)
+        self.abort_button = ttk.Button(action_frame, text="Abort Download", command=self.abort_download, state=tk.DISABLED)
+        self.abort_button.pack(side=tk.LEFT, padx=5)
         clear_button = ttk.Button(action_frame, text="Clear Selected", command=self.clear_selected)
         clear_button.pack(side=tk.LEFT, padx=5)
         clear_all_button = ttk.Button(action_frame, text="Clear All", command=self.clear_all)
@@ -710,6 +719,13 @@ class MediaDownloaderApp:
         selected_format_state = self.download_format.get()
         chop_settings = (self.enable_chop_var.get(), chop_interval_sec)
 
+        # Reset abort flag and update UI
+        self.abort_flag.clear()
+        self.is_downloading = True
+        self.download_button.config(state=tk.DISABLED)
+        self.abort_button.config(state=tk.NORMAL)
+        self.add_button.config(state=tk.DISABLED)
+        
         download_thread = threading.Thread(
             target=self.process_queue_sequential,
             args=(queue_copy, time_range, aspect_ratio_selection,
@@ -717,6 +733,32 @@ class MediaDownloaderApp:
             daemon=True)
         download_thread.start()
 
+    def abort_download(self):
+        """Abort the current download operation."""
+        if self.is_downloading:
+            self.update_status("Aborting download...")
+            self.abort_flag.set()
+            
+            # Terminate current subprocess if running
+            if self.current_process and self.current_process.poll() is None:
+                try:
+                    self.current_process.terminate()
+                    self.current_process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    self.current_process.kill()
+                except Exception as e:
+                    print(f"Error terminating process: {e}")
+            
+            # Update UI
+            self.abort_button.config(state=tk.DISABLED)
+            self.update_status("Download aborted by user")
+
+    def enable_download_buttons(self):
+        """Re-enable download buttons after completion or abort."""
+        self.is_downloading = False
+        self.download_button.config(state=tk.NORMAL)
+        self.abort_button.config(state=tk.DISABLED)
+        self.add_button.config(state=tk.NORMAL)
 
     # --- SEQUENTIAL PROCESSING LOGIC (with SyntaxError fixes) ---
     def process_queue_sequential(self, queue_to_process, time_range, aspect_ratio_selection,
@@ -736,6 +778,11 @@ class MediaDownloaderApp:
         processed_count = 0
 
         for url in queue_to_process:
+            # Check abort flag at start of each URL
+            if self.abort_flag.is_set():
+                self.update_status("Download queue aborted")
+                break
+                
             processed_count += 1
             progress_prefix = f"[{processed_count}/{initial_queue_size}]"
             self.update_status(f"{progress_prefix} Starting: {url[:70]}...")
@@ -765,7 +812,15 @@ class MediaDownloaderApp:
             stderr_info = ""
             needs_audio_removal_post_dl = False
 
-            temp_output_template = os.path.join(path, f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}{final_extension}")
+            # For MP3, we need to use a different output template without extension since yt-dlp will add it
+            if selected_format == "mp3":
+                temp_output_base = os.path.join(path, f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}")
+                temp_output_template = temp_output_base + ".%(ext)s"
+                # Store for later use when finding the file
+                self.temp_output_base = temp_output_base
+            else:
+                temp_output_template = os.path.join(path, f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}{final_extension}")
+            
             print(f"DEBUG: Using temp download template: {temp_output_template}")
 
             command = [
@@ -796,12 +851,18 @@ class MediaDownloaderApp:
                 process = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                             text=True, encoding='utf-8', errors='replace', bufsize=1,
                                             creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0 )
+                self.current_process = process  # Store for potential abort
                 current_status_msg = f"{progress_prefix} Downloading..."
                 self.update_status(current_status_msg)
                 captured_title_from_progress = None
 
                 if process.stdout:
                     for line in iter(process.stdout.readline, ''):
+                        # Check abort flag during download
+                        if self.abort_flag.is_set():
+                            process.terminate()
+                            break
+                            
                         line = line.strip()
                         if not line: continue
                         if line.startswith("download-status:"):
@@ -833,8 +894,15 @@ class MediaDownloaderApp:
                              except Exception as e: print(f"Error parsing progress line: {line} | Error: {e}")
 
                 process.stdout.close() if process.stdout else None
-                return_code = process.wait()
-                stderr_output = process.stderr.read() if process.stderr else ""
+                
+                # Check if process was terminated due to abort
+                if self.abort_flag.is_set():
+                    return_code = -1
+                    stderr_output = "Download aborted by user"
+                else:
+                    return_code = process.wait()
+                    stderr_output = process.stderr.read() if process.stderr else ""
+                
                 process.stderr.close() if process.stderr else None
                 stderr_info = stderr_output
 
@@ -882,15 +950,41 @@ class MediaDownloaderApp:
                     if initial_download_path and os.path.exists(initial_download_path):
                         try: os.remove(initial_download_path); print(f"Cleaned up failed download: {initial_download_path}")
                         except OSError as e: print(f"Warning: Could not delete failed download temp file: {e}")
+                    elif selected_format == "mp3" and hasattr(self, 'temp_output_base'):
+                        # For MP3, check for any audio file with the base name
+                        for ext in ['.mp3', '.webm', '.m4a', '.opus', '.ogg']:
+                            potential_file = self.temp_output_base + ext
+                            if os.path.exists(potential_file):
+                                try: 
+                                    os.remove(potential_file)
+                                    print(f"Cleaned up likely failed temp: {potential_file}")
+                                except OSError as e: 
+                                    print(f"Warning: Could not delete likely failed temp file: {e}")
                     elif os.path.exists(temp_output_template):
                          try: os.remove(temp_output_template); print(f"Cleaned up likely failed temp: {temp_output_template}")
                          except OSError as e: print(f"Warning: Could not delete likely failed temp file: {e}")
                     continue
 
-            except FileNotFoundError: self.update_status(f"{progress_prefix} Error: yt-dlp command not found!"); self.root.after(0, self.enable_download_button_and_add); return
+            except FileNotFoundError: self.update_status(f"{progress_prefix} Error: yt-dlp command not found!"); self.root.after(0, self.enable_download_buttons); return
             except Exception as e: self.update_status(f"{progress_prefix} Download Error: {e}"); yt_dlp_success = False; continue
 
 
+            # For MP3 downloads, we need to find the actual file since yt-dlp might have used a different extension
+            if selected_format == "mp3" and yt_dlp_success and not initial_download_path:
+                # Look for files matching the pattern
+                if hasattr(self, 'temp_output_base'):
+                    temp_base = self.temp_output_base
+                else:
+                    temp_base = os.path.join(path, f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}")
+                
+                # Check for common audio extensions
+                for ext in ['.mp3', '.webm', '.m4a', '.opus', '.ogg']:
+                    potential_file = temp_base + ext
+                    if os.path.exists(potential_file):
+                        initial_download_path = potential_file
+                        print(f"DEBUG: Found MP3 download at: {initial_download_path}")
+                        break
+            
             # Proceed only if download succeeded
             if not yt_dlp_success or not initial_download_path or not unique_base_title:
                 self.update_status(f"{progress_prefix} Skipping post-processing due to download issue.")
@@ -910,7 +1004,10 @@ class MediaDownloaderApp:
 
 
             # --- Stage 1.5: Remove Audio (if TikTok Video-Only case) ---
-            if needs_audio_removal_post_dl and not processing_error:
+            if self.abort_flag.is_set():
+                processing_error = True
+                self.update_status(f"{progress_prefix} Aborted")
+            elif needs_audio_removal_post_dl and not processing_error:
                  self.update_status(f"{progress_prefix} Removing audio track...")
                  output_noaudio_path = os.path.join(path, f"{unique_base_title}_TEMP_NOAUDIO{final_extension}")
                  ffmpeg_an_command = [ ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "error",
@@ -946,7 +1043,10 @@ class MediaDownloaderApp:
 
 
             # --- Stage 2: Aspect Ratio Adjustment ---
-            if is_adjusting_ar and not processing_error:
+            if self.abort_flag.is_set():
+                processing_error = True
+                self.update_status(f"{progress_prefix} Aborted")
+            elif is_adjusting_ar and not processing_error:
                  self.update_status(f"{progress_prefix} Adjusting Aspect Ratio to {aspect_ratio_selection}...")
                  width, height = get_video_dimensions(current_file_path)
                  output_ar_path = os.path.join(path, f"{unique_base_title}_TEMP_AR{final_extension}") # Define path outside try/except
@@ -1005,7 +1105,10 @@ class MediaDownloaderApp:
 
 
             # --- Stage 3: Time Cutting ---
-            if is_cutting and not processing_error:
+            if self.abort_flag.is_set():
+                processing_error = True
+                self.update_status(f"{progress_prefix} Aborted")
+            elif is_cutting and not processing_error:
                  self.update_status(f"{progress_prefix} Cutting time range...")
                  start_sec, end_sec = time_range
                  output_cut_path = os.path.join(path, f"{unique_base_title}_TEMP_CUT{final_extension}") # Define path outside try/except
@@ -1052,7 +1155,10 @@ class MediaDownloaderApp:
 
 
             # --- Stage 4: Chopping into Intervals ---
-            if is_chopping and not processing_error:
+            if self.abort_flag.is_set():
+                processing_error = True
+                self.update_status(f"{progress_prefix} Aborted")
+            elif is_chopping and not processing_error:
                 self.update_status(f"{progress_prefix} Preparing to chop into {chop_interval_seconds}s intervals...")
                 source_duration = get_video_duration(current_file_path)
 
@@ -1175,7 +1281,8 @@ class MediaDownloaderApp:
 
 
         # --- Loop finished ---
-        self.root.after(0, self.enable_download_button_and_add)
+        self.current_process = None  # Clear process reference
+        self.root.after(0, self.enable_download_buttons)
         remaining_items = self.queue_listbox.get(0, tk.END)
         if not remaining_items:
             self.update_status("Download queue finished. All items processed.")

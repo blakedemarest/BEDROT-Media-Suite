@@ -506,6 +506,14 @@ class VideoRemixerApp:
         )
         self.generate_button.pack(pady=10)
         
+        # Abort button (initially hidden)
+        self.abort_button = ttk.Button(
+            process_button_frame,
+            text="Abort Processing",
+            command=self.abort_processing
+        )
+        # Don't pack initially
+        
         # Stop button (initially hidden)
         self.stop_button = ttk.Button(
             process_button_frame,
@@ -864,6 +872,10 @@ class VideoRemixerApp:
 
         # Setup UI for processing
         self.enable_generate_button(False)
+        # Show abort button during processing
+        if not self.continuous_processing:
+            self.abort_button.pack(pady=(0, 10))
+            self.abort_button.config(state=tk.NORMAL)
         output_msg = f"Output: {os.path.basename(final_output_path)}"
         self.update_status(output_msg)
         # Log output file for launcher log area
@@ -921,6 +933,7 @@ class VideoRemixerApp:
                     self.root.after(2000, self.start_next_continuous_remix)  # 2 second delay
                 else:
                     self.enable_generate_button(True)
+                    self.abort_button.pack_forget()
                     self.continuous_processing = False
             else:
                 failure_msg = "Processing failed. Check console for details."
@@ -929,6 +942,7 @@ class VideoRemixerApp:
                 safe_print(f"[FAILED] {failure_msg}")
                 self.logger.error(failure_msg)
                 self.enable_generate_button(True)
+                self.abort_button.pack_forget()
                 self.continuous_processing = False
 
         # Get export settings from config
@@ -1112,6 +1126,13 @@ class VideoRemixerApp:
         self.generate_button.pack(pady=10)
         self.enable_generate_button(True)
         self.update_status(f"Continuous mode stopped. Created {self.continuous_count} remixes.")
+    
+    def abort_processing(self):
+        """Abort the current processing operation."""
+        if self.processing_worker.is_processing():
+            self.update_status("Aborting processing...")
+            self.processing_worker.abort_processing()
+            self.abort_button.config(state=tk.DISABLED)
     
     def update_continuous_counter(self):
         """Update the continuous mode counter display with current settings."""

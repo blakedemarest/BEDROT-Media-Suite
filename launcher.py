@@ -57,6 +57,8 @@ PYTHON_EXECUTABLE = sys.executable
 # --- Globals for Process Management ---
 active_processes = []
 process_lock = threading.Lock()
+# Dictionary to track processes by script path
+process_map = {}
 
 # --- Helper Function to Update Log Area Safely ---
 def _insert_log_text(log_widget, text):
@@ -127,6 +129,7 @@ def run_script(script_path, status_label, log_widget): # Added log_widget
 
             with process_lock:
                 active_processes.append(process)
+                process_map[script_path] = process  # Track by script path
             update_log(log_widget, f"Process {script_name} (PID: {process.pid}) started.")
 
             # --- Stream Output (More responsive for long scripts) ---
@@ -160,6 +163,15 @@ def run_script(script_path, status_label, log_widget): # Added log_widget
             stdout_thread.join() # Wait for stdout reader to finish
             stderr_thread.join() # Wait for stderr reader to finish
             return_code = process.wait() # Wait for process to exit & get code
+            
+            # Clean up process pipes to prevent resource leak
+            try:
+                if hasattr(process, 'stdout') and process.stdout:
+                    process.stdout.close()
+                if hasattr(process, 'stderr') and process.stderr:
+                    process.stderr.close()
+            except Exception as e:
+                update_log(log_widget, f"Warning: Error closing process pipes: {e}")
 
             # --- End Streaming ---
 
@@ -196,6 +208,8 @@ def run_script(script_path, status_label, log_widget): # Added log_widget
                 with process_lock:
                     if process in active_processes:
                         active_processes.remove(process)
+                    if script_path in process_map:
+                        del process_map[script_path]
                         # update_log(log_widget, f"Removed process {script_name} (PID: {process.pid}) from tracked list.") # Optional: uncomment for verbose logging
 
             # Update status if it seems stuck on "Running" and widget exists
@@ -211,6 +225,46 @@ def run_script(script_path, status_label, log_widget): # Added log_widget
     thread = threading.Thread(target=task)
     thread.daemon = True
     thread.start()
+
+# --- Function to stop individual scripts ---
+def stop_script(script_path, status_label, log_widget):
+    """Stops a specific running script."""
+    script_name = os.path.basename(script_path)
+    
+    with process_lock:
+        process = process_map.get(script_path)
+        if process and process.poll() is None:
+            try:
+                update_log(log_widget, f"Stopping {script_name} (PID: {process.pid})...")
+                process.terminate()
+                try:
+                    process.wait(timeout=0.5)
+                    update_log(log_widget, f"Process {script_name} terminated successfully.")
+                except subprocess.TimeoutExpired:
+                    update_log(log_widget, f"Process {script_name} did not terminate, forcing kill...")
+                    process.kill()
+                    process.wait()
+                    update_log(log_widget, f"Process {script_name} killed.")
+                
+                # Clean up pipes after termination
+                try:
+                    if hasattr(process, 'stdout') and process.stdout:
+                        process.stdout.close()
+                    if hasattr(process, 'stderr') and process.stderr:
+                        process.stderr.close()
+                except Exception as e:
+                    update_log(log_widget, f"Warning: Error closing pipes for {script_name}: {e}")
+                    
+                # Update status
+                if status_label.winfo_exists():
+                    status_label.config(text=f"Status: {script_name} stopped by user.")
+                    
+            except Exception as e:
+                update_log(log_widget, f"Error stopping {script_name}: {e}")
+        else:
+            update_log(log_widget, f"No active process found for {script_name}")
+            if status_label.winfo_exists():
+                status_label.config(text="Status: Not running")
 
 # --- Function to handle window closing (Modified to log termination) ---
 def on_closing():
@@ -335,13 +389,26 @@ label1 = ttk.Label(tab1, text="Run the Media Downloader script.")
 label1.pack(pady=10)
 status_label1 = ttk.Label(tab1, text="Status: Idle", width=50, anchor="w") # Give status labels more width
 status_label1.pack(pady=5)
-# Button command now passes log_area
+
+# Button frame for Run/Stop buttons
+button_frame1 = ttk.Frame(tab1)
+button_frame1.pack(pady=20)
+
+# Run button
 run_button1 = ttk.Button(
-    tab1,
+    button_frame1,
     text="Run Media Downloader",
-    command=lambda: run_script(SCRIPT_1_PATH, status_label1, log_area) # Pass log_area
+    command=lambda: run_script(SCRIPT_1_PATH, status_label1, log_area)
 )
-run_button1.pack(pady=20)
+run_button1.pack(side=tk.LEFT, padx=5)
+
+# Stop button
+stop_button1 = ttk.Button(
+    button_frame1,
+    text="Stop",
+    command=lambda: stop_script(SCRIPT_1_PATH, status_label1, log_area)
+)
+stop_button1.pack(side=tk.LEFT, padx=5)
 
 # --- Tab 2: Snippet Remixer ---
 tab2 = ttk.Frame(notebook, padding="10")
@@ -350,13 +417,26 @@ label2 = ttk.Label(tab2, text="Run the Snippet Remixer script.")
 label2.pack(pady=10)
 status_label2 = ttk.Label(tab2, text="Status: Idle", width=50, anchor="w")
 status_label2.pack(pady=5)
-# Button command now passes log_area
+
+# Button frame for Run/Stop buttons
+button_frame2 = ttk.Frame(tab2)
+button_frame2.pack(pady=20)
+
+# Run button
 run_button2 = ttk.Button(
-    tab2,
+    button_frame2,
     text="Run Snippet Remixer",
-    command=lambda: run_script(SCRIPT_2_PATH, status_label2, log_area) # Pass log_area
+    command=lambda: run_script(SCRIPT_2_PATH, status_label2, log_area)
 )
-run_button2.pack(pady=20)
+run_button2.pack(side=tk.LEFT, padx=5)
+
+# Stop button
+stop_button2 = ttk.Button(
+    button_frame2,
+    text="Stop",
+    command=lambda: stop_script(SCRIPT_2_PATH, status_label2, log_area)
+)
+stop_button2.pack(side=tk.LEFT, padx=5)
 
 # --- Tab 3: Random Slideshow ---
 tab3 = ttk.Frame(notebook, padding="10")
@@ -365,13 +445,26 @@ label3 = ttk.Label(tab3, text="Run the Random Slideshow Generator script.")
 label3.pack(pady=10)
 status_label3 = ttk.Label(tab3, text="Status: Idle", width=50, anchor="w") # Create unique status label
 status_label3.pack(pady=5)
-# Button command uses SCRIPT_3_PATH and status_label3
+
+# Button frame for Run/Stop buttons
+button_frame3 = ttk.Frame(tab3)
+button_frame3.pack(pady=20)
+
+# Run button
 run_button3 = ttk.Button(
-    tab3,
+    button_frame3,
     text="Run Random Slideshow",
-    command=lambda: run_script(SCRIPT_3_PATH, status_label3, log_area) # Pass correct path and status label
+    command=lambda: run_script(SCRIPT_3_PATH, status_label3, log_area)
 )
-run_button3.pack(pady=20)
+run_button3.pack(side=tk.LEFT, padx=5)
+
+# Stop button
+stop_button3 = ttk.Button(
+    button_frame3,
+    text="Stop",
+    command=lambda: stop_script(SCRIPT_3_PATH, status_label3, log_area)
+)
+stop_button3.pack(side=tk.LEFT, padx=5)
 
 # --- Tab 4: Reel Tracker ---
 tab4 = ttk.Frame(notebook, padding="10")
@@ -380,13 +473,26 @@ label4 = ttk.Label(tab4, text="Run the Reel Tracker application for CSV-based re
 label4.pack(pady=10)
 status_label4 = ttk.Label(tab4, text="Status: Idle", width=50, anchor="w") # Create unique status label
 status_label4.pack(pady=5)
-# Button command uses SCRIPT_4_PATH and status_label4
+
+# Button frame for Run/Stop buttons
+button_frame4 = ttk.Frame(tab4)
+button_frame4.pack(pady=20)
+
+# Run button
 run_button4 = ttk.Button(
-    tab4,
+    button_frame4,
     text="Run Reel Tracker",
-    command=lambda: run_script(SCRIPT_4_PATH, status_label4, log_area) # Pass correct path and status label
+    command=lambda: run_script(SCRIPT_4_PATH, status_label4, log_area)
 )
-run_button4.pack(pady=20)
+run_button4.pack(side=tk.LEFT, padx=5)
+
+# Stop button
+stop_button4 = ttk.Button(
+    button_frame4,
+    text="Stop",
+    command=lambda: stop_script(SCRIPT_4_PATH, status_label4, log_area)
+)
+stop_button4.pack(side=tk.LEFT, padx=5)
 # --- END OF REEL TRACKER TAB ---
 
 # --- Tab 5: Video Caption Generator ---
@@ -396,12 +502,26 @@ label5 = ttk.Label(tab5, text="Generate time-synchronized captions for videos us
 label5.pack(pady=10)
 status_label5 = ttk.Label(tab5, text="Status: Idle", width=50, anchor="w")
 status_label5.pack(pady=5)
+
+# Button frame for Run/Stop buttons
+button_frame5 = ttk.Frame(tab5)
+button_frame5.pack(pady=20)
+
+# Run button
 run_button5 = ttk.Button(
-    tab5,
+    button_frame5,
     text="Run Caption Generator",
     command=lambda: run_script(SCRIPT_5_PATH, status_label5, log_area)
 )
-run_button5.pack(pady=20)
+run_button5.pack(side=tk.LEFT, padx=5)
+
+# Stop button
+stop_button5 = ttk.Button(
+    button_frame5,
+    text="Stop",
+    command=lambda: stop_script(SCRIPT_5_PATH, status_label5, log_area)
+)
+stop_button5.pack(side=tk.LEFT, padx=5)
 # --- END OF VIDEO CAPTION GENERATOR TAB ---
 
 # --- Tab 6: Release Calendar ---
@@ -411,12 +531,27 @@ label6 = ttk.Label(tab6, text="Manage music release schedules with comprehensive
 label6.pack(pady=10)
 status_label6 = ttk.Label(tab6, text="Status: Idle", width=50, anchor="w")
 status_label6.pack(pady=5)
+
+# Button frame for Run/Stop buttons
+button_frame6 = ttk.Frame(tab6)
+button_frame6.pack(pady=20)
+
+# Run button
 run_button6 = ttk.Button(
-    tab6,
+    button_frame6,
     text="Run Release Calendar",
     command=lambda: run_script(SCRIPT_6_PATH, status_label6, log_area)
 )
-run_button6.pack(pady=20)
+run_button6.pack(side=tk.LEFT, padx=5)
+
+# Stop button
+stop_button6 = ttk.Button(
+    button_frame6,
+    text="Stop",
+    command=lambda: stop_script(SCRIPT_6_PATH, status_label6, log_area)
+)
+stop_button6.pack(side=tk.LEFT, padx=5)
+
 # Note: Release Calendar requires PyQt6
 req_label6 = ttk.Label(tab6, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", foreground="gray")
 req_label6.pack(pady=5)

@@ -3,13 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environment folders
-venv/
+# Virtual environment folders (IMPROVED)
 .venv/
+venv/
+venv_*/
 ENV/
 env/
-venv_caption
-# If you use conda:
 .conda/
 .condarc
 .conda_lock/
@@ -72,3 +71,20 @@ logs/
 .claude/
 CLAUDE.md
 claude.md
+
+# NEW ADDITIONS TO PREVENT FUTURE CLUTTER:
+# Test artifacts (ADDED)
+**/test_results_*.json
+**/module_test_*.txt
+test_downloads/
+*test_output*
+
+# Backup and emergency files (ADDED) 
+*backup*
+*BACKUP*
+*EMERGENCY*
+*.backup
+backups/*.csv
+
+# Function registry cache (ADDED)
+function_registry_cache.json

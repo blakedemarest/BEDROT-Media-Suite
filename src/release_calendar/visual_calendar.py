@@ -13,13 +13,13 @@ import calendar
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QScrollArea, QFrame, QGraphicsDropShadowEffect, QSizePolicy,
-    QMenu, QFileDialog, QMessageBox, QGridLayout, QAction
+    QMenu, QFileDialog, QMessageBox, QGridLayout
 )
 from PyQt6.QtCore import Qt, QDate, QRect, QPoint, QSize, pyqtSignal, QMimeData, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import (
     QPainter, QColor, QPen, QBrush, QFont, QPalette,
     QDragEnterEvent, QDragMoveEvent, QDropEvent, QMouseEvent,
-    QPixmap, QDrag, QPainterPath
+    QPixmap, QDrag, QPainterPath, QAction
 )
 
 from .utils import logger, format_deliverable_name, days_until

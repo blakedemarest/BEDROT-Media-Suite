@@ -29,6 +29,7 @@ class ProcessingWorker:
         self.video_filter = video_filter
         self.video_processor = VideoProcessor(script_dir, video_filter)
         self.processing_active = False
+        self.abort_requested = False
         self.thread = None
     
     def calculate_durations(self, length_mode, settings):
@@ -138,6 +139,9 @@ class ProcessingWorker:
                 raise Exception("FFmpeg/FFprobe not found")
             
             # Stage 1: Analyze Durations
+            if self.abort_requested:
+                raise Exception("Processing aborted by user")
+                
             if progress_callback:
                 progress_callback("Analyzing input video durations...")
                 
@@ -155,6 +159,9 @@ class ProcessingWorker:
                 raise Exception("No valid input videos found or none are long enough.")
             
             # Stage 2: Generate Snippet List
+            if self.abort_requested:
+                raise Exception("Processing aborted by user")
+                
             if progress_callback:
                 progress_callback("Generating random snippet list...")
             
@@ -171,6 +178,9 @@ class ProcessingWorker:
             )
             
             # Stage 3: Create Temp Dir & Cut Snippets
+            if self.abort_requested:
+                raise Exception("Processing aborted by user")
+                
             if not self.video_processor.prepare_temp_directory():
                 raise Exception("Temp dir creation failed.")
             
@@ -185,11 +195,17 @@ class ProcessingWorker:
                 raise Exception("No snippets were successfully cut.")
             
             # Stage 4: Concatenate Snippets
+            if self.abort_requested:
+                raise Exception("Processing aborted by user")
+                
             temp_concat_path = self.video_processor.concatenate_snippets(
                 snippet_files, progress_callback
             )
             
             # Stage 5: Aspect Ratio Adjustment and Final Output
+            if self.abort_requested:
+                raise Exception("Processing aborted by user")
+                
             success = self.video_processor.adjust_aspect_ratio(
                 temp_concat_path, final_output_path, aspect_ratio_selection, export_settings, progress_callback, aspect_ratio_mode
             )
@@ -302,6 +318,7 @@ class ProcessingWorker:
             return
         
         self.processing_active = True
+        self.abort_requested = False  # Reset abort flag
         
         self.thread = threading.Thread(
             target=self.process_videos,
@@ -325,6 +342,17 @@ class ProcessingWorker:
             bool: True if processing is active
         """
         return self.processing_active
+    
+    def abort_processing(self):
+        """
+        Request abort of current processing operation.
+        """
+        if self.processing_active:
+            self.logger.info("Abort requested by user")
+            self.abort_requested = True
+            # Also signal the video processor to abort if it has subprocesses running
+            if hasattr(self.video_processor, 'abort_processing'):
+                self.video_processor.abort_processing()
     
     def get_video_processor(self):
         """

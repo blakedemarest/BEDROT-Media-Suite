@@ -60,6 +60,8 @@ class VideoProcessor:
         self.ffprobe_path = None
         self.ffmpeg_found = False
         self.ffprobe_found = False
+        self.current_process = None
+        self.abort_requested = False
         self.check_ffmpeg_tools()
     
     def check_ffmpeg_tools(self):
@@ -429,17 +431,40 @@ class VideoProcessor:
                 log_ffmpeg_command(self.logger, cut_command)
                 
             try:
+                # Check abort before starting
+                if self.abort_requested:
+                    raise Exception("Processing aborted by user")
+                    
                 start_time = time.time()
                 creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
-                proc = subprocess.run(
+                self.current_process = subprocess.Popen(
                     cut_command, 
-                    capture_output=True, 
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     text=True, 
-                    check=True, 
                     encoding='utf-8', 
                     errors='ignore', 
                     creationflags=creationflags
                 )
+                stdout, stderr = self.current_process.communicate()
+                return_code = self.current_process.returncode
+                
+                # Clean up subprocess pipes to prevent resource leak
+                if hasattr(self.current_process.stdout, 'close'):
+                    try:
+                        self.current_process.stdout.close()
+                    except Exception:
+                        pass
+                if hasattr(self.current_process.stderr, 'close'):
+                    try:
+                        self.current_process.stderr.close()
+                    except Exception:
+                        pass
+                
+                self.current_process = None
+                
+                if return_code != 0:
+                    raise subprocess.CalledProcessError(return_code, cut_command, stdout, stderr)
                 elapsed = time.time() - start_time
                 
                 # Verify output and log results
@@ -675,6 +700,33 @@ class VideoProcessor:
             tuple: (ffmpeg_found, ffprobe_found)
         """
         return self.ffmpeg_found, self.ffprobe_found
+    
+    def abort_processing(self):
+        """
+        Request abort of current processing and terminate any running subprocess.
+        """
+        self.abort_requested = True
+        if self.current_process and self.current_process.poll() is None:
+            try:
+                self.current_process.terminate()
+                self.current_process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.current_process.kill()
+                self.current_process.wait()
+            except Exception as e:
+                self.logger.error(f"Error terminating subprocess: {e}")
+            finally:
+                # Clean up subprocess pipes after termination
+                if hasattr(self.current_process, 'stdout') and self.current_process.stdout:
+                    try:
+                        self.current_process.stdout.close()
+                    except Exception:
+                        pass
+                if hasattr(self.current_process, 'stderr') and self.current_process.stderr:
+                    try:
+                        self.current_process.stderr.close()
+                    except Exception:
+                        pass
     
     def verify_output_dimensions(self, video_path, expected_width=None, expected_height=None, check_black_bars=False):
         """

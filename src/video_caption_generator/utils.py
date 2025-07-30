@@ -8,6 +8,15 @@ import shutil
 from pathlib import Path
 import re
 
+# Import environment loader for proper configuration
+try:
+    from ..core.env_loader import get_env_var
+    CORE_AVAILABLE = True
+except ImportError:
+    CORE_AVAILABLE = False
+    def get_env_var(key, default=None):
+        return os.environ.get(key, default)
+
 def safe_print(*args, **kwargs):
     """Print with proper encoding handling."""
     try:
@@ -23,22 +32,35 @@ def safe_print(*args, **kwargs):
         print(*safe_args, **kwargs)
 
 def get_ffmpeg_path():
-    """Get FFmpeg executable path."""
+    """Get FFmpeg executable path using environment configuration."""
+    # Check environment variable first
+    env_path = get_env_var('SLIDESHOW_FFMPEG_PATH')
+    if env_path and os.path.exists(env_path):
+        return env_path
+    
     # Check if ffmpeg is in PATH
     ffmpeg_path = shutil.which("ffmpeg")
     if ffmpeg_path:
         return ffmpeg_path
     
-    # Windows-specific paths
+    # Platform-specific fallback paths from environment or defaults
     if sys.platform == "win32":
-        common_paths = [
-            r"C:\ffmpeg\bin\ffmpeg.exe",
-            r"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
-            r"C:\Program Files (x86)\ffmpeg\bin\ffmpeg.exe",
-        ]
+        # Get configurable paths from environment or use minimal defaults
+        custom_paths = get_env_var('SLIDESHOW_FFMPEG_SEARCH_PATHS', '').split(';')
+        common_paths = [path.strip() for path in custom_paths if path.strip()]
+        
+        # Add minimal fallback paths if no custom paths provided
+        if not common_paths:
+            common_paths = [
+                "ffmpeg.exe",  # Try current directory
+                os.path.expandvars(r"%PROGRAMFILES%\ffmpeg\bin\ffmpeg.exe"),
+                os.path.expandvars(r"%PROGRAMFILES(X86)%\ffmpeg\bin\ffmpeg.exe"),
+            ]
+        
         for path in common_paths:
-            if os.path.exists(path):
-                return path
+            expanded_path = os.path.expandvars(path)
+            if os.path.exists(expanded_path):
+                return expanded_path
     
     return "ffmpeg"  # Fallback to PATH
 

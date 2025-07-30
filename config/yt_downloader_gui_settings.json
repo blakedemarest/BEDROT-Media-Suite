@@ -1,6 +1,6 @@
 {
-    "download_path": "E:/REPOS/cat-video-overlay",
-    "video_only": true,
+    "download_path": "E:/VIDEOS/A04_MEDIADOWNLOADEROUTPUTS",
+    "video_only": false,
     "enable_cut": false,
     "start_time": "01:00",
     "end_time": "02:00",

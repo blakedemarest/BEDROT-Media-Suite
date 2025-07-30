@@ -16,10 +16,10 @@ from PyQt6.QtWidgets import (
     QLabel, QComboBox, QDateEdit, QSpinBox, QTextEdit,
     QMessageBox, QFileDialog, QHeaderView, QSplitter,
     QGroupBox, QGridLayout, QProgressBar, QStatusBar,
-    QMenuBar, QMenu, QToolBar, QAction, QLineEdit
+    QMenuBar, QMenu, QToolBar, QLineEdit
 )
 from PyQt6.QtCore import Qt, QDate, QTimer, pyqtSignal
-from PyQt6.QtGui import QIcon, QColor, QFont
+from PyQt6.QtGui import QIcon, QColor, QFont, QAction
 
 import pandas as pd
 
@@ -28,6 +28,7 @@ from .visual_calendar import VisualCalendarWidget
 from .checklist_dialog import ReleaseChecklistDialog
 from .config_manager import ConfigManager
 from .data_manager import CalendarDataManager
+from .utils import format_deliverable_name
 from .utils import logger, format_date, days_until
 
 
