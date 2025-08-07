@@ -81,10 +81,26 @@ class ConfigManager:
                 default_input = default_output  # Use same for input initially
             except Exception as e:
                 safe_print(f"Warning: Could not resolve default paths: {e}")
-                default_output = getattr(self, 'script_dir', os.getcwd())
+                # Use user's Videos folder as default if available
+                user_home = os.path.expanduser("~")
+                videos_dir = os.path.join(user_home, "Videos", "RemixedVideos")
+                if os.path.exists(os.path.join(user_home, "Videos")):
+                    default_output = videos_dir
+                    os.makedirs(videos_dir, exist_ok=True)
+                else:
+                    default_output = os.path.join(user_home, "RemixedVideos")
+                    os.makedirs(default_output, exist_ok=True)
                 default_input = default_output
         else:
-            default_output = getattr(self, 'script_dir', os.getcwd())
+            # Use user's Videos folder as default if available
+            user_home = os.path.expanduser("~")
+            videos_dir = os.path.join(user_home, "Videos", "RemixedVideos")
+            if os.path.exists(os.path.join(user_home, "Videos")):
+                default_output = videos_dir
+                os.makedirs(videos_dir, exist_ok=True)
+            else:
+                default_output = os.path.join(user_home, "RemixedVideos")
+                os.makedirs(default_output, exist_ok=True)
             default_input = default_output
         
         return {

@@ -12,6 +12,7 @@ This module contains the main application window and GUI functionality for:
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
+import sys
 import logging
 from .config_manager import ConfigManager
 from .processing_worker import ProcessingWorker
@@ -312,6 +313,15 @@ class VideoRemixerApp:
             command=self.browse_output_folder
         )
         browse_output_button.grid(row=0, column=2, padx=5, pady=5)
+        
+        # Add folder open button
+        open_folder_button = ttk.Button(
+            output_frame,
+            text="📁",  # Folder icon
+            command=self.open_output_folder,
+            width=3
+        )
+        open_folder_button.grid(row=0, column=3, padx=2, pady=5)
 
         # Aspect Ratio
         ttk.Label(output_frame, text="Aspect Ratio:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
@@ -690,6 +700,26 @@ class VideoRemixerApp:
         if folder_selected:
             self.output_folder_var.set(folder_selected)
             self.update_status(f"Output folder set to: {folder_selected}")
+            # Save settings immediately when output folder changes
+            self.settings["output_folder"] = folder_selected
+            self.config_manager.save_config(self.settings)
+            self.logger.info(f"Output folder changed and saved to: {folder_selected}")
+    
+    def open_output_folder(self):
+        """Open the output folder in File Explorer."""
+        output_folder = self.output_folder_var.get()
+        if output_folder and os.path.exists(output_folder):
+            try:
+                if os.name == 'nt':  # Windows
+                    os.startfile(output_folder)
+                elif os.name == 'posix':  # macOS and Linux
+                    os.system(f'open "{output_folder}"' if sys.platform == 'darwin' else f'xdg-open "{output_folder}"')
+                self.update_status(f"Opened folder: {output_folder}")
+            except Exception as e:
+                self.logger.error(f"Failed to open folder: {e}")
+                self.update_status(f"Failed to open folder: {e}")
+        else:
+            self.update_status("Output folder not set or doesn't exist")
 
     def clear_selected(self):
         """Clear selected items from the queue."""
