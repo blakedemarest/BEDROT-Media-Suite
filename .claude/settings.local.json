@@ -16,7 +16,12 @@
       "Bash(where claude)",
       "mcp__Context7__resolve-library-id",
       "Bash(cmd.exe:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(./venv/Scripts/yt-dlp.exe --version)",
+      "Bash(echo:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)"
     ],
     "deny": []
   }

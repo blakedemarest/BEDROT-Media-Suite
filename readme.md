@@ -1,183 +1,348 @@
 # Bedrot Productions - Media Tool Suite
 
-This suite provides a collection of Python-based tools for downloading, remixing, and generating video content, all managed through a central graphical user interface (GUI) launcher (`launcher.py`).
+A comprehensive Python-based multimedia processing suite for content creation, video downloading, editing, and automated slideshow generation. All tools are managed through a central GUI launcher with real-time process monitoring.
+
+## Quick Start (Windows)
+
+```batch
+# Recommended method for Windows users
+start_launcher.bat
+```
+
+## Quick Start (Linux/macOS)
+
+```bash
+# Install system dependencies (Linux/WSL)
+sudo apt-get install python3-tk ffmpeg
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run the launcher
+python launcher.py
+```
 
 ## Directory Structure
 
-The codebase is organized as follows:
+```
+bedrot-media-suite/
+├── launcher.py                   # Main GUI launcher (Tkinter-based)
+├── start_launcher.bat           # Windows batch launcher (recommended for Windows)
+├── requirements.txt             # Python dependencies
+├── .env                        # Environment configuration (create from .env.example)
+├── .env.example               # Template for environment variables
+│
+├── config/                    # Primary configuration directory
+│   ├── yt_downloader_gui_settings.json     # Media Downloader settings
+│   ├── video_remixer_settings.json         # Snippet Remixer settings
+│   ├── combined_random_config.json         # Random Slideshow settings
+│   ├── config.json                         # Slideshow Editor settings
+│   ├── reel_tracker_config.json            # Reel Tracker settings
+│   ├── video_caption_generator_config.json # Caption Generator settings
+│   ├── release_calendar_config.json        # Release Calendar settings
+│   ├── calendar_data.json                  # Release Calendar data
+│   └── slideshow_presets.json             # Slideshow presets
+│
+├── src/                       # Source code directory
+│   ├── core/                 # Centralized utilities (partially implemented)
+│   ├── media_download_app.py               # Standalone media downloader
+│   ├── snippet_remixer_modular.py          # Snippet remixer entry point
+│   ├── reel_tracker_modular.py             # Reel tracker entry point
+│   ├── release_calendar_modular.py         # Release calendar entry point
+│   ├── snippet_remixer/                    # Snippet remixer package
+│   ├── random_slideshow/                   # Random slideshow package
+│   ├── reel_tracker/                       # Reel tracker package
+│   ├── release_calendar/                   # Release calendar package
+│   └── video_caption_generator/            # Caption generator package
+│
+└── tools/                     # Standalone utilities
+    ├── slideshow_editor.py   # PyQt5 slideshow editor
+    ├── xyimagescaler.py     # Image scaling utility
+    └── generate_function_registry.py # Code analysis tool
 
-* `launcher.py`: The main application entry point (run this file).
-* `readme.md`: This documentation file.
-* `requirements.txt`: Lists the required Python libraries.
-* `config/`: Contains all JSON configuration files for the tools.
-    * `yt_downloader_gui_settings.json`: Settings for the Media Downloader.
-    * `video_remixer_settings.json`: Settings for the Snippet Remixer.
-    * `combined_random_config.json`: Settings for the Random Slideshow Generator.
-    * `config.json`: Settings for the Slideshow Editor.
-    * `reel_tracker_config.json`: Settings for the Reel Tracker.
-    * `video_caption_generator_config.json`: Settings for the Video Caption Generator.
-    * `release_calendar_config.json`: Settings for the Release Calendar.
-    * `calendar_data.json`: Data storage for the Release Calendar.
-* `src/`: Contains the core Python source code for the tools.
-    * `media_download_app.py`: Media Downloader tool.
-    * `snippet_remixer.py` & `snippet_remixer/`: Snippet Remixer tool (modular).
-    * `random_slideshow/`: Random Slideshow Generator tool (modular).
-    * `reel_tracker/`: Reel Tracker tool (modular).
-    * `video_caption_generator/`: Video Caption Generator tool (modular).
-    * `release_calendar/`: Release Calendar tool (modular).
-    * `core/`: Centralized configuration and utilities.
-* `tools/`: Contains utility scripts.
-    * `xyimagescaler.py`: A simple image scaling/cropping utility.
+```
 
-**Core Components:**
+## Core Components
 
-1.  **Launcher (`launcher.py`):** A Tkinter GUI to run and monitor the other tools located in the `src/` directory.
-2.  **Media Downloader (`src/media_download_app.py`):** Downloads video/audio using `yt-dlp` with post-processing options. Uses settings from `config/yt_downloader_gui_settings.json`.
-3.  **Snippet Remixer (`src/snippet_remixer/`):** Creates new videos by randomly combining short snippets. Uses settings from `config/video_remixer_settings.json`.
-4.  **Random Slideshow Generator (`src/random_slideshow/`):** Continuously generates short, randomized video slideshows. Uses settings from `config/combined_random_config.json`.
-5.  **Reel Tracker (`src/reel_tracker/`):** CSV-based content tracking and management system with PyQt5 interface.
-6.  **Video Caption Generator (`src/video_caption_generator/`):** AI-powered caption generation with real-time preview and MP4 output.
-7.  **Release Calendar (`src/release_calendar/`):** Music release scheduling system with multi-artist support and deliverable tracking (requires PyQt6).
+1. **Launcher (`launcher.py`)** - Central control hub with tabbed interface for all tools
+2. **Media Downloader** - YouTube/media downloader with format conversion
+3. **Snippet Remixer** - Creates remixed videos from random snippets
+4. **Random Slideshow Generator** - Automated slideshow creation from images
+5. **Reel Tracker** - Advanced content tracking with CSV backend
+6. **Video Caption Generator** - AI-powered caption generation
+7. **Release Calendar** - Music release scheduling (requires PyQt6)
 
----
+## Installation & Setup
 
-## 1. The Launcher (`launcher.py`)
+### Prerequisites
 
-This application, run from the project root directory, provides the main interface to launch and monitor the media tools found in the `src/` directory.
+1. **Python 3.8+** - Download from [python.org](https://www.python.org/)
+2. **FFmpeg/FFprobe** - Required for video processing
+3. **System Dependencies:**
+   - **Linux/WSL:** `sudo apt-get install python3-tk ffmpeg`
+   - **Windows:** FFmpeg must be in PATH
+   - **macOS:** `brew install ffmpeg`
 
-### Launcher Features
+### Windows Installation (Recommended)
 
-* **Tabbed Interface:** Uses a `ttk.Notebook` to provide separate controls for launching each target script.
-* **Simple Launch Buttons:** Dedicated buttons on each tab to run the corresponding script.
-* **Independent Processes:** Each script is launched as a separate process using Python's `subprocess` module.
-* **Relative Pathing:** Automatically locates the scripts within the `src/` directory relative to its own position. No manual path configuration is needed.
-* **Real-time Log Output:** Captures both standard output (`stdout`) and standard error (`stderr`) streams from the launched scripts.
-* **Timestamped Logging:** Displays the captured output in a shared, scrollable text area, with each line prefixed by a timestamp.
-* **Background Execution:** Script execution and output streaming are handled in background threads (`threading`) to keep the main GUI responsive.
-* **Status Indicators:** Each tab displays the current status (Idle, Running, Finished Successfully, Finished with Errors) of the script it controls.
-* **Process Management:** Tracks the processes of actively running scripts.
-* **Graceful Shutdown:** When closing the launcher window, it checks for active script processes, prompts the user for confirmation, and attempts to terminate (`terminate`/`kill`) any running scripts before exiting.
-* **Log Clearing:** A button is provided to clear the contents of the log display area.
-* **Cross-Platform Considerations:** Attempts to use platform-appropriate UI themes and process termination methods.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/bedrot-media-suite.git
+   cd bedrot-media-suite
+   ```
 
----
+2. **Run the Windows launcher:**
+   ```batch
+   start_launcher.bat
+   ```
+   This will automatically:
+   - Create a virtual environment
+   - Install all dependencies
+   - Launch the application
 
-## 2. Installation & Setup (Overall)
+### Manual Installation (All Platforms)
 
-Follow these steps to set up the entire suite:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/bedrot-media-suite.git
+   cd bedrot-media-suite
+   ```
 
-1.  **Python:** Ensure you have Python 3.x installed. Download from [python.org](https://www.python.org/) if needed.
-2.  **Clone/Download:** Obtain the project files and navigate to the root project directory (`blakedemarest-bedrot-media-suite.git/`) in your terminal.
-3.  **Create Virtual Environment (Recommended):**
-    * Navigate to the project root directory.
-    * Create a virtual environment: `python -m venv venv`
-    * Activate it:
-        * Windows: `.\venv\Scripts\activate`
-        * macOS/Linux: `source venv/bin/activate`
-4.  **Install Python Libraries:** Install all necessary Python packages using the `requirements.txt` file:
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *(Note: Tkinter is usually included with Python).*
-5.  **Install External Tools (FFmpeg/FFprobe):**
-    * Download `ffmpeg` from the official website: [ffmpeg.org](https://ffmpeg.org/download.html). `ffprobe` is typically included.
-    * Follow their installation instructions for your operating system.
-    * **Crucially, ensure the directory containing the `ffmpeg` and `ffprobe` executables is added to your system's PATH environment variable.** The tools rely on calling these commands directly. You may need to restart your terminal or computer after modifying the PATH.
-    * *Alternative (Package Managers):* `sudo apt update && sudo apt install ffmpeg` (Debian/Ubuntu), `brew install ffmpeg` (macOS), `choco install ffmpeg` (Windows - verify PATH).
-6.  **Configuration Files:** Settings for each tool (e.g., default folders, options) are stored in `.json` files within the `config/` directory. You can modify these directly if needed, but the tools should also save your preferences there during use.
+2. **Create virtual environment:**
+   ```bash
+   python -m venv venv
+   ```
 
----
+3. **Activate virtual environment:**
+   - Windows: `.\venv\Scripts\activate`
+   - Linux/macOS: `source venv/bin/activate`
 
-## 3. How to Run
+4. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-1.  Ensure you have completed all steps in the "Installation & Setup" section, especially activating your virtual environment (if used).
-2.  Open your terminal or command prompt.
-3.  **Navigate to the root project directory** (the one containing `launcher.py`, `src/`, `config/`, etc.).
-4.  Run the launcher application:
-    ```bash
-    python launcher.py
-    ```
-5.  The main launcher window will appear with tabs for each tool.
+5. **Linux/WSL only - Install tkinter:**
+   ```bash
+   sudo apt-get install python3-tk
+   ```
 
----
+6. **Configure environment (optional):**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your preferred settings
+   ```
 
-## 4. Using the Suite
+7. **Run the launcher:**
+   ```bash
+   python launcher.py
+   ```
 
-1.  **Run the Launcher:** Start `launcher.py` from the project root as described above.
-2.  **Select a Tool:** Click the tab corresponding to the tool you want to use (e.g., "MP4 downloader/MP3 Converter", "Snippet Remixer", "Random Slideshow", "Reel Tracker", "Caption Generator", "Release Calendar").
-3.  **Launch the Tool:** Click the "Run..." button on the selected tab. This will open the chosen tool's window.
-4.  **Use the Tool:** Interact with the specific tool's GUI as needed (see detailed guides below). Settings are loaded from/saved to the corresponding JSON file in the `config/` directory.
-5.  **Monitor Status & Logs:**
-    * The "Status:" label on the launcher's tab for that tool will update (Idle, Running, Finished...).
-    * The main "Log Output" area at the bottom of the launcher shows timestamped `stdout` and `stderr` messages from all launched scripts. Errors often appear here prefixed with `[stderr]`.
-6.  **Launch Multiple Tools:** You can run multiple tools concurrently; their output will be interleaved in the log area.
-7.  **Clear Log:** Click the "Clear Log" button in the launcher to empty the log display.
-8.  **Close Launcher:** Click the launcher window's close button. If any tools are still running, you will be asked to confirm termination before the launcher exits.
+## Usage Guide
 
----
+### Running the Launcher
 
-## 5. Included Tools - Details
+**Windows (Recommended):**
+```batch
+start_launcher.bat
+```
 
-### 5.1 Media Downloader GUI (`src/media_download_app.py`)
+**All Platforms:**
+```bash
+python launcher.py
+```
 
-Downloads videos/audio using `yt-dlp` with post-processing options.
+### Using the Suite
 
-* **Features:** GUI (Tkinter), URL Queue, MP4/MP3 format, Video-Only option, Time Cutting, Aspect Ratio adjustment, Video Chopping, Persistent Settings (in `config/yt_downloader_gui_settings.json`), Status/Progress updates.
-* **Dependencies:** Python, Tkinter, `yt-dlp`, `ffmpeg`, `ffprobe`.
-* **Usage Guide:** (Refer to original guide - functionality unchanged)
-* **Troubleshooting:** Ensure `yt-dlp`, `ffmpeg`, `ffprobe` are in PATH. Check launcher log for specific errors. Check permissions for the output folder specified in the tool's GUI or `config/yt_downloader_gui_settings.json`.
+1. **Launch** - Run the launcher from project root
+2. **Select Tool** - Click the tab for your desired tool
+3. **Run Tool** - Click the "Run..." button to launch
+4. **Monitor** - Watch real-time logs in the output area
+5. **Multiple Tools** - Run several tools simultaneously
+6. **Shutdown** - Close launcher to terminate all tools
 
-### 5.2 Video Snippet Remixer (`src/snippet_remixer.py`)
+### Running Tools Individually
 
-Creates remixes by combining random short snippets from source videos.
+You can also run tools directly without the launcher:
 
-* **Features:** GUI (Tkinter), Multi-file input, Output naming control (unique `(n)` suffix), Length definition (Seconds or BPM), Random snippet selection, Intermediate transcoding (`.ts`), Reliable concatenation, Aspect Ratio adjustment, Background processing, Persistent Settings (in `config/video_remixer_settings.json`), Temp file management (in `remixer_temp_snippets` subdirectory).
-* **Dependencies:** Python, Tkinter, `ffmpeg`, `ffprobe`.
-* **Usage Guide:** (Refer to original guide - functionality unchanged)
-* **Troubleshooting:** Ensure `ffmpeg`/`ffprobe` are in PATH. Input videos must be longer than the calculated snippet duration. Check launcher log for `ffmpeg` errors. Temp folder (`remixer_temp_snippets`) should be auto-deleted; check if script crashes. Check permissions for the output folder specified in the tool's GUI or `config/video_remixer_settings.json`.
+```bash
+# Media Downloader
+python src/media_download_app.py
 
-### 5.3 Random Slideshow Generator (`src/random_slideshow.py`)
+# Snippet Remixer (use modular version)
+python src/snippet_remixer_modular.py
 
-Continuously generates short, randomized video slideshows from images.
+# Random Slideshow
+python src/random_slideshow/main.py
 
-* **Features:** GUI (PyQt5), Folder selection (input/output), Aspect Ratio options (16:9 Landscape / 9:16 Portrait), Randomized duration/timing, Continuous generation loop, Background processing (QThread), Status updates & count, Persistent Settings (in `config/combined_random_config.json`), Error handling.
-* **Dependencies:** Python, `PyQt5`, `MoviePy`, `NumPy`, `Pillow`.
-* **Usage Guide:** (Refer to original guide - functionality unchanged)
-* **Troubleshooting:** Ensure dependencies are installed (`pip install -r requirements.txt`). Requires valid image files. Processing can be resource-intensive. Check permissions for input/output folders specified in the tool's GUI or `config/combined_random_config.json`.
+# Reel Tracker
+python src/reel_tracker_modular.py
 
----
+# Release Calendar (requires PyQt6)
+python src/release_calendar_modular.py
 
-### 5.6 Release Calendar (`src/release_calendar/`)
+# Video Caption Generator
+python -m src.video_caption_generator.main_app
 
-The Release Calendar is a comprehensive music release management system with visual scheduling and deliverable tracking.
+# Tools
+python tools/slideshow_editor.py
+python tools/xyimagescaler.py
+```
 
-**Key Features:**
-* Visual calendar with drag-and-drop release scheduling
-* Multi-artist support (ZONE A0, PIG1987) with conflict detection
-* 9+ deliverable checklist per release
-* Waterfall release strategy (8 singles, 1 EP, 1 album per artist/year)
-* Excel and iCal export capabilities
-* Automatic deadline calculations and overdue alerts
+## Tool Descriptions
 
-**Note:** This module requires PyQt6, which is separate from PyQt5 used by other modules. Both can coexist when run through the launcher.
+### 1. Media Downloader (`src/media_download_app.py`)
 
-## 6. Other Included Tools
+**GUI Framework:** Tkinter  
+**Config:** `config/yt_downloader_gui_settings.json`
 
-* **Slideshow Editor (`tools/slideshow_editor.py`):** A PyQt5 tool for creating single slideshow videos from dragged-and-dropped images with specific duration and aspect ratio settings. Uses `config/config.json` for output folder history. (Can be launched via the launcher).
-* **XY Image Scaler (`tools/xyimagescaler.py`):** A simple Tkinter utility to scale and crop an image to a target width and height (defaults to 1632x2912). This needs to be run separately (`python tools/xyimagescaler.py`).
+**Features:**
+- Multi-platform video/audio downloading via yt-dlp
+- MP4/MP3 format conversion
+- Time trimming and aspect ratio adjustment
+- Queue-based batch processing
+- Real-time progress updates
 
----
+### 2. Snippet Remixer (`src/snippet_remixer_modular.py`)
 
-## 7. Overall Troubleshooting
+**GUI Framework:** Tkinter  
+**Config:** `config/video_remixer_settings.json`
 
-* **Launcher Errors:** Ensure `launcher.py` is run from the project's root directory. If scripts don't launch, check the console for errors related to finding the `src` directory or the scripts within it.
-* **Errors Running Tools:** If a tool fails after being launched, check the **"Log Output"** area in the **launcher window**. Errors prefixed with `[stderr]` often indicate problems within the launched tool itself or its dependencies. Common issues include:
-    * Missing Python libraries (`pip install -r requirements.txt`).
-    * External tools (`ffmpeg`, `ffprobe`, `yt-dlp`) not installed or not found in the system PATH. Re-check PATH configuration.
-    * Invalid input provided in the tool's own GUI (e.g., incorrect URL, non-existent folder, invalid time format). Check the relevant `.json` file in `config/` for saved invalid paths.
-    * Permissions issues (cannot write to output folder, cannot read input files).
-    * Bugs within the specific tool's script in the `src/` directory.
-* **Process Termination:** The launcher attempts to stop scripts gracefully, but unresponsive scripts might require manual termination via your OS Task Manager / Activity Monitor.
+**Features:**
+- Random video snippet combination
+- BPM-based or seconds-based timing
+- Background processing with progress tracking
+- Automatic temp file cleanup
+- Output naming with unique suffixes
 
----
+### 3. Random Slideshow Generator (`src/random_slideshow/main.py`)
+
+**GUI Framework:** PyQt5  
+**Config:** `config/combined_random_config.json`
+
+**Features:**
+- Continuous automated slideshow generation
+- 16:9 and 9:16 aspect ratio support
+- Batch processing capabilities
+- Preset management system
+- Resource-efficient processing
+
+### 4. Reel Tracker (`src/reel_tracker_modular.py`)
+
+**GUI Framework:** PyQt5  
+**Config:** `config/reel_tracker_config.json`
+
+**Features:**
+- CSV-based content management
+- Advanced configuration with version history
+- Automatic backup system
+- Bulk editing capabilities
+- Media randomization tools
+- Custom metadata fields
+
+### 5. Release Calendar (`src/release_calendar_modular.py`)
+
+**GUI Framework:** PyQt6 (Note: Different from other tools!)  
+**Config:** `config/release_calendar_config.json`, `config/calendar_data.json`
+
+**Features:**
+- Visual drag-and-drop calendar interface
+- Multi-artist release scheduling
+- 9+ deliverable checklist per release
+- Waterfall strategy (8 singles, 1 EP, 1 album/year)
+- Excel and iCal export
+- Automatic conflict detection
+- Friday release day highlighting
+
+### 6. Video Caption Generator
+
+**Entry:** `python -m src.video_caption_generator.main_app`  
+**Config:** `config/video_caption_generator_config.json`
+
+**Features:**
+- AI-powered caption generation
+- Live preview widget
+- Font management system
+- Multiple export formats
+- Audio transcription support
+
+## Additional Tools
+
+### Slideshow Editor (`tools/slideshow_editor.py`)
+- PyQt5-based single slideshow creator
+- Drag-and-drop image interface
+- Duration and aspect ratio controls
+- Config: `config/config.json`
+
+### XY Image Scaler (`tools/xyimagescaler.py`)
+- Simple image scaling/cropping utility
+- Default output: 1632x2912
+- Tkinter-based interface
+
+### Function Registry Generator (`tools/generate_function_registry.py`)
+- Code analysis tool
+- Generates function registry for codebase
+- Useful for documentation and refactoring
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"No module named tkinter"**
+   - Linux/WSL: `sudo apt-get install python3-tk`
+   - Windows: Reinstall Python with tkinter included
+
+2. **FFmpeg not found**
+   - Ensure FFmpeg is in system PATH
+   - Windows: Add FFmpeg/bin to environment variables
+   - Linux: `sudo apt install ffmpeg`
+
+3. **PyQt5/PyQt6 conflicts**
+   - Run tools through launcher (isolates processes)
+   - Both versions can coexist when launched separately
+
+4. **Module import errors**
+   - Always run from project root directory
+   - Use modular entry points (e.g., `snippet_remixer_modular.py`)
+   - Ensure virtual environment is activated
+
+5. **Configuration file not found**
+   - Check `/config/` directory first
+   - Some modules have configs in subdirectories
+   - Create from defaults if missing
+
+6. **Launcher won't start tools**
+   - Check log output for specific errors
+   - Verify Python path in virtual environment
+   - Some launcher fallback paths are incorrect (known issue)
+
+### Getting Help
+
+- Check the launcher's log output for detailed error messages
+- Review CLAUDE.md for technical implementation details
+- Ensure all prerequisites are installed
+- Verify FFmpeg is accessible from command line: `ffmpeg -version`
+
+## Known Issues
+
+1. **Launcher fallback paths** - Some hardcoded paths in launcher.py are incorrect
+2. **Configuration duplication** - Some modules have config files in multiple locations
+3. **Inconsistent entry points** - Mix of modular and direct entry points
+4. **Missing tkinter in requirements** - Must be installed separately on Linux/WSL
+
+## Contributing
+
+This project is actively maintained. When contributing:
+- Follow existing code patterns
+- Update both README.md and CLAUDE.md
+- Test on both Windows and Linux/WSL
+- Maintain backwards compatibility
+
+## License
+
+[Add your license information here]
 

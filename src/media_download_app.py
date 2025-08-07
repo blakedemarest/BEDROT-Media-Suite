@@ -328,21 +328,31 @@ def expand_playlist_url(url_to_expand):
     Uses yt-dlp to extract individual video URLs from a playlist or profile URL.
     Returns a list of URLs. Returns [url_to_expand] on failure or if it's likely a single video.
     """
-    try:
-        cmd_where = "where" if os.name == 'nt' else "which"
-        subprocess.run([cmd_where, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name=='nt'))
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print("ERROR: yt-dlp not found, cannot expand URL.")
-        return [url_to_expand] # Fallback
-
-    command = [
-        "yt-dlp",
+    # Use Python module invocation for yt-dlp
+    venv_python = os.path.join(SCRIPT_DIR, "venv", "Scripts", "python.exe")
+    if os.path.exists(venv_python):
+        command = [
+            venv_python, "-m", "yt_dlp"
+        ]
+    else:
+        # Fallback to system yt-dlp
+        try:
+            cmd_where = "where" if os.name == 'nt' else "which"
+            subprocess.run([cmd_where, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name=='nt'))
+            command = [
+                "yt-dlp"
+            ]
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("ERROR: yt-dlp not found, cannot expand URL.")
+            return [url_to_expand] # Fallback
+    
+    command.extend([
         "--flat-playlist",
         "--print", "webpage_url",
         "--no-warnings",
         "--skip-download",
         url_to_expand
-    ]
+    ])
     print(f"Attempting to expand URL: {url_to_expand}")
     try:
         proc = subprocess.run(command, capture_output=True, text=True, check=True,
@@ -647,11 +657,28 @@ class MediaDownloaderApp:
             return
 
         # Pre-checks (yt-dlp, path, ffmpeg/ffprobe based on OPTIONS)
-        try:
-             cmd = "where" if os.name == 'nt' else "which"
-             subprocess.run([cmd, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name=='nt'))
-        except (subprocess.CalledProcessError, FileNotFoundError):
-             messagebox.showerror("yt-dlp Error", "yt-dlp command not found in PATH. Cannot download or expand URLs.")
+        yt_dlp_available = False
+        venv_python = os.path.join(SCRIPT_DIR, "venv", "Scripts", "python.exe")
+        if os.path.exists(venv_python):
+            # Check if yt-dlp module is available
+            try:
+                result = subprocess.run([venv_python, "-m", "yt_dlp", "--version"], 
+                                      capture_output=True, text=True, timeout=5)
+                if result.returncode == 0:
+                    yt_dlp_available = True
+            except:
+                pass
+        
+        if not yt_dlp_available:
+            try:
+                 cmd = "where" if os.name == 'nt' else "which"
+                 subprocess.run([cmd, "yt-dlp"], capture_output=True, text=True, check=True, shell=(os.name=='nt'))
+                 yt_dlp_available = True
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                 pass
+        
+        if not yt_dlp_available:
+             messagebox.showerror("yt-dlp Error", "yt-dlp module not found. Please install yt-dlp in the virtual environment.")
              return
 
         if not os.path.isdir(self.download_path.get()):
@@ -823,28 +850,76 @@ class MediaDownloaderApp:
             
             print(f"DEBUG: Using temp download template: {temp_output_template}")
 
-            command = [
-                "yt-dlp", url,
-                "--no-playlist", # Critical: Prevent re-interpreting individual URL
-                "--progress",
-                "--progress-template", "download-status:%(progress)j",
-                "--no-warnings",
-                "-o", temp_output_template,
-                "--ffmpeg-location", ffmpeg_path if ffmpeg_path else "ffmpeg"
-            ]
+            # Use Python module invocation for yt-dlp for better compatibility
+            venv_python = os.path.join(SCRIPT_DIR, "venv", "Scripts", "python.exe")
+            if os.path.exists(venv_python):
+                # Use venv Python with module invocation
+                command = [
+                    venv_python, "-m", "yt_dlp", url,
+                    "--no-playlist", # Critical: Prevent re-interpreting individual URL
+                    "--progress",
+                    "--progress-template", "download-status:%(progress)j",
+                    "--no-warnings",
+                    "--no-abort-on-error",  # Continue on errors
+                    "--ignore-errors",  # Skip unavailable videos in playlists
+                    "-o", temp_output_template,
+                    # YouTube-specific options
+                    "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "--referer", "https://www.youtube.com/"
+                ]
+            else:
+                # Fallback to system yt-dlp
+                command = [
+                    "yt-dlp", url,
+                    "--no-playlist", # Critical: Prevent re-interpreting individual URL
+                    "--progress",
+                    "--progress-template", "download-status:%(progress)j",
+                    "--no-warnings",
+                    "--no-abort-on-error",  # Continue on errors
+                    "--ignore-errors",  # Skip unavailable videos in playlists
+                    "-o", temp_output_template,
+                    # YouTube-specific options
+                    "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "--referer", "https://www.youtube.com/"
+                ]
+            
+            # Add cookies support for age-restricted content
+            # Try to use browser cookies if available
+            if "youtube.com" in url or "youtu.be" in url:
+                # Try Chrome cookies first, then Firefox, then Edge
+                for browser in ["chrome", "firefox", "edge"]:
+                    try:
+                        # Test if browser cookies are accessible
+                        if os.path.exists(venv_python):
+                            test_cmd = [venv_python, "-m", "yt_dlp", "--cookies-from-browser", browser, "--simulate", "--quiet"]
+                        else:
+                            test_cmd = ["yt-dlp", "--cookies-from-browser", browser, "--simulate", "--quiet"]
+                        test_result = subprocess.run(test_cmd, capture_output=True, timeout=5)
+                        if test_result.returncode == 0:
+                            command.extend(["--cookies-from-browser", browser])
+                            print(f"INFO: Using {browser} cookies for YouTube")
+                            break
+                    except:
+                        continue
 
-            # Determine yt-dlp Format Flags
+            # Determine yt-dlp Format Flags with robust fallbacks
             if tiktok_video_only_special_case:
                 command.extend(["-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--merge-output-format", "mp4"])
                 needs_audio_removal_post_dl = True
                 print(f"INFO: ({os.path.basename(url[:50])}...): TikTok+VideoOnly. Downloading with audio first.")
             elif selected_format == "mp3":
-                 command.extend(["-x", "--audio-format", "mp3", "-f", "bestaudio/best"])
+                 # More robust MP3 format selection
+                 command.extend(["-x", "--audio-format", "mp3", "-f", "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best", "--audio-quality", "0"])
             else: # Standard MP4
                  if is_video_only_general_flag and not is_tiktok_url:
-                     command.extend(["-f", "bestvideo[ext=mp4]/bestvideo", "--recode-video", "mp4"])
+                     # Video only with fallbacks
+                     command.extend(["-f", "bestvideo[ext=mp4]/bestvideo[ext=webm]/bestvideo", "--recode-video", "mp4"])
                  else:
-                     command.extend(["-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "--merge-output-format", "mp4"])
+                     # Best quality with multiple fallbacks for YouTube
+                     command.extend([
+                         "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best[ext=mp4]/best",
+                         "--merge-output-format", "mp4"
+                     ])
 
             # Execute yt-dlp and Parse Output
             try:
@@ -907,9 +982,27 @@ class MediaDownloaderApp:
                 stderr_info = stderr_output
 
                 # Check download result
-                if return_code == 0 and initial_download_path and os.path.exists(initial_download_path):
-                    yt_dlp_success = True
-                    self.update_status(f"{progress_prefix} Download successful.")
+                # For MP3, yt-dlp converts and deletes the original, so we need to check for the MP3 file
+                if return_code == 0 and initial_download_path:
+                    if selected_format == "mp3":
+                        # For MP3, check if the converted file exists
+                        base_path = os.path.splitext(initial_download_path)[0]
+                        mp3_path = base_path + ".mp3"
+                        if os.path.exists(mp3_path):
+                            yt_dlp_success = True
+                            initial_download_path = mp3_path  # Update to point to the actual MP3
+                            print(f"DEBUG: MP3 conversion successful, file at: {mp3_path}")
+                        else:
+                            yt_dlp_success = False
+                            print(f"DEBUG: MP3 file not found after conversion: {mp3_path}")
+                    elif os.path.exists(initial_download_path):
+                        yt_dlp_success = True
+                    else:
+                        yt_dlp_success = False
+                        print(f"DEBUG: Download file not found: {initial_download_path}")
+                    
+                    if yt_dlp_success:
+                        self.update_status(f"{progress_prefix} Download successful.")
 
                     # Get Base Title
                     ffprobe_title_cmd = [ ffprobe_path if ffprobe_path else "ffprobe", "-v", "error",
@@ -940,50 +1033,76 @@ class MediaDownloaderApp:
 
                 else: # Download failed
                     yt_dlp_success = False
+                    
+                if not yt_dlp_success:
+                    # Process failed download
                     error_lines = stderr_info.strip().split('\n')
                     specific_error = f"yt-dlp failed (code {return_code})"
-                    for err_line in reversed(error_lines):
-                        if err_line.strip().startswith("ERROR:"): specific_error = err_line.strip()[6:].strip(); break
+                    error_details = []
+                    
+                    # Collect all ERROR and WARNING lines for better diagnostics
+                    for err_line in error_lines:
+                        if "ERROR:" in err_line or "WARNING:" in err_line:
+                            error_details.append(err_line.strip())
+                        if err_line.strip().startswith("ERROR:"):
+                            specific_error = err_line.strip()[6:].strip()
+                    
+                    # Check for common YouTube-specific errors
+                    if "Sign in to confirm" in stderr_info:
+                        specific_error = "Video is age-restricted. Consider using browser cookies."
+                    elif "Video unavailable" in stderr_info:
+                        specific_error = "Video is unavailable or has been removed."
+                    elif "429" in stderr_info or "Too Many Requests" in stderr_info:
+                        specific_error = "YouTube rate limit hit. Try again later."
+                    elif "private video" in stderr_info.lower():
+                        specific_error = "Video is private and cannot be downloaded."
+                    
                     final_msg = f"{progress_prefix} Download Failed: {specific_error}"
                     print(f"yt-dlp Error Log ({url}):\n{stderr_info}")
+                    if error_details:
+                        print(f"Detailed errors:\n" + "\n".join(error_details))
                     self.update_status(final_msg)
-                    if initial_download_path and os.path.exists(initial_download_path):
-                        try: os.remove(initial_download_path); print(f"Cleaned up failed download: {initial_download_path}")
-                        except OSError as e: print(f"Warning: Could not delete failed download temp file: {e}")
-                    elif selected_format == "mp3" and hasattr(self, 'temp_output_base'):
-                        # For MP3, check for any audio file with the base name
-                        for ext in ['.mp3', '.webm', '.m4a', '.opus', '.ogg']:
-                            potential_file = self.temp_output_base + ext
-                            if os.path.exists(potential_file):
+                    
+                    # Clean up any temp files that might exist
+                    # For MP3, clean up the temp pattern files
+                    if selected_format == "mp3" and temp_output_template:
+                        base_pattern = os.path.splitext(temp_output_template)[0]
+                        for ext in ['.mp3', '.m4a', '.webm', '.opus']:
+                            temp_file = base_pattern + ext
+                            if os.path.exists(temp_file):
                                 try: 
-                                    os.remove(potential_file)
-                                    print(f"Cleaned up likely failed temp: {potential_file}")
+                                    os.remove(temp_file)
+                                    print(f"Cleaned up failed temp file: {temp_file}")
                                 except OSError as e: 
-                                    print(f"Warning: Could not delete likely failed temp file: {e}")
-                    elif os.path.exists(temp_output_template):
-                         try: os.remove(temp_output_template); print(f"Cleaned up likely failed temp: {temp_output_template}")
-                         except OSError as e: print(f"Warning: Could not delete likely failed temp file: {e}")
+                                    print(f"Warning: Could not delete temp file: {e}")
+                    elif initial_download_path and os.path.exists(initial_download_path):
+                        try: 
+                            os.remove(initial_download_path)
+                            print(f"Cleaned up failed download: {initial_download_path}")
+                        except OSError as e: 
+                            print(f"Warning: Could not delete failed download temp file: {e}")
                     continue
 
             except FileNotFoundError: self.update_status(f"{progress_prefix} Error: yt-dlp command not found!"); self.root.after(0, self.enable_download_buttons); return
             except Exception as e: self.update_status(f"{progress_prefix} Download Error: {e}"); yt_dlp_success = False; continue
 
 
-            # For MP3 downloads, we need to find the actual file since yt-dlp might have used a different extension
-            if selected_format == "mp3" and yt_dlp_success and not initial_download_path:
-                # Look for files matching the pattern
-                if hasattr(self, 'temp_output_base'):
-                    temp_base = self.temp_output_base
+            # MP3 file path is already updated in the success check above, no need to search again
+            
+            # Verify downloaded file
+            if yt_dlp_success and initial_download_path:
+                if os.path.exists(initial_download_path):
+                    file_size = os.path.getsize(initial_download_path)
+                    if file_size < 1024:  # Less than 1KB is suspicious
+                        print(f"WARNING: Downloaded file is suspiciously small ({file_size} bytes)")
+                        yt_dlp_success = False
+                        specific_error = "Downloaded file is too small, likely corrupted"
+                    else:
+                        print(f"INFO: Downloaded file verified: {initial_download_path} ({file_size / (1024*1024):.2f} MB)")
                 else:
-                    temp_base = os.path.join(path, f"TEMP_DOWNLOAD_{unique_suffix.strip('_')}")
-                
-                # Check for common audio extensions
-                for ext in ['.mp3', '.webm', '.m4a', '.opus', '.ogg']:
-                    potential_file = temp_base + ext
-                    if os.path.exists(potential_file):
-                        initial_download_path = potential_file
-                        print(f"DEBUG: Found MP3 download at: {initial_download_path}")
-                        break
+                    print(f"ERROR: Expected download file not found: {initial_download_path}")
+                    yt_dlp_success = False
+                    specific_error = "Downloaded file not found"
             
             # Proceed only if download succeeded
             if not yt_dlp_success or not initial_download_path or not unique_base_title:
