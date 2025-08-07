@@ -2,6 +2,33 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Check Function Registry Before Writing Code
+
+**IMPORTANT**: Before creating ANY new functions, methods, or scripts, you MUST check the function registry to avoid duplicates:
+
+**Function Registry Location**: `bedrot_media_suite_function_registry.json` (at repository root)
+
+This registry contains:
+- All existing functions, classes, and methods in the codebase
+- Their locations (file paths and line numbers)
+- Signatures and docstrings
+- Identified duplicate functions (24 duplicates currently found!)
+
+**Before writing code**:
+1. Check if a similar function already exists in the registry
+2. Reuse existing utilities instead of creating duplicates
+3. If modifying existing functions, note their current locations
+4. Update the registry after significant changes using:
+   ```bash
+   python tools/generate_function_registry.py
+   ```
+
+**Known Duplicates to Avoid**:
+- `parse_aspect_ratio` - exists in 3 files
+- `generate_unique_suffix` - exists in 3 files
+- `main` - exists in 13 files (expected for entry points)
+- `start_download`, `parse_time_to_seconds`, `load_settings`, `save_settings` - each in 2 files
+
 ## Project Overview
 
 The **Bedrot Productions Media Tool Suite** is a sophisticated Python-based collection of multimedia processing tools designed for content creation, video downloading, editing, and automated slideshow generation. The suite has evolved from monolithic scripts to a modern modular architecture with centralized process orchestration.
@@ -101,6 +128,7 @@ bedrot-media-suite/
 ├── launcher.py                    # Main GUI launcher
 ├── start_launcher.bat             # Windows batch launcher
 ├── requirements.txt               # Python dependencies
+├── bedrot_media_suite_function_registry.json  # Complete function registry (CHECK BEFORE CODING!)
 ├── .env                          # Environment configuration (user-specific)
 ├── .env.example                  # Template for environment variables
 │

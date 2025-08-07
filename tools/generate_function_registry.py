@@ -289,15 +289,16 @@ class FunctionRegistryGenerator:
 
 def main():
     """Main execution function."""
-    project_root = Path(__file__).parent.resolve()
+    # Get the actual project root (parent of tools directory)
+    project_root = Path(__file__).parent.parent.resolve()
     
-    # Get all Python files
+    # Get all Python files from the entire project
     python_files = []
     for py_file in project_root.rglob("*.py"):
         # Skip virtual environments and temporary files
         if any(part.startswith(('.venv', 'venv', '__pycache__', '.git')) for part in py_file.parts):
             continue
-        if 'temp/' in str(py_file) or py_file.name == 'generate_function_registry.py':
+        if 'temp/' in str(py_file):
             continue
         python_files.append(str(py_file))
     
@@ -305,8 +306,8 @@ def main():
     generator = FunctionRegistryGenerator(project_root)
     registry = generator.generate_registry(python_files)
     
-    # Save to file
-    output_file = project_root / "function_registry.json"
+    # Save to file at repo root
+    output_file = project_root / "bedrot_media_suite_function_registry.json"
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(registry, f, indent=2, ensure_ascii=False)
     

@@ -1,13 +1,176 @@
 {
   "metadata": {
-    "generated_at": "1753798759.1159723",
+    "generated_at": "1754563681.2579336",
     "project_root": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite",
-    "total_files": 91,
-    "total_functions": 181,
+    "total_files": 94,
+    "total_functions": 187,
     "total_classes": 111,
-    "total_methods": 1045
+    "total_methods": 1043
   },
   "files": {
+    "fix_and_test_gui.py": {
+      "functions": {
+        "direct_test_download": {
+          "type": "function",
+          "name": "direct_test_download",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/fix_and_test_gui.py",
+          "line": 100,
+          "args": [],
+          "docstring": "Test download functionality directly without GUI",
+          "is_async": false,
+          "language": "python"
+        }
+      },
+      "classes": {
+        "TestWrapper": {
+          "type": "class",
+          "name": "TestWrapper",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/fix_and_test_gui.py",
+          "line": 18,
+          "docstring": "",
+          "bases": [],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 19,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "log",
+              "args": [
+                "self",
+                "msg"
+              ],
+              "docstring": "Add message to log window",
+              "line": 38,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "wrapped_process_queue",
+              "args": [
+                "self",
+                "*args",
+                "**kwargs"
+              ],
+              "docstring": "Wrapper to add logging to the download process",
+              "line": 44,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "quick_test",
+              "args": [
+                "self"
+              ],
+              "docstring": "Quick test with a short video",
+              "line": 62,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "start_download",
+              "args": [
+                "self"
+              ],
+              "docstring": "Start the download after queue is ready",
+              "line": 86,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "run",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 97,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        }
+      },
+      "imports": [
+        {
+          "module": "os",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "sys",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "tkinter",
+          "alias": "tk",
+          "type": "import"
+        },
+        {
+          "module": "tkinter",
+          "name": "ttk",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "threading",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "time",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "media_download_app",
+          "name": "MediaDownloaderApp",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "subprocess",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "glob",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "traceback",
+          "alias": null,
+          "type": "import"
+        }
+      ],
+      "constants": [
+        {
+          "name": "SCRIPT_DIR",
+          "value": "<complex_expression>",
+          "line": 13
+        }
+      ]
+    },
     "launcher.py": {
       "functions": {
         "get_script_path": {
@@ -67,7 +230,7 @@
           "type": "function",
           "name": "stop_script",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-          "line": 221,
+          "line": 230,
           "args": [
             "script_path",
             "status_label",
@@ -81,7 +244,7 @@
           "type": "function",
           "name": "on_closing",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-          "line": 252,
+          "line": 270,
           "args": [],
           "docstring": "Handles window close event, terminates running scripts, logs actions.",
           "is_async": false,
@@ -91,7 +254,7 @@
           "type": "function",
           "name": "clear_log",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-          "line": 320,
+          "line": 338,
           "args": [],
           "docstring": "Clears the content of the log area.",
           "is_async": false,
@@ -101,7 +264,7 @@
           "type": "function",
           "name": "initial_log",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-          "line": 559,
+          "line": 577,
           "args": [],
           "docstring": "",
           "is_async": false,
@@ -237,135 +400,42 @@
         }
       ]
     },
-    "test_media_downloader.py": {
+    "test_fixed_gui.py": {
       "functions": {
-        "main": {
+        "run_test": {
           "type": "function",
-          "name": "main",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_media_downloader.py",
-          "line": 414,
+          "name": "run_test",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
+          "line": 31,
           "args": [],
-          "docstring": "Run the media downloader tests.",
+          "docstring": "",
+          "is_async": false,
+          "language": "python"
+        },
+        "start_download": {
+          "type": "function",
+          "name": "start_download",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
+          "line": 57,
+          "args": [],
+          "docstring": "",
+          "is_async": false,
+          "language": "python"
+        },
+        "monitor_download": {
+          "type": "function",
+          "name": "monitor_download",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
+          "line": 72,
+          "args": [
+            "start_time"
+          ],
+          "docstring": "",
           "is_async": false,
           "language": "python"
         }
       },
-      "classes": {
-        "MediaDownloaderTest": {
-          "type": "class",
-          "name": "MediaDownloaderTest",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_media_downloader.py",
-          "line": 34,
-          "docstring": "",
-          "bases": [],
-          "methods": [
-            {
-              "name": "__init__",
-              "args": [
-                "self"
-              ],
-              "docstring": "",
-              "line": 35,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "setup_test_environment",
-              "args": [
-                "self"
-              ],
-              "docstring": "Create test directory and verify dependencies.",
-              "line": 41,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "test_direct_download",
-              "args": [
-                "self",
-                "url",
-                "format_type",
-                "test_name"
-              ],
-              "docstring": "Test direct download using yt-dlp command line.",
-              "line": 66,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "test_programmatic_download",
-              "args": [
-                "self",
-                "url",
-                "format_type",
-                "test_name"
-              ],
-              "docstring": "Test download using the media_download_app module.",
-              "line": 181,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "verify_media_files",
-              "args": [
-                "self"
-              ],
-              "docstring": "Verify the downloaded media files using ffprobe.",
-              "line": 255,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "generate_report",
-              "args": [
-                "self"
-              ],
-              "docstring": "Generate test report.",
-              "line": 303,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "cleanup",
-              "args": [
-                "self",
-                "keep_files"
-              ],
-              "docstring": "Clean up test files.",
-              "line": 363,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "run_all_tests",
-              "args": [
-                "self"
-              ],
-              "docstring": "Run all media downloader tests.",
-              "line": 374,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            }
-          ],
-          "language": "python"
-        }
-      },
+      "classes": {},
       "imports": [
         {
           "module": "os",
@@ -378,91 +448,74 @@
           "type": "import"
         },
         {
-          "module": "subprocess",
-          "alias": null,
-          "type": "import"
-        },
-        {
           "module": "time",
           "alias": null,
           "type": "import"
         },
         {
-          "module": "json",
+          "module": "glob",
           "alias": null,
           "type": "import"
         },
         {
-          "module": "shutil",
-          "alias": null,
+          "module": "tkinter",
+          "alias": "tk",
           "type": "import"
         },
         {
-          "module": "pathlib",
-          "name": "Path",
+          "module": "media_download_app",
+          "name": "MediaDownloaderApp",
           "alias": null,
           "type": "from_import"
-        },
-        {
-          "module": "datetime",
-          "name": "datetime",
-          "alias": null,
-          "type": "from_import"
-        },
-        {
-          "module": "argparse",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "traceback",
-          "alias": null,
-          "type": "import"
         }
       ],
       "constants": [
         {
           "name": "SCRIPT_DIR",
           "value": "<complex_expression>",
-          "line": 17
-        },
-        {
-          "name": "TEST_VIDEOS",
-          "value": {
-            "regular_video": {
-              "url": "https://www.youtube.com/watch?v=Rkv6iZhggTY",
-              "title": "Regular YouTube Video",
-              "expected_duration": 60
-            },
-            "youtube_short": {
-              "url": "https://www.youtube.com/watch?v=wHc2fBTFYho",
-              "title": "YouTube Short",
-              "expected_duration": 60
-            }
-          },
-          "line": 21
+          "line": 10
         }
       ]
     },
-    "test_module_status.py": {
+    "test_gui_simple.py": {
       "functions": {
-        "main": {
+        "test_sequence": {
           "type": "function",
-          "name": "main",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_module_status.py",
-          "line": 390,
+          "name": "test_sequence",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+          "line": 38,
           "args": [],
-          "docstring": "Run the module status test.",
+          "docstring": "Run a test download sequence",
+          "is_async": false,
+          "language": "python"
+        },
+        "start_download": {
+          "type": "function",
+          "name": "start_download",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+          "line": 63,
+          "args": [],
+          "docstring": "Start download after queue is populated",
+          "is_async": false,
+          "language": "python"
+        },
+        "monitor_status": {
+          "type": "function",
+          "name": "monitor_status",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+          "line": 84,
+          "args": [],
+          "docstring": "Monitor download status",
           "is_async": false,
           "language": "python"
         }
       },
       "classes": {
-        "ModuleTestResult": {
+        "Logger": {
           "type": "class",
-          "name": "ModuleTestResult",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_module_status.py",
-          "line": 55,
+          "name": "Logger",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+          "line": 14,
           "docstring": "",
           "bases": [],
           "methods": [
@@ -470,122 +523,35 @@
               "name": "__init__",
               "args": [
                 "self",
-                "name"
+                "filename"
               ],
               "docstring": "",
-              "line": 56,
+              "line": 15,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
               "is_classmethod": false
-            }
-          ],
-          "language": "python"
-        },
-        "ModuleTester": {
-          "type": "class",
-          "name": "ModuleTester",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_module_status.py",
-          "line": 70,
-          "docstring": "",
-          "bases": [],
-          "methods": [
+            },
             {
-              "name": "__init__",
+              "name": "write",
+              "args": [
+                "self",
+                "message"
+              ],
+              "docstring": "",
+              "line": 19,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "flush",
               "args": [
                 "self"
               ],
               "docstring": "",
-              "line": 71,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "capture_output",
-              "args": [
-                "self",
-                "pipe",
-                "result",
-                "stream_type"
-              ],
-              "docstring": "Capture output from a subprocess pipe.",
-              "line": 77,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "test_module",
-              "args": [
-                "self",
-                "name",
-                "module_info"
-              ],
-              "docstring": "Test a single module in a separate thread.",
-              "line": 100,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "run_all_tests",
-              "args": [
-                "self"
-              ],
-              "docstring": "Run all module tests concurrently.",
-              "line": 213,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "generate_report",
-              "args": [
-                "self"
-              ],
-              "docstring": "Generate and display test report.",
-              "line": 244,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "save_detailed_log",
-              "args": [
-                "self"
-              ],
-              "docstring": "Save detailed test results to a JSON file.",
-              "line": 295,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "analyze_errors",
-              "args": [
-                "self"
-              ],
-              "docstring": "Analyze common error patterns across modules.",
-              "line": 323,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "cleanup",
-              "args": [
-                "self"
-              ],
-              "docstring": "Clean up any remaining processes.",
-              "line": 379,
+              "line": 28,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -607,12 +573,51 @@
           "type": "import"
         },
         {
-          "module": "subprocess",
+          "module": "time",
           "alias": null,
           "type": "import"
         },
         {
-          "module": "threading",
+          "module": "tkinter",
+          "alias": "tk",
+          "type": "import"
+        },
+        {
+          "module": "media_download_app",
+          "name": "MediaDownloaderApp",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "glob",
+          "alias": null,
+          "type": "import"
+        }
+      ],
+      "constants": [
+        {
+          "name": "SCRIPT_DIR",
+          "value": "<complex_expression>",
+          "line": 10
+        }
+      ]
+    },
+    "test_mp3_fix.py": {
+      "functions": {},
+      "classes": {},
+      "imports": [
+        {
+          "module": "os",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "sys",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "subprocess",
           "alias": null,
           "type": "import"
         },
@@ -622,29 +627,7 @@
           "type": "import"
         },
         {
-          "module": "queue",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "json",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "datetime",
-          "name": "datetime",
-          "alias": null,
-          "type": "from_import"
-        },
-        {
-          "module": "pathlib",
-          "name": "Path",
-          "alias": null,
-          "type": "from_import"
-        },
-        {
-          "module": "traceback",
+          "module": "glob",
           "alias": null,
           "type": "import"
         }
@@ -653,43 +636,7 @@
         {
           "name": "SCRIPT_DIR",
           "value": "<complex_expression>",
-          "line": 18
-        },
-        {
-          "name": "MODULES",
-          "value": {
-            "Media Download App": {
-              "script": "src/media_download_app.py",
-              "type": "tkinter",
-              "test_duration": 5
-            },
-            "Snippet Remixer": {
-              "script": "src/snippet_remixer_modular.py",
-              "type": "tkinter",
-              "test_duration": 5
-            },
-            "Random Slideshow": {
-              "script": "src/random_slideshow/main.py",
-              "type": "pyqt5",
-              "test_duration": 5
-            },
-            "Video Caption Generator": {
-              "script": "src/video_caption_generator/main_app.py",
-              "type": "pyqt5",
-              "test_duration": 5
-            },
-            "Reel Tracker": {
-              "script": "src/reel_tracker_modular.py",
-              "type": "pyqt5",
-              "test_duration": 5
-            },
-            "Release Calendar": {
-              "script": "src/release_calendar_modular.py",
-              "type": "pyqt6",
-              "test_duration": 5
-            }
-          },
-          "line": 22
+          "line": 11
         }
       ]
     },
@@ -795,7 +742,7 @@
           "type": "class",
           "name": "MediaDownloaderApp",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/media_download_app.py",
-          "line": 380,
+          "line": 390,
           "docstring": "",
           "bases": [],
           "methods": [
@@ -806,7 +753,7 @@
                 "root"
               ],
               "docstring": "",
-              "line": 381,
+              "line": 391,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -818,7 +765,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 420,
+              "line": 430,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -831,7 +778,7 @@
                 "*args"
               ],
               "docstring": "",
-              "line": 519,
+              "line": 529,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -844,7 +791,7 @@
                 "*args"
               ],
               "docstring": "",
-              "line": 527,
+              "line": 537,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -857,7 +804,7 @@
                 "*args"
               ],
               "docstring": "",
-              "line": 535,
+              "line": 545,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -869,7 +816,7 @@
                 "self"
               ],
               "docstring": "Starts the URL expansion and adding process in a separate thread.",
-              "line": 544,
+              "line": 554,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -882,7 +829,7 @@
                 "url_to_process"
               ],
               "docstring": "Expands the URL and adds results to the queue listbox. Runs in a separate thread.",
-              "line": 566,
+              "line": 576,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -894,7 +841,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 614,
+              "line": 624,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -906,7 +853,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 622,
+              "line": 632,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -918,7 +865,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 631,
+              "line": 641,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -931,7 +878,7 @@
                 "message"
               ],
               "docstring": "",
-              "line": 635,
+              "line": 645,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -943,7 +890,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 642,
+              "line": 652,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -955,7 +902,7 @@
                 "self"
               ],
               "docstring": "Abort the current download operation.",
-              "line": 736,
+              "line": 763,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -967,7 +914,7 @@
                 "self"
               ],
               "docstring": "Re-enable download buttons after completion or abort.",
-              "line": 756,
+              "line": 783,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -985,7 +932,7 @@
                 "chop_settings"
               ],
               "docstring": "Processes queue item by item: Download -> Apply Unique Suffix -> Remove Audio -> Adjust AR -> Cut -> Chop -> Finalize.\n        Manages intermediate files. Receives only INDIVIDUAL video URLs.",
-              "line": 764,
+              "line": 791,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -998,7 +945,7 @@
                 "url"
               ],
               "docstring": "",
-              "line": 1296,
+              "line": 1415,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -1010,7 +957,7 @@
                 "self"
               ],
               "docstring": "Enables both Download and Add buttons.",
-              "line": 1308,
+              "line": 1427,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -1022,7 +969,7 @@
                 "self"
               ],
               "docstring": "Called when the user tries to close the window.",
-              "line": 1318,
+              "line": 1437,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -2647,6 +2594,170 @@
           "name": "log_ffmpeg_command",
           "alias": null,
           "type": "from_import"
+        }
+      ],
+      "constants": []
+    },
+    "tools/generate_function_registry.py": {
+      "functions": {
+        "main": {
+          "type": "function",
+          "name": "main",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/generate_function_registry.py",
+          "line": 290,
+          "args": [],
+          "docstring": "Main execution function.",
+          "is_async": false,
+          "language": "python"
+        }
+      },
+      "classes": {
+        "FunctionRegistryGenerator": {
+          "type": "class",
+          "name": "FunctionRegistryGenerator",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/generate_function_registry.py",
+          "line": 15,
+          "docstring": "",
+          "bases": [],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self",
+                "project_root: str"
+              ],
+              "docstring": "",
+              "line": 16,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "extract_docstring",
+              "args": [
+                "self",
+                "node"
+              ],
+              "docstring": "Extract docstring from an AST node.",
+              "line": 20,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "get_function_signature",
+              "args": [
+                "self",
+                "node: ast.FunctionDef"
+              ],
+              "docstring": "Extract function arguments from AST node.",
+              "line": 30,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "get_class_info",
+              "args": [
+                "self",
+                "node: ast.ClassDef",
+                "file_path: str"
+              ],
+              "docstring": "Extract class information.",
+              "line": 76,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "scan_file",
+              "args": [
+                "self",
+                "file_path: Path"
+              ],
+              "docstring": "Scan a single Python file and extract all functions and classes.",
+              "line": 120,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "generate_registry",
+              "args": [
+                "self",
+                "python_files: List[str]"
+              ],
+              "docstring": "Generate complete function registry.",
+              "line": 198,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        }
+      },
+      "imports": [
+        {
+          "module": "ast",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "json",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "os",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "sys",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "pathlib",
+          "name": "Path",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "typing",
+          "name": "Dict",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "typing",
+          "name": "List",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "typing",
+          "name": "Any",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "typing",
+          "name": "Optional",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "inspect",
+          "alias": null,
+          "type": "import"
         }
       ],
       "constants": []
@@ -11324,7 +11435,7 @@
           "type": "class",
           "name": "RandomSlideshowWorker",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/random_slideshow/slideshow_worker.py",
-          "line": 23,
+          "line": 35,
           "docstring": "Worker thread for generating random slideshow videos.",
           "bases": [
             "QThread"
@@ -11339,7 +11450,7 @@
                 "aspect_ratio"
               ],
               "docstring": "",
-              "line": 33,
+              "line": 45,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -11351,7 +11462,7 @@
                 "self"
               ],
               "docstring": "Main loop for generating slideshow videos.",
-              "line": 41,
+              "line": 53,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -11363,7 +11474,7 @@
                 "self"
               ],
               "docstring": "Signals the worker thread to stop looping.",
-              "line": 224,
+              "line": 184,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -11436,19 +11547,38 @@
           "type": "from_import"
         },
         {
-          "module": "gc",
+          "module": "core.moviepy_utils",
+          "name": "ClipManager",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "core.moviepy_utils",
+          "name": "safe_close_clip",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "sys",
           "alias": null,
           "type": "import"
         },
         {
-          "module": "gc",
+          "module": "os",
           "alias": null,
           "type": "import"
         },
         {
-          "module": "gc",
+          "module": "core.moviepy_utils",
+          "name": "ClipManager",
           "alias": null,
-          "type": "import"
+          "type": "from_import"
+        },
+        {
+          "module": "core.moviepy_utils",
+          "name": "safe_close_clip",
+          "alias": null,
+          "type": "from_import"
         }
       ],
       "constants": []
@@ -20399,7 +20529,7 @@
                 "progress_callback"
               ],
               "docstring": "Concatenate video snippets into a single file.\n        \n        Args:\n            snippet_files (list): List of snippet file paths\n            progress_callback (callable): Optional progress callback\n            \n        Returns:\n            str: Path to concatenated video file",
-              "line": 494,
+              "line": 507,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -20417,7 +20547,7 @@
                 "aspect_ratio_mode"
               ],
               "docstring": "Adjust aspect ratio and create final output file.\n        \n        Args:\n            temp_concat_path (str): Path to temporary concatenated file\n            final_output_path (str): Path for final output file\n            aspect_ratio_selection (str): Target aspect ratio\n            export_settings (dict): Optional export settings\n            progress_callback (callable): Optional progress callback\n            aspect_ratio_mode (str): How to handle aspect ratio - \"crop\" or \"pad\"\n            \n        Returns:\n            bool: True if successful, False otherwise",
-              "line": 555,
+              "line": 568,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -20429,7 +20559,7 @@
                 "self"
               ],
               "docstring": "Clean up temporary directory and files.\n        \n        Returns:\n            bool: True if successful, False otherwise",
-              "line": 665,
+              "line": 678,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -20441,7 +20571,7 @@
                 "self"
               ],
               "docstring": "Check if both FFmpeg and FFprobe are available.\n        \n        Returns:\n            tuple: (ffmpeg_found, ffprobe_found)",
-              "line": 682,
+              "line": 695,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -20453,7 +20583,7 @@
                 "self"
               ],
               "docstring": "Request abort of current processing and terminate any running subprocess.",
-              "line": 691,
+              "line": 704,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -20469,7 +20599,7 @@
                 "check_black_bars"
               ],
               "docstring": "Verify the actual output dimensions of a video file and optionally check for black bars.\n        \n        Args:\n            video_path (str): Path to the video file to verify\n            expected_width (int): Expected width (optional)\n            expected_height (int): Expected height (optional)\n            check_black_bars (bool): Whether to check for black bars using blackdetect filter\n            \n        Returns:\n            tuple: (actual_width, actual_height, has_black_bars)\n                   Returns (None, None, None) if verification fails",
-              "line": 705,
+              "line": 731,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -24659,7 +24789,7 @@
           "type": "function",
           "name": "safe_print",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 11,
+          "line": 20,
           "args": [
             "*args",
             "**kwargs"
@@ -24672,9 +24802,9 @@
           "type": "function",
           "name": "get_ffmpeg_path",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 25,
+          "line": 34,
           "args": [],
-          "docstring": "Get FFmpeg executable path.",
+          "docstring": "Get FFmpeg executable path using environment configuration.",
           "is_async": false,
           "language": "python"
         },
@@ -24682,7 +24812,7 @@
           "type": "function",
           "name": "get_ffprobe_path",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 45,
+          "line": 67,
           "args": [],
           "docstring": "Get FFprobe executable path.",
           "is_async": false,
@@ -24692,7 +24822,7 @@
           "type": "function",
           "name": "run_ffmpeg_command",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 63,
+          "line": 85,
           "args": [
             "command",
             "shell"
@@ -24705,7 +24835,7 @@
           "type": "function",
           "name": "get_video_info",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 98,
+          "line": 120,
           "args": [
             "video_path"
           ],
@@ -24717,7 +24847,7 @@
           "type": "function",
           "name": "get_audio_duration",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 143,
+          "line": 165,
           "args": [
             "audio_path"
           ],
@@ -24729,7 +24859,7 @@
           "type": "function",
           "name": "create_temp_directory",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 162,
+          "line": 184,
           "args": [],
           "docstring": "Create a temporary directory for processing.",
           "is_async": false,
@@ -24739,7 +24869,7 @@
           "type": "function",
           "name": "cleanup_temp_directory",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 167,
+          "line": 189,
           "args": [
             "temp_dir"
           ],
@@ -24751,7 +24881,7 @@
           "type": "function",
           "name": "format_timestamp",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 175,
+          "line": 197,
           "args": [
             "seconds",
             "fmt"
@@ -24764,7 +24894,7 @@
           "type": "function",
           "name": "parse_timestamp",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 196,
+          "line": 218,
           "args": [
             "timestamp_str"
           ],
@@ -24776,7 +24906,7 @@
           "type": "function",
           "name": "sanitize_filename",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 210,
+          "line": 232,
           "args": [
             "filename"
           ],
@@ -24788,7 +24918,7 @@
           "type": "function",
           "name": "split_text_for_captions",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 226,
+          "line": 248,
           "args": [
             "text",
             "max_length"
@@ -24801,7 +24931,7 @@
           "type": "function",
           "name": "estimate_processing_time",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 251,
+          "line": 273,
           "args": [
             "duration",
             "model_size"
@@ -24814,7 +24944,7 @@
           "type": "function",
           "name": "get_available_languages",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 270,
+          "line": 292,
           "args": [],
           "docstring": "Get list of available languages for Whisper.",
           "is_async": false,
@@ -24824,7 +24954,7 @@
           "type": "function",
           "name": "check_cuda_available",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 296,
+          "line": 318,
           "args": [],
           "docstring": "Check if CUDA is available for GPU acceleration.",
           "is_async": false,
@@ -24834,7 +24964,7 @@
           "type": "function",
           "name": "get_optimal_device",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-          "line": 304,
+          "line": 326,
           "args": [],
           "docstring": "Get optimal device for processing.",
           "is_async": false,
@@ -24878,6 +25008,12 @@
           "module": "re",
           "alias": null,
           "type": "import"
+        },
+        {
+          "module": "core.env_loader",
+          "name": "get_env_var",
+          "alias": null,
+          "type": "from_import"
         },
         {
           "module": "json",
@@ -25753,6 +25889,16 @@
     }
   },
   "functions": {
+    "fix_and_test_gui.py::direct_test_download": {
+      "type": "function",
+      "name": "direct_test_download",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/fix_and_test_gui.py",
+      "line": 100,
+      "args": [],
+      "docstring": "Test download functionality directly without GUI",
+      "is_async": false,
+      "language": "python"
+    },
     "launcher.py::get_script_path": {
       "type": "function",
       "name": "get_script_path",
@@ -25810,7 +25956,7 @@
       "type": "function",
       "name": "stop_script",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-      "line": 221,
+      "line": 230,
       "args": [
         "script_path",
         "status_label",
@@ -25824,7 +25970,7 @@
       "type": "function",
       "name": "on_closing",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-      "line": 252,
+      "line": 270,
       "args": [],
       "docstring": "Handles window close event, terminates running scripts, logs actions.",
       "is_async": false,
@@ -25834,7 +25980,7 @@
       "type": "function",
       "name": "clear_log",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-      "line": 320,
+      "line": 338,
       "args": [],
       "docstring": "Clears the content of the log area.",
       "is_async": false,
@@ -25844,29 +25990,71 @@
       "type": "function",
       "name": "initial_log",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-      "line": 559,
+      "line": 577,
       "args": [],
       "docstring": "",
       "is_async": false,
       "language": "python"
     },
-    "test_media_downloader.py::main": {
+    "test_fixed_gui.py::run_test": {
       "type": "function",
-      "name": "main",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_media_downloader.py",
-      "line": 414,
+      "name": "run_test",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
+      "line": 31,
       "args": [],
-      "docstring": "Run the media downloader tests.",
+      "docstring": "",
       "is_async": false,
       "language": "python"
     },
-    "test_module_status.py::main": {
+    "test_fixed_gui.py::start_download": {
       "type": "function",
-      "name": "main",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_module_status.py",
-      "line": 390,
+      "name": "start_download",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
+      "line": 57,
       "args": [],
-      "docstring": "Run the module status test.",
+      "docstring": "",
+      "is_async": false,
+      "language": "python"
+    },
+    "test_fixed_gui.py::monitor_download": {
+      "type": "function",
+      "name": "monitor_download",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
+      "line": 72,
+      "args": [
+        "start_time"
+      ],
+      "docstring": "",
+      "is_async": false,
+      "language": "python"
+    },
+    "test_gui_simple.py::test_sequence": {
+      "type": "function",
+      "name": "test_sequence",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+      "line": 38,
+      "args": [],
+      "docstring": "Run a test download sequence",
+      "is_async": false,
+      "language": "python"
+    },
+    "test_gui_simple.py::start_download": {
+      "type": "function",
+      "name": "start_download",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+      "line": 63,
+      "args": [],
+      "docstring": "Start download after queue is populated",
+      "is_async": false,
+      "language": "python"
+    },
+    "test_gui_simple.py::monitor_status": {
+      "type": "function",
+      "name": "monitor_status",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+      "line": 84,
+      "args": [],
+      "docstring": "Monitor download status",
       "is_async": false,
       "language": "python"
     },
@@ -26485,6 +26673,16 @@
       "line": 161,
       "args": [],
       "docstring": "Run all logging tests.",
+      "is_async": false,
+      "language": "python"
+    },
+    "tools/generate_function_registry.py::main": {
+      "type": "function",
+      "name": "main",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/generate_function_registry.py",
+      "line": 290,
+      "args": [],
+      "docstring": "Main execution function.",
       "is_async": false,
       "language": "python"
     },
@@ -27555,7 +27753,7 @@
       "type": "function",
       "name": "safe_print",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 11,
+      "line": 20,
       "args": [
         "*args",
         "**kwargs"
@@ -27568,9 +27766,9 @@
       "type": "function",
       "name": "get_ffmpeg_path",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 25,
+      "line": 34,
       "args": [],
-      "docstring": "Get FFmpeg executable path.",
+      "docstring": "Get FFmpeg executable path using environment configuration.",
       "is_async": false,
       "language": "python"
     },
@@ -27578,7 +27776,7 @@
       "type": "function",
       "name": "get_ffprobe_path",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 45,
+      "line": 67,
       "args": [],
       "docstring": "Get FFprobe executable path.",
       "is_async": false,
@@ -27588,7 +27786,7 @@
       "type": "function",
       "name": "run_ffmpeg_command",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 63,
+      "line": 85,
       "args": [
         "command",
         "shell"
@@ -27601,7 +27799,7 @@
       "type": "function",
       "name": "get_video_info",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 98,
+      "line": 120,
       "args": [
         "video_path"
       ],
@@ -27613,7 +27811,7 @@
       "type": "function",
       "name": "get_audio_duration",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 143,
+      "line": 165,
       "args": [
         "audio_path"
       ],
@@ -27625,7 +27823,7 @@
       "type": "function",
       "name": "create_temp_directory",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 162,
+      "line": 184,
       "args": [],
       "docstring": "Create a temporary directory for processing.",
       "is_async": false,
@@ -27635,7 +27833,7 @@
       "type": "function",
       "name": "cleanup_temp_directory",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 167,
+      "line": 189,
       "args": [
         "temp_dir"
       ],
@@ -27647,7 +27845,7 @@
       "type": "function",
       "name": "format_timestamp",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 175,
+      "line": 197,
       "args": [
         "seconds",
         "fmt"
@@ -27660,7 +27858,7 @@
       "type": "function",
       "name": "parse_timestamp",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 196,
+      "line": 218,
       "args": [
         "timestamp_str"
       ],
@@ -27672,7 +27870,7 @@
       "type": "function",
       "name": "sanitize_filename",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 210,
+      "line": 232,
       "args": [
         "filename"
       ],
@@ -27684,7 +27882,7 @@
       "type": "function",
       "name": "split_text_for_captions",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 226,
+      "line": 248,
       "args": [
         "text",
         "max_length"
@@ -27697,7 +27895,7 @@
       "type": "function",
       "name": "estimate_processing_time",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 251,
+      "line": 273,
       "args": [
         "duration",
         "model_size"
@@ -27710,7 +27908,7 @@
       "type": "function",
       "name": "get_available_languages",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 270,
+      "line": 292,
       "args": [],
       "docstring": "Get list of available languages for Whisper.",
       "is_async": false,
@@ -27720,7 +27918,7 @@
       "type": "function",
       "name": "check_cuda_available",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 296,
+      "line": 318,
       "args": [],
       "docstring": "Check if CUDA is available for GPU acceleration.",
       "is_async": false,
@@ -27730,7 +27928,7 @@
       "type": "function",
       "name": "get_optimal_device",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/video_caption_generator/utils.py",
-      "line": 304,
+      "line": 326,
       "args": [],
       "docstring": "Get optimal device for processing.",
       "is_async": false,
@@ -27838,11 +28036,11 @@
     }
   },
   "classes": {
-    "test_media_downloader.py::MediaDownloaderTest": {
+    "fix_and_test_gui.py::TestWrapper": {
       "type": "class",
-      "name": "MediaDownloaderTest",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_media_downloader.py",
-      "line": 34,
+      "name": "TestWrapper",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/fix_and_test_gui.py",
+      "line": 18,
       "docstring": "",
       "bases": [],
       "methods": [
@@ -27852,98 +28050,70 @@
             "self"
           ],
           "docstring": "",
-          "line": 35,
+          "line": 19,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
           "is_classmethod": false
         },
         {
-          "name": "setup_test_environment",
-          "args": [
-            "self"
-          ],
-          "docstring": "Create test directory and verify dependencies.",
-          "line": 41,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "test_direct_download",
+          "name": "log",
           "args": [
             "self",
-            "url",
-            "format_type",
-            "test_name"
+            "msg"
           ],
-          "docstring": "Test direct download using yt-dlp command line.",
-          "line": 66,
+          "docstring": "Add message to log window",
+          "line": 38,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
           "is_classmethod": false
         },
         {
-          "name": "test_programmatic_download",
+          "name": "wrapped_process_queue",
           "args": [
             "self",
-            "url",
-            "format_type",
-            "test_name"
+            "*args",
+            "**kwargs"
           ],
-          "docstring": "Test download using the media_download_app module.",
-          "line": 181,
+          "docstring": "Wrapper to add logging to the download process",
+          "line": 44,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
           "is_classmethod": false
         },
         {
-          "name": "verify_media_files",
+          "name": "quick_test",
           "args": [
             "self"
           ],
-          "docstring": "Verify the downloaded media files using ffprobe.",
-          "line": 255,
+          "docstring": "Quick test with a short video",
+          "line": 62,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
           "is_classmethod": false
         },
         {
-          "name": "generate_report",
+          "name": "start_download",
           "args": [
             "self"
           ],
-          "docstring": "Generate test report.",
-          "line": 303,
+          "docstring": "Start the download after queue is ready",
+          "line": 86,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
           "is_classmethod": false
         },
         {
-          "name": "cleanup",
-          "args": [
-            "self",
-            "keep_files"
-          ],
-          "docstring": "Clean up test files.",
-          "line": 363,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "run_all_tests",
+          "name": "run",
           "args": [
             "self"
           ],
-          "docstring": "Run all media downloader tests.",
-          "line": 374,
+          "docstring": "",
+          "line": 97,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -27952,11 +28122,11 @@
       ],
       "language": "python"
     },
-    "test_module_status.py::ModuleTestResult": {
+    "test_gui_simple.py::Logger": {
       "type": "class",
-      "name": "ModuleTestResult",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_module_status.py",
-      "line": 55,
+      "name": "Logger",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
+      "line": 14,
       "docstring": "",
       "bases": [],
       "methods": [
@@ -27964,122 +28134,35 @@
           "name": "__init__",
           "args": [
             "self",
-            "name"
+            "filename"
           ],
           "docstring": "",
-          "line": 56,
+          "line": 15,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
           "is_classmethod": false
-        }
-      ],
-      "language": "python"
-    },
-    "test_module_status.py::ModuleTester": {
-      "type": "class",
-      "name": "ModuleTester",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_module_status.py",
-      "line": 70,
-      "docstring": "",
-      "bases": [],
-      "methods": [
+        },
         {
-          "name": "__init__",
+          "name": "write",
+          "args": [
+            "self",
+            "message"
+          ],
+          "docstring": "",
+          "line": 19,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "flush",
           "args": [
             "self"
           ],
           "docstring": "",
-          "line": 71,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "capture_output",
-          "args": [
-            "self",
-            "pipe",
-            "result",
-            "stream_type"
-          ],
-          "docstring": "Capture output from a subprocess pipe.",
-          "line": 77,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "test_module",
-          "args": [
-            "self",
-            "name",
-            "module_info"
-          ],
-          "docstring": "Test a single module in a separate thread.",
-          "line": 100,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "run_all_tests",
-          "args": [
-            "self"
-          ],
-          "docstring": "Run all module tests concurrently.",
-          "line": 213,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "generate_report",
-          "args": [
-            "self"
-          ],
-          "docstring": "Generate and display test report.",
-          "line": 244,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "save_detailed_log",
-          "args": [
-            "self"
-          ],
-          "docstring": "Save detailed test results to a JSON file.",
-          "line": 295,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "analyze_errors",
-          "args": [
-            "self"
-          ],
-          "docstring": "Analyze common error patterns across modules.",
-          "line": 323,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "cleanup",
-          "args": [
-            "self"
-          ],
-          "docstring": "Clean up any remaining processes.",
-          "line": 379,
+          "line": 28,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28092,7 +28175,7 @@
       "type": "class",
       "name": "MediaDownloaderApp",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/media_download_app.py",
-      "line": 380,
+      "line": 390,
       "docstring": "",
       "bases": [],
       "methods": [
@@ -28103,7 +28186,7 @@
             "root"
           ],
           "docstring": "",
-          "line": 381,
+          "line": 391,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28115,7 +28198,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 420,
+          "line": 430,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28128,7 +28211,7 @@
             "*args"
           ],
           "docstring": "",
-          "line": 519,
+          "line": 529,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28141,7 +28224,7 @@
             "*args"
           ],
           "docstring": "",
-          "line": 527,
+          "line": 537,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28154,7 +28237,7 @@
             "*args"
           ],
           "docstring": "",
-          "line": 535,
+          "line": 545,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28166,7 +28249,7 @@
             "self"
           ],
           "docstring": "Starts the URL expansion and adding process in a separate thread.",
-          "line": 544,
+          "line": 554,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28179,7 +28262,7 @@
             "url_to_process"
           ],
           "docstring": "Expands the URL and adds results to the queue listbox. Runs in a separate thread.",
-          "line": 566,
+          "line": 576,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28191,7 +28274,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 614,
+          "line": 624,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28203,7 +28286,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 622,
+          "line": 632,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28215,7 +28298,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 631,
+          "line": 641,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28228,7 +28311,7 @@
             "message"
           ],
           "docstring": "",
-          "line": 635,
+          "line": 645,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28240,7 +28323,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 642,
+          "line": 652,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28252,7 +28335,7 @@
             "self"
           ],
           "docstring": "Abort the current download operation.",
-          "line": 736,
+          "line": 763,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28264,7 +28347,7 @@
             "self"
           ],
           "docstring": "Re-enable download buttons after completion or abort.",
-          "line": 756,
+          "line": 783,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28282,7 +28365,7 @@
             "chop_settings"
           ],
           "docstring": "Processes queue item by item: Download -> Apply Unique Suffix -> Remove Audio -> Adjust AR -> Cut -> Chop -> Finalize.\n        Manages intermediate files. Receives only INDIVIDUAL video URLs.",
-          "line": 764,
+          "line": 791,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28295,7 +28378,7 @@
             "url"
           ],
           "docstring": "",
-          "line": 1296,
+          "line": 1415,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28307,7 +28390,7 @@
             "self"
           ],
           "docstring": "Enables both Download and Add buttons.",
-          "line": 1308,
+          "line": 1427,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28319,7 +28402,7 @@
             "self"
           ],
           "docstring": "Called when the user tries to close the window.",
-          "line": 1318,
+          "line": 1437,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28514,6 +28597,96 @@
           ],
           "docstring": "Handles window closing: saves settings, prompts if processing.",
           "line": 667,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        }
+      ],
+      "language": "python"
+    },
+    "tools/generate_function_registry.py::FunctionRegistryGenerator": {
+      "type": "class",
+      "name": "FunctionRegistryGenerator",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/generate_function_registry.py",
+      "line": 15,
+      "docstring": "",
+      "bases": [],
+      "methods": [
+        {
+          "name": "__init__",
+          "args": [
+            "self",
+            "project_root: str"
+          ],
+          "docstring": "",
+          "line": 16,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "extract_docstring",
+          "args": [
+            "self",
+            "node"
+          ],
+          "docstring": "Extract docstring from an AST node.",
+          "line": 20,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "get_function_signature",
+          "args": [
+            "self",
+            "node: ast.FunctionDef"
+          ],
+          "docstring": "Extract function arguments from AST node.",
+          "line": 30,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "get_class_info",
+          "args": [
+            "self",
+            "node: ast.ClassDef",
+            "file_path: str"
+          ],
+          "docstring": "Extract class information.",
+          "line": 76,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "scan_file",
+          "args": [
+            "self",
+            "file_path: Path"
+          ],
+          "docstring": "Scan a single Python file and extract all functions and classes.",
+          "line": 120,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "generate_registry",
+          "args": [
+            "self",
+            "python_files: List[str]"
+          ],
+          "docstring": "Generate complete function registry.",
+          "line": 198,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -34091,7 +34264,7 @@
       "type": "class",
       "name": "RandomSlideshowWorker",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/random_slideshow/slideshow_worker.py",
-      "line": 23,
+      "line": 35,
       "docstring": "Worker thread for generating random slideshow videos.",
       "bases": [
         "QThread"
@@ -34106,7 +34279,7 @@
             "aspect_ratio"
           ],
           "docstring": "",
-          "line": 33,
+          "line": 45,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -34118,7 +34291,7 @@
             "self"
           ],
           "docstring": "Main loop for generating slideshow videos.",
-          "line": 41,
+          "line": 53,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -34130,7 +34303,7 @@
             "self"
           ],
           "docstring": "Signals the worker thread to stop looping.",
-          "line": 224,
+          "line": 184,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39855,7 +40028,7 @@
             "progress_callback"
           ],
           "docstring": "Concatenate video snippets into a single file.\n        \n        Args:\n            snippet_files (list): List of snippet file paths\n            progress_callback (callable): Optional progress callback\n            \n        Returns:\n            str: Path to concatenated video file",
-          "line": 494,
+          "line": 507,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39873,7 +40046,7 @@
             "aspect_ratio_mode"
           ],
           "docstring": "Adjust aspect ratio and create final output file.\n        \n        Args:\n            temp_concat_path (str): Path to temporary concatenated file\n            final_output_path (str): Path for final output file\n            aspect_ratio_selection (str): Target aspect ratio\n            export_settings (dict): Optional export settings\n            progress_callback (callable): Optional progress callback\n            aspect_ratio_mode (str): How to handle aspect ratio - \"crop\" or \"pad\"\n            \n        Returns:\n            bool: True if successful, False otherwise",
-          "line": 555,
+          "line": 568,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39885,7 +40058,7 @@
             "self"
           ],
           "docstring": "Clean up temporary directory and files.\n        \n        Returns:\n            bool: True if successful, False otherwise",
-          "line": 665,
+          "line": 678,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39897,7 +40070,7 @@
             "self"
           ],
           "docstring": "Check if both FFmpeg and FFprobe are available.\n        \n        Returns:\n            tuple: (ffmpeg_found, ffprobe_found)",
-          "line": 682,
+          "line": 695,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39909,7 +40082,7 @@
             "self"
           ],
           "docstring": "Request abort of current processing and terminate any running subprocess.",
-          "line": 691,
+          "line": 704,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39925,7 +40098,7 @@
             "check_black_bars"
           ],
           "docstring": "Verify the actual output dimensions of a video file and optionally check for black bars.\n        \n        Args:\n            video_path (str): Path to the video file to verify\n            expected_width (int): Expected width (optional)\n            expected_height (int): Expected height (optional)\n            check_black_bars (bool): Whether to check for black bars using blackdetect filter\n            \n        Returns:\n            tuple: (actual_width, actual_height, has_black_bars)\n                   Returns (None, None, None) if verification fails",
-          "line": 705,
+          "line": 731,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -42750,22 +42923,10 @@
   "duplicates": [
     {
       "type": "function",
-      "name": "main",
+      "name": "start_download",
       "files": [
-        "test_media_downloader.py",
-        "test_module_status.py",
-        "src/release_calendar_modular.py",
-        "tests/test_config_system.py",
-        "tests/test_crop_fix.py",
-        "tests/test_output_verification.py",
-        "tests/test_pyqt5.py",
-        "tests/test_video_logging.py",
-        "src/random_slideshow/main.py",
-        "src/reel_tracker/main_app.py",
-        "src/release_calendar/main_app.py",
-        "src/snippet_remixer/main.py",
-        "src/snippet_remixer/main_app.py",
-        "src/video_caption_generator/main_app.py"
+        "test_fixed_gui.py",
+        "test_gui_simple.py"
       ]
     },
     {
@@ -42808,6 +42969,25 @@
         "src/media_download_app.py",
         "src/snippet_remixer.py",
         "src/snippet_remixer/utils.py"
+      ]
+    },
+    {
+      "type": "function",
+      "name": "main",
+      "files": [
+        "src/release_calendar_modular.py",
+        "tests/test_config_system.py",
+        "tests/test_crop_fix.py",
+        "tests/test_output_verification.py",
+        "tests/test_pyqt5.py",
+        "tests/test_video_logging.py",
+        "tools/generate_function_registry.py",
+        "src/random_slideshow/main.py",
+        "src/reel_tracker/main_app.py",
+        "src/release_calendar/main_app.py",
+        "src/snippet_remixer/main.py",
+        "src/snippet_remixer/main_app.py",
+        "src/video_caption_generator/main_app.py"
       ]
     },
     {
@@ -42956,10 +43136,10 @@
   ],
   "statistics": {
     "files_by_directory": {
-      ".": 3,
+      ".": 5,
       "src": 6,
       "tests": 7,
-      "tools": 3,
+      "tools": 4,
       "src/core": 10,
       "src/random_slideshow": 17,
       "src/reel_tracker": 12,
@@ -42968,9 +43148,11 @@
       "src/video_caption_generator": 16
     },
     "functions_per_file": {
+      "fix_and_test_gui.py": 1,
       "launcher.py": 8,
-      "test_media_downloader.py": 1,
-      "test_module_status.py": 1,
+      "test_fixed_gui.py": 3,
+      "test_gui_simple.py": 3,
+      "test_mp3_fix.py": 0,
       "src/media_download_app.py": 8,
       "src/reel_tracker_modular.py": 0,
       "src/release_calendar_modular.py": 1,
@@ -42984,6 +43166,7 @@
       "tests/test_pyqt5.py": 1,
       "tests/test_threading_fixes.py": 2,
       "tests/test_video_logging.py": 7,
+      "tools/generate_function_registry.py": 1,
       "tools/gitingest.py": 2,
       "tools/slideshow_editor.py": 2,
       "tools/xyimagescaler.py": 0,
@@ -43061,9 +43244,11 @@
       "src/video_caption_generator/__init__.py": 10
     },
     "classes_per_file": {
+      "fix_and_test_gui.py": 1,
       "launcher.py": 0,
-      "test_media_downloader.py": 1,
-      "test_module_status.py": 2,
+      "test_fixed_gui.py": 0,
+      "test_gui_simple.py": 1,
+      "test_mp3_fix.py": 0,
       "src/media_download_app.py": 1,
       "src/reel_tracker_modular.py": 0,
       "src/release_calendar_modular.py": 0,
@@ -43077,6 +43262,7 @@
       "tests/test_pyqt5.py": 0,
       "tests/test_threading_fixes.py": 0,
       "tests/test_video_logging.py": 0,
+      "tools/generate_function_registry.py": 1,
       "tools/gitingest.py": 0,
       "tools/slideshow_editor.py": 3,
       "tools/xyimagescaler.py": 1,
@@ -43153,6 +43339,6 @@
       "src/video_caption_generator/worker_threads.py": 3,
       "src/video_caption_generator/__init__.py": 0
     },
-    "duplicate_count": 23
+    "duplicate_count": 24
   }
 }
