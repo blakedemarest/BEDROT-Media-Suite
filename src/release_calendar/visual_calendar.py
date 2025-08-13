@@ -93,43 +93,46 @@ class DayCell(QFrame):
         self.apply_style()
         
     def apply_style(self):
-        """Apply styling based on day type."""
+        """Apply BEDROT cyberpunk styling based on day type."""
         if not self.is_current_month:
             # Gray out days from other months
             self.setStyleSheet("""
                 DayCell {
-                    background-color: #f8f8f8;
-                    border: 1px solid #e0e0e0;
-                    color: #ccc;
+                    background-color: #0a0a0a;
+                    border: 1px solid #2a2a2a;
+                    color: #404040;
                 }
             """)
-            self.date_label.setStyleSheet("color: #ccc;")
+            self.date_label.setStyleSheet("color: #404040;")
         elif self.is_today:
-            # Highlight today
+            # Highlight today with cyan glow
             self.setStyleSheet("""
                 DayCell {
-                    background-color: #e3f2fd;
-                    border: 2px solid #2196f3;
+                    background-color: #1a1a1a;
+                    border: 2px solid #00ffff;
+                    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
                 }
             """)
+            self.date_label.setStyleSheet("color: #00ffff; font-weight: bold;")
         elif self.is_friday:
-            # Highlight Fridays (release days)
+            # Highlight Fridays (release days) with green accent
             self.setStyleSheet("""
                 DayCell {
-                    background-color: #f0f8ff;
-                    border: 1px solid #4a90e2;
+                    background-color: #1a2a1a;
+                    border: 1px solid #00ff88;
                 }
             """)
-            self.date_label.setStyleSheet("color: #2196f3; font-weight: bold;")
+            self.date_label.setStyleSheet("color: #00ff88; font-weight: bold;")
         else:
             # Normal day
             self.setStyleSheet("""
                 DayCell {
-                    background-color: white;
-                    border: 1px solid #ddd;
+                    background-color: #1a1a1a;
+                    border: 1px solid #404040;
                 }
                 DayCell:hover {
-                    border: 1px solid #4a90e2;
+                    border: 1px solid #00ff88;
+                    background-color: #222222;
                 }
             """)
             
@@ -159,7 +162,7 @@ class DayCell(QFrame):
         # Add "more" indicator if needed
         if len(self.releases) > 2:
             more_label = QLabel(f"+{len(self.releases) - 2} more")
-            more_label.setStyleSheet("color: #666; font-size: 10px;")
+            more_label.setStyleSheet("color: #00ff88; font-size: 10px; font-weight: bold;")
             self.releases_layout.addWidget(more_label)
             
     def update_deadlines_display(self):
@@ -176,19 +179,20 @@ class DayCell(QFrame):
             self.deadline_layout.addWidget(badge)
             
     def create_release_card(self, release: Dict[str, Any]) -> QFrame:
-        """Create a visual card for a release."""
+        """Create a visual card for a release with BEDROT styling."""
         card = QFrame()
         card.setFrameStyle(QFrame.Shape.Box)
         card.setStyleSheet("""
             QFrame {
-                background-color: #f5f5f5;
-                border: 1px solid #ddd;
+                background-color: #252525;
+                border: 1px solid #00ffff;
                 border-radius: 4px;
-                padding: 2px;
+                padding: 4px;
             }
             QFrame:hover {
-                background-color: #e8e8e8;
-                border-color: #4a90e2;
+                background-color: #2a2a2a;
+                border-color: #00ff88;
+                box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
             }
         """)
         
@@ -215,7 +219,7 @@ class DayCell(QFrame):
         completed = sum(1 for item in checklist.values() if item.get('completed', False))
         total = len(checklist)
         progress_label = QLabel(f"{completed}/{total}")
-        progress_label.setStyleSheet("font-size: 10px; color: #666;")
+        progress_label.setStyleSheet("font-size: 10px; color: #00ff88; font-weight: bold;")
         layout.addWidget(progress_label)
         
         # Store release data
@@ -230,22 +234,22 @@ class DayCell(QFrame):
         return card
         
     def create_deadline_badge(self, deadline: Dict[str, Any]) -> QLabel:
-        """Create a deadline badge."""
+        """Create a deadline badge with BEDROT styling."""
         days = deadline.get('days_until', 0)
         name = deadline.get('name', '')
         
-        # Color based on urgency
+        # Color based on urgency - cyberpunk style
         if days < 0:
-            color = "#f44336"  # Red - overdue
+            color = "#ff0066"  # Magenta - overdue
             text = "!"
         elif days <= 3:
-            color = "#ff9800"  # Orange - urgent
+            color = "#ff6600"  # Orange - urgent
             text = str(days)
         elif days <= 7:
-            color = "#ffc107"  # Yellow - soon
+            color = "#ffff00"  # Yellow - soon
             text = str(days)
         else:
-            color = "#4caf50"  # Green - ok
+            color = "#00ff88"  # Green - ok
             text = str(days)
             
         badge = QLabel(text)
@@ -253,7 +257,7 @@ class DayCell(QFrame):
         badge.setStyleSheet(f"""
             QLabel {{
                 background-color: {color};
-                color: white;
+                color: #000000;
                 border-radius: 8px;
                 padding: 2px 6px;
                 font-size: 10px;
@@ -281,12 +285,13 @@ class DayCell(QFrame):
         
         drag.setMimeData(mime_data)
         
-        # Create drag pixmap
+        # Create drag pixmap with BEDROT styling
         pixmap = QPixmap(150, 40)
-        pixmap.fill(Qt.GlobalColor.white)
+        pixmap.fill(QColor("#1a1a1a"))
         painter = QPainter(pixmap)
-        painter.setPen(QPen(QColor("#4a90e2"), 2))
+        painter.setPen(QPen(QColor("#00ffff"), 2))
         painter.drawRect(0, 0, 149, 39)
+        painter.setPen(QColor("#e0e0e0"))
         painter.drawText(5, 25, f"{release['artist']} - {release['title']}")
         painter.end()
         
@@ -394,14 +399,15 @@ class VisualCalendarWidget(QWidget):
         self.calendar_layout = QGridLayout(self.calendar_widget)
         self.calendar_layout.setSpacing(2)
         
-        # Add day headers
+        # Add day headers with BEDROT styling
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         for i, day in enumerate(days):
-            label = QLabel(day[:3])
+            label = QLabel(day[:3].upper())
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            label.setStyleSheet("font-weight: bold; padding: 5px;")
-            if i == 4:  # Friday
-                label.setStyleSheet("font-weight: bold; padding: 5px; color: #2196f3;")
+            if i == 4:  # Friday - release day
+                label.setStyleSheet("font-weight: bold; padding: 5px; color: #00ff88; background-color: #0a0a0a; text-transform: uppercase;")
+            else:
+                label.setStyleSheet("font-weight: bold; padding: 5px; color: #00ffff; background-color: #0a0a0a; text-transform: uppercase;")
             self.calendar_layout.addWidget(label, 0, i)
             
         # Scroll area for calendar
@@ -419,26 +425,24 @@ class VisualCalendarWidget(QWidget):
         layout = QHBoxLayout(header)
         
         # Previous month button
-        prev_btn = QPushButton("◀")
+        prev_btn = QPushButton("◀ PREV")
         prev_btn.clicked.connect(self.previous_month)
         layout.addWidget(prev_btn)
         
         # Month/Year label
         self.month_label = QLabel()
         self.month_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        font = QFont()
-        font.setPointSize(16)
-        font.setBold(True)
-        self.month_label.setFont(font)
+        self.month_label.setStyleSheet("color: #00ffff; font-size: 18px; font-weight: bold; text-transform: uppercase;")
         layout.addWidget(self.month_label, 1)
         
         # Next month button
-        next_btn = QPushButton("▶")
+        next_btn = QPushButton("NEXT ▶")
         next_btn.clicked.connect(self.next_month)
         layout.addWidget(next_btn)
         
         # Today button
-        today_btn = QPushButton("Today")
+        today_btn = QPushButton("TODAY")
+        today_btn.setObjectName("primaryButton")
         today_btn.clicked.connect(self.go_to_today)
         layout.addWidget(today_btn)
         
