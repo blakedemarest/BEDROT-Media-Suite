@@ -979,6 +979,10 @@ class ReelTrackerApp(QMainWindow):
         self.table.setAcceptDrops(True)
         self.table.setDragDropMode(QTableWidget.DropOnly)
         
+        # Configure scrollbars
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
         # Configure table appearance
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Interactive)
