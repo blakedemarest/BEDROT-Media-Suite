@@ -431,6 +431,76 @@ class MediaDownloaderApp:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.is_adding_to_queue = False
 
+    def apply_bedrot_theme(self):
+        """Apply the BEDROT cyberpunk visual theme to all tkinter/ttk widgets."""
+        style = ttk.Style()
+        
+        # Configure ttk styles with BEDROT theme
+        style.configure('TFrame', background='#121212', borderwidth=0)
+        style.configure('TLabel', background='#121212', foreground='#e0e0e0')
+        
+        # Entry widget style
+        style.configure('TEntry',
+                       fieldbackground='#1a1a1a',
+                       foreground='#e0e0e0',
+                       insertcolor='#00ff88',
+                       borderwidth=1)
+        style.map('TEntry',
+                 fieldbackground=[('focus', '#222222')],
+                 bordercolor=[('focus', '#00ffff')])
+        
+        # Button style
+        style.configure('TButton',
+                       background='#1a1a1a',
+                       foreground='#e0e0e0',
+                       borderwidth=1,
+                       focuscolor='none',
+                       relief='flat')
+        style.map('TButton',
+                 background=[('active', '#252525'), ('pressed', '#0a0a0a')],
+                 foreground=[('active', '#00ff88'), ('pressed', '#00ffff')])
+        
+        # Radiobutton style
+        style.configure('TRadiobutton',
+                       background='#121212',
+                       foreground='#e0e0e0',
+                       focuscolor='none',
+                       indicatorcolor='#00ff88')
+        style.map('TRadiobutton',
+                 background=[('active', '#121212')],
+                 foreground=[('active', '#00ff88')])
+        
+        # Checkbutton style
+        style.configure('TCheckbutton',
+                       background='#121212',
+                       foreground='#e0e0e0',
+                       focuscolor='none',
+                       indicatorcolor='#00ff88')
+        style.map('TCheckbutton',
+                 background=[('active', '#121212')],
+                 foreground=[('active', '#00ff88')])
+        
+        # Combobox style
+        style.configure('TCombobox',
+                       fieldbackground='#1a1a1a',
+                       foreground='#e0e0e0',
+                       selectbackground='#00ffff',
+                       selectforeground='#000000',
+                       arrowcolor='#00ff88')
+        style.map('TCombobox',
+                 fieldbackground=[('focus', '#222222')])
+        
+        # Scrollbar style
+        style.configure('Vertical.TScrollbar',
+                       background='#0a0a0a',
+                       troughcolor='#0a0a0a',
+                       bordercolor='#1a1a1a',
+                       arrowcolor='#00ff88',
+                       darkcolor='#0a0a0a',
+                       lightcolor='#0a0a0a')
+        style.map('Vertical.TScrollbar',
+                 background=[('active', '#00ff88'), ('pressed', '#00ffff')])
+
     def create_widgets(self):
         # Input & Folder Frames
         input_frame = ttk.Frame(self.root, padding="10")
@@ -439,16 +509,19 @@ class MediaDownloaderApp:
         self.url_entry = ttk.Entry(input_frame, width=50)
         self.url_entry.grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
         input_frame.columnconfigure(1, weight=1)
-        self.add_button = ttk.Button(input_frame, text="Add to Queue", command=self.add_to_queue_threaded)
+        self.add_button = ttk.Button(input_frame, text="ADD TO QUEUE", command=self.add_to_queue_threaded)
         self.add_button.grid(row=0, column=2, padx=5, pady=5)
 
         folder_frame = ttk.Frame(self.root, padding="10")
         folder_frame.pack(fill=tk.X)
         ttk.Label(folder_frame, text="Download Folder:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
-        self.folder_label = ttk.Label(folder_frame, textvariable=self.download_path, relief=tk.SUNKEN, padding=2)
-        self.folder_label.grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
+        # Create a frame for the folder path display
+        folder_display_frame = tk.Frame(folder_frame, bg='#1a1a1a', highlightbackground='#404040', highlightthickness=1, bd=0)
+        self.folder_label = tk.Label(folder_display_frame, textvariable=self.download_path, bg='#1a1a1a', fg='#e0e0e0', padx=5, pady=2)
+        self.folder_label.pack(fill=tk.BOTH, expand=True)
+        folder_display_frame.grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
         folder_frame.columnconfigure(1, weight=1)
-        browse_button = ttk.Button(folder_frame, text="Browse...", command=self.choose_folder)
+        browse_button = ttk.Button(folder_frame, text="BROWSE", command=self.choose_folder)
         browse_button.grid(row=0, column=2, padx=5, pady=5)
 
         # Options Frame
@@ -458,8 +531,16 @@ class MediaDownloaderApp:
         # Format Column
         format_column = ttk.Frame(options_outer_frame)
         format_column.pack(side=tk.LEFT, padx=5, pady=5, anchor='nw', fill=tk.Y)
-        format_frame = ttk.LabelFrame(format_column, text="Format", padding="5")
-        format_frame.pack(fill=tk.X)
+        
+        # Custom frame for Format section
+        format_container = tk.Frame(format_column, bg='#121212', bd=0)
+        format_container.pack(fill=tk.X)
+        format_label = tk.Label(format_container, text=" FORMAT ", bg='#121212', fg='#00ffff', font=('Segoe UI', 10, 'bold'))
+        format_label.pack(anchor=tk.W)
+        format_border = tk.Frame(format_container, bg='#121212', highlightbackground='#00ffff', highlightthickness=1, bd=0)
+        format_border.pack(fill=tk.BOTH, expand=True)
+        format_frame = tk.Frame(format_border, bg='#121212', bd=0)
+        format_frame.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
         mp4_radio = ttk.Radiobutton(format_frame, text="MP4", variable=self.download_format, value="mp4")
         mp4_radio.pack(anchor=tk.W)
         mp3_radio = ttk.Radiobutton(format_frame, text="MP3 (Audio Only)", variable=self.download_format, value="mp3")
@@ -472,40 +553,67 @@ class MediaDownloaderApp:
         processing_column.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True, anchor='nw')
 
         # Cutting Options
-        cut_frame = ttk.LabelFrame(processing_column, text="Time Range Cut (Requires FFmpeg)", padding="5")
-        cut_frame.pack(fill=tk.X, pady=(0, 5))
+        cut_container = tk.Frame(processing_column, bg='#121212', bd=0)
+        cut_container.pack(fill=tk.X, pady=(0, 5))
+        cut_label = tk.Label(cut_container, text=" TIME RANGE CUT (REQUIRES FFMPEG) ", bg='#121212', fg='#00ffff', font=('Segoe UI', 10, 'bold'))
+        cut_label.pack(anchor=tk.W)
+        cut_border = tk.Frame(cut_container, bg='#121212', highlightbackground='#00ffff', highlightthickness=1, bd=0)
+        cut_border.pack(fill=tk.BOTH, expand=True)
+        cut_frame = tk.Frame(cut_border, bg='#121212', bd=0)
+        cut_frame.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
         enable_cut_check = ttk.Checkbutton(cut_frame, text="Cut to Selected Time Range", variable=self.enable_cut_var)
         enable_cut_check.grid(row=0, column=0, columnspan=4, sticky=tk.W, pady=(0, 5))
-        ttk.Label(cut_frame, text="Start:").grid(row=1, column=0, sticky=tk.W)
+        tk.Label(cut_frame, text="Start:", bg='#121212', fg='#e0e0e0').grid(row=1, column=0, sticky=tk.W)
         self.start_time_entry = ttk.Entry(cut_frame, textvariable=self.start_time_var, width=12)
         self.start_time_entry.grid(row=1, column=1, padx=5, sticky=tk.W)
-        ttk.Label(cut_frame, text="End:").grid(row=1, column=2, sticky=tk.W, padx=(10, 0))
+        tk.Label(cut_frame, text="End:", bg='#121212', fg='#e0e0e0').grid(row=1, column=2, sticky=tk.W, padx=(10, 0))
         self.end_time_entry = ttk.Entry(cut_frame, textvariable=self.end_time_var, width=12)
         self.end_time_entry.grid(row=1, column=3, padx=5, sticky=tk.W)
-        time_format_label = ttk.Label(cut_frame, text="(HH:MM:SS or MM:SS or SS)")
+        time_format_label = tk.Label(cut_frame, text="(HH:MM:SS or MM:SS or SS)", bg='#121212', fg='#666666')
         time_format_label.grid(row=2, column=0, columnspan=4, sticky=tk.W, pady=(5,0))
 
         # Aspect Ratio Frame
-        ar_frame = ttk.LabelFrame(processing_column, text="Aspect Ratio (Requires FFmpeg/FFprobe)", padding="5")
-        ar_frame.pack(fill=tk.X, pady=(5, 5))
-        ttk.Label(ar_frame, text="Adjust to:").pack(side=tk.LEFT, padx=(0, 5))
+        ar_container = tk.Frame(processing_column, bg='#121212', bd=0)
+        ar_container.pack(fill=tk.X, pady=(5, 5))
+        ar_label = tk.Label(ar_container, text=" ASPECT RATIO (REQUIRES FFMPEG/FFPROBE) ", bg='#121212', fg='#00ffff', font=('Segoe UI', 10, 'bold'))
+        ar_label.pack(anchor=tk.W)
+        ar_border = tk.Frame(ar_container, bg='#121212', highlightbackground='#00ffff', highlightthickness=1, bd=0)
+        ar_border.pack(fill=tk.BOTH, expand=True)
+        ar_frame = tk.Frame(ar_border, bg='#121212', bd=0)
+        ar_frame.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
+        tk.Label(ar_frame, text="Adjust to:", bg='#121212', fg='#e0e0e0').pack(side=tk.LEFT, padx=(0, 5))
         self.ar_combobox = ttk.Combobox(ar_frame, textvariable=self.aspect_ratio_var, values=ASPECT_RATIOS, state="readonly", width=15)
         self.ar_combobox.pack(side=tk.LEFT)
-        ttk.Label(ar_frame, text="(Crop/Pad)").pack(side=tk.LEFT, padx=(10, 0))
+        tk.Label(ar_frame, text="(Crop/Pad)", bg='#121212', fg='#666666').pack(side=tk.LEFT, padx=(10, 0))
 
         # Chopping Frame
-        chop_frame = ttk.LabelFrame(processing_column, text="Chop into Intervals (Requires FFmpeg/FFprobe)", padding="5")
-        chop_frame.pack(fill=tk.X, pady=(5, 0))
+        chop_container = tk.Frame(processing_column, bg='#121212', bd=0)
+        chop_container.pack(fill=tk.X, pady=(5, 0))
+        chop_label = tk.Label(chop_container, text=" CHOP INTO INTERVALS (REQUIRES FFMPEG/FFPROBE) ", bg='#121212', fg='#00ffff', font=('Segoe UI', 10, 'bold'))
+        chop_label.pack(anchor=tk.W)
+        chop_border = tk.Frame(chop_container, bg='#121212', highlightbackground='#00ffff', highlightthickness=1, bd=0)
+        chop_border.pack(fill=tk.BOTH, expand=True)
+        chop_frame = tk.Frame(chop_border, bg='#121212', bd=0)
+        chop_frame.pack(padx=5, pady=5, fill=tk.BOTH, expand=True)
         enable_chop_check = ttk.Checkbutton(chop_frame, text="Chop output into segments of:", variable=self.enable_chop_var)
         enable_chop_check.grid(row=0, column=0, sticky=tk.W)
         self.chop_interval_entry = ttk.Entry(chop_frame, textvariable=self.chop_interval_var, width=8)
         self.chop_interval_entry.grid(row=0, column=1, padx=5, sticky=tk.W)
-        ttk.Label(chop_frame, text="seconds").grid(row=0, column=2, sticky=tk.W)
+        tk.Label(chop_frame, text="seconds", bg='#121212', fg='#e0e0e0').grid(row=0, column=2, sticky=tk.W)
 
         # Queue Frame
-        queue_frame = ttk.LabelFrame(self.root, text="Download Queue", padding="10")
-        queue_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5,0))
-        self.queue_listbox = tk.Listbox(queue_frame, height=6)
+        queue_container = tk.Frame(self.root, bg='#121212', bd=0)
+        queue_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5,0))
+        queue_label = tk.Label(queue_container, text=" DOWNLOAD QUEUE ", bg='#121212', fg='#00ffff', font=('Segoe UI', 10, 'bold'))
+        queue_label.pack(anchor=tk.W)
+        queue_border = tk.Frame(queue_container, bg='#121212', highlightbackground='#00ffff', highlightthickness=1, bd=0)
+        queue_border.pack(fill=tk.BOTH, expand=True)
+        queue_frame = tk.Frame(queue_border, bg='#121212', bd=0)
+        queue_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        self.queue_listbox = tk.Listbox(queue_frame, height=6, bg='#1a1a1a', fg='#e0e0e0', 
+                                        selectbackground='#00ffff', selectforeground='#000000',
+                                        highlightbackground='#404040', highlightcolor='#00ffff',
+                                        highlightthickness=1, bd=0)
         self.queue_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar = ttk.Scrollbar(queue_frame, orient=tk.VERTICAL, command=self.queue_listbox.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -514,19 +622,21 @@ class MediaDownloaderApp:
         # Action Buttons Frame
         action_frame = ttk.Frame(self.root, padding="10")
         action_frame.pack(fill=tk.X)
-        self.download_button = ttk.Button(action_frame, text="Download Queue", command=self.start_download_thread)
+        self.download_button = ttk.Button(action_frame, text="DOWNLOAD QUEUE", command=self.start_download_thread)
         self.download_button.pack(side=tk.LEFT, padx=5)
-        self.abort_button = ttk.Button(action_frame, text="Abort Download", command=self.abort_download, state=tk.DISABLED)
+        self.abort_button = ttk.Button(action_frame, text="ABORT DOWNLOAD", command=self.abort_download, state=tk.DISABLED)
         self.abort_button.pack(side=tk.LEFT, padx=5)
-        clear_button = ttk.Button(action_frame, text="Clear Selected", command=self.clear_selected)
+        clear_button = ttk.Button(action_frame, text="CLEAR SELECTED", command=self.clear_selected)
         clear_button.pack(side=tk.LEFT, padx=5)
-        clear_all_button = ttk.Button(action_frame, text="Clear All", command=self.clear_all)
+        clear_all_button = ttk.Button(action_frame, text="CLEAR ALL", command=self.clear_all)
         clear_all_button.pack(side=tk.LEFT, padx=5)
 
         # Status Bar
         self.status_var = tk.StringVar(value="Ready (using yt-dlp)")
-        status_bar = ttk.Label(self.root, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W, padding=5)
-        status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        status_bar_frame = tk.Frame(self.root, bg='#0a0a0a', highlightbackground='#404040', highlightthickness=1, bd=0)
+        status_bar = tk.Label(status_bar_frame, textvariable=self.status_var, bg='#0a0a0a', fg='#00ff88', anchor=tk.W, padx=5, pady=5)
+        status_bar.pack(fill=tk.BOTH, expand=True)
+        status_bar_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
 
     # Toggle Control States
