@@ -50,8 +50,11 @@ class RandomSlideshowEditor(QWidget):
         super().__init__()
         print("Initializing RandomSlideshowEditor...")
         
-        self.setWindowTitle("Random Slideshow Generator - Simple")
-        self.resize(600, 400)
+        self.setWindowTitle("BEDROT RANDOM SLIDESHOW // CYBERCORE GENERATION")
+        self.resize(700, 500)
+        
+        # Apply BEDROT theme
+        self.apply_bedrot_theme()
         
         # Check if we have required modules
         if ConfigManager is None:
@@ -98,12 +101,258 @@ class RandomSlideshowEditor(QWidget):
         
         self.setLayout(layout)
     
+    def apply_bedrot_theme(self):
+        """Apply the BEDROT cyberpunk visual theme."""
+        theme = """
+        /* Main Widget Background */
+        QWidget {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 12px;
+        }
+        
+        /* Group Boxes */
+        QGroupBox {
+            background-color: #121212;
+            border: 1px solid #00ffff;
+            border-radius: 4px;
+            margin-top: 12px;
+            padding-top: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #00ffff;
+        }
+        
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 5px 0 5px;
+            color: #00ffff;
+            background-color: #121212;
+        }
+        
+        /* Labels */
+        QLabel {
+            color: #e0e0e0;
+            background-color: transparent;
+        }
+        
+        /* Line Edits */
+        QLineEdit {
+            background-color: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 5px;
+            color: #e0e0e0;
+            selection-background-color: #00ffff;
+            selection-color: #000000;
+        }
+        
+        QLineEdit:focus {
+            border: 1px solid #00ffff;
+            background-color: #222222;
+        }
+        
+        QLineEdit:disabled {
+            background-color: #0a0a0a;
+            color: #666666;
+        }
+        
+        /* Push Buttons */
+        QPushButton {
+            background-color: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 6px 10px;
+            color: #e0e0e0;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            min-width: 80px;
+        }
+        
+        QPushButton:hover {
+            background-color: #252525;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        QPushButton:pressed {
+            background-color: #0a0a0a;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+        }
+        
+        QPushButton:disabled {
+            background-color: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: #666666;
+        }
+        
+        /* Toggle Button (Start/Stop) */
+        QPushButton:checked {
+            background-color: #ff0066;
+            border: none;
+            color: #ffffff;
+        }
+        
+        QPushButton:checked:hover {
+            background-color: #ff3388;
+        }
+        
+        QPushButton:checked:pressed {
+            background-color: #cc0044;
+        }
+        
+        QPushButton#startButton {
+            background-color: #00ff88;
+            border: none;
+            color: #000000;
+            min-width: 120px;
+            font-size: 12px;
+        }
+        
+        QPushButton#startButton:hover {
+            background-color: #00ffaa;
+        }
+        
+        QPushButton#startButton:pressed {
+            background-color: #00cc66;
+        }
+        
+        /* Browse Buttons */
+        QPushButton#browseButton {
+            background-color: #1a1a1a;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            min-width: 80px;
+        }
+        
+        QPushButton#browseButton:hover {
+            background-color: #252525;
+            border: 1px solid #66ffff;
+            color: #66ffff;
+        }
+        
+        /* Radio Buttons */
+        QRadioButton {
+            color: #e0e0e0;
+            spacing: 5px;
+        }
+        
+        QRadioButton::indicator {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            background-color: #1a1a1a;
+        }
+        
+        QRadioButton::indicator:hover {
+            border: 2px solid #00ff88;
+        }
+        
+        QRadioButton::indicator:checked {
+            background-color: #00ff88;
+            border: 2px solid #00ff88;
+        }
+        
+        QRadioButton::indicator:checked:hover {
+            background-color: #00ffaa;
+            border: 2px solid #00ffaa;
+        }
+        
+        /* ComboBox */
+        QComboBox {
+            background-color: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            padding: 5px;
+            color: #e0e0e0;
+            min-width: 100px;
+        }
+        
+        QComboBox:hover {
+            border: 1px solid #00ff88;
+        }
+        
+        QComboBox:focus {
+            border: 1px solid #00ffff;
+            background-color: #222222;
+        }
+        
+        QComboBox::drop-down {
+            border: none;
+            width: 20px;
+        }
+        
+        QComboBox::down-arrow {
+            image: none;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #00ff88;
+            margin-right: 5px;
+        }
+        
+        QComboBox QAbstractItemView {
+            background-color: #1a1a1a;
+            border: 1px solid #00ffff;
+            selection-background-color: #00ffff;
+            selection-color: #000000;
+            color: #e0e0e0;
+        }
+        
+        /* Scrollbars */
+        QScrollBar:vertical {
+            background-color: #0a0a0a;
+            width: 14px;
+            border: 1px solid #1a1a1a;
+            border-radius: 7px;
+            margin: 2px;
+        }
+        
+        QScrollBar::handle:vertical {
+            background-color: #00ff88;
+            border-radius: 6px;
+            min-height: 30px;
+            margin: 1px;
+        }
+        
+        QScrollBar::handle:vertical:hover {
+            background-color: #00ffff;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+        
+        QScrollBar::handle:vertical:pressed {
+            background-color: #00cccc;
+        }
+        
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            height: 0px;
+        }
+        
+        /* Message Boxes */
+        QMessageBox {
+            background-color: #121212;
+        }
+        
+        QMessageBox QLabel {
+            color: #e0e0e0;
+        }
+        
+        QMessageBox QPushButton {
+            min-width: 80px;
+        }
+        """
+        self.setStyleSheet(theme)
+    
     def setup_ui(self):
         """Setup the user interface."""
         main_layout = QVBoxLayout()
         
         # Title
-        title_label = QLabel("<h2>Random Slideshow Generator</h2>")
+        title_label = QLabel("<h2 style='color: #00ffff;'>RANDOM SLIDESHOW GENERATOR</h2>")
         title_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(title_label)
         
@@ -120,15 +369,15 @@ class RandomSlideshowEditor(QWidget):
             self.preset_combo.currentTextChanged.connect(self.on_preset_selected)
             preset_layout.addWidget(self.preset_combo)
             
-            self.save_preset_btn = QPushButton("Save")
+            self.save_preset_btn = QPushButton("SAVE")
             self.save_preset_btn.clicked.connect(self.save_preset)
             preset_layout.addWidget(self.save_preset_btn)
             
-            self.save_as_btn = QPushButton("Save As...")
+            self.save_as_btn = QPushButton("SAVE AS")
             self.save_as_btn.clicked.connect(self.save_preset_as)
             preset_layout.addWidget(self.save_as_btn)
             
-            self.manage_presets_btn = QPushButton("Manage...")
+            self.manage_presets_btn = QPushButton("MANAGE")
             self.manage_presets_btn.clicked.connect(self.open_preset_manager)
             preset_layout.addWidget(self.manage_presets_btn)
             
@@ -145,7 +394,8 @@ class RandomSlideshowEditor(QWidget):
         img_layout.addWidget(QLabel("Image Folder:"))
         self.img_folder_input = QLineEdit()
         self.img_folder_input.setText(self.config_manager.get_image_folder())
-        self.img_browse_btn = QPushButton("Browse")
+        self.img_browse_btn = QPushButton("BROWSE")
+        self.img_browse_btn.setObjectName("browseButton")
         self.img_browse_btn.clicked.connect(self.browse_image_folder)
         img_layout.addWidget(self.img_folder_input)
         img_layout.addWidget(self.img_browse_btn)
@@ -156,7 +406,8 @@ class RandomSlideshowEditor(QWidget):
         out_layout.addWidget(QLabel("Output Folder:"))
         self.out_folder_input = QLineEdit()
         self.out_folder_input.setText(self.config_manager.get_output_folder())
-        self.out_browse_btn = QPushButton("Browse")
+        self.out_browse_btn = QPushButton("BROWSE")
+        self.out_browse_btn.setObjectName("browseButton")
         self.out_browse_btn.clicked.connect(self.browse_output_folder)
         out_layout.addWidget(self.out_folder_input)
         out_layout.addWidget(self.out_browse_btn)
@@ -197,7 +448,8 @@ class RandomSlideshowEditor(QWidget):
         main_layout.addWidget(status_group)
         
         # Control Button
-        self.toggle_button = QPushButton("Start Generation")
+        self.toggle_button = QPushButton("START GENERATION")
+        self.toggle_button.setObjectName("startButton")
         self.toggle_button.setCheckable(True)
         self.toggle_button.clicked.connect(self.toggle_worker)
         main_layout.addWidget(self.toggle_button)
@@ -277,7 +529,7 @@ class RandomSlideshowEditor(QWidget):
             self.worker_thread.start()
             
             # Update UI
-            self.toggle_button.setText("Stop Generation")
+            self.toggle_button.setText("STOP GENERATION")
             self.set_controls_enabled(False)
             self.status_label.setText("Status: Starting generation...")
             
@@ -318,7 +570,7 @@ class RandomSlideshowEditor(QWidget):
     def reset_ui(self):
         """Reset UI after worker stops."""
         self.toggle_button.setChecked(False)
-        self.toggle_button.setText("Start Generation")
+        self.toggle_button.setText("START GENERATION")
         self.set_controls_enabled(True)
         if "Error" not in self.status_label.text():
             self.status_label.setText("Status: Ready")

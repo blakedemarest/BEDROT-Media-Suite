@@ -390,7 +390,11 @@ def expand_playlist_url(url_to_expand):
 class MediaDownloaderApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Media Downloader (yt-dlp)")
+        self.root.title("BEDROT MEDIA DOWNLOADER // MP4 & MP3 CONVERTER")
+        self.root.configure(bg='#121212')
+        
+        # Apply BEDROT theme
+        self.apply_bedrot_theme()
 
         self.settings = load_settings()
         initial_path = self.settings.get("download_path", SCRIPT_DIR)

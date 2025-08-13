@@ -1,9 +1,13 @@
 {
-    "aspect_ratio": "16:9",
-    "image_folder": "",
-    "output_folder": "",
+    "aspect_ratio": "9:16",
+    "image_folder": "C:/Users/Earth/OneDrive/Desktop/IMAGES4RANDOMSLIDESHOW/RENEGADEPIPELINE",
+    "output_folder": "E:/VIDEOS/RandomSlideshows",
     "batch_settings": {
-        "max_workers": 2,
-        "auto_start": false
+        "max_workers": 4,
+        "max_memory_mb": 2048,
+        "cache_size": 100,
+        "auto_start": false,
+        "preserve_completed_jobs": true,
+        "completed_jobs_limit": 50
     }
 }
