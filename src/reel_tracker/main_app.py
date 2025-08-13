@@ -494,37 +494,69 @@ class ReelTrackerApp(QMainWindow):
         }
         
         QScrollBar:vertical {
-            background-color: #1a1a1a;
-            width: 12px;
-            border: none;
-            border-radius: 6px;
+            background-color: #0a0a0a;
+            width: 14px;
+            border: 1px solid #1a1a1a;
+            border-radius: 7px;
+            margin: 2px;
         }
         
         QScrollBar::handle:vertical {
             background-color: #00ff88;
             border-radius: 6px;
-            min-height: 20px;
+            min-height: 30px;
+            margin: 1px;
         }
         
         QScrollBar::handle:vertical:hover {
             background-color: #00ffff;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+        
+        QScrollBar::handle:vertical:pressed {
+            background-color: #00cccc;
+        }
+        
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            background: none;
+            height: 0px;
+        }
+        
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            background: none;
         }
         
         QScrollBar:horizontal {
-            background-color: #1a1a1a;
-            height: 12px;
-            border: none;
-            border-radius: 6px;
+            background-color: #0a0a0a;
+            height: 14px;
+            border: 1px solid #1a1a1a;
+            border-radius: 7px;
+            margin: 2px;
         }
         
         QScrollBar::handle:horizontal {
             background-color: #00ff88;
             border-radius: 6px;
-            min-width: 20px;
+            min-width: 30px;
+            margin: 1px;
         }
         
         QScrollBar::handle:horizontal:hover {
             background-color: #00ffff;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+        
+        QScrollBar::handle:horizontal:pressed {
+            background-color: #00cccc;
+        }
+        
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+            background: none;
+            width: 0px;
+        }
+        
+        QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+            background: none;
         }
         
         QProgressBar {

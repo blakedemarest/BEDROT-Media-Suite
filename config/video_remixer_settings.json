@@ -24,6 +24,6 @@
     },
     "continuous_mode": false,
     "jitter_enabled": true,
-    "jitter_intensity": 23,
+    "jitter_intensity": 17,
     "aspect_ratio_mode": "Crop to Fill"
 }

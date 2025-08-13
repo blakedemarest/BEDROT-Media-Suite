@@ -36,12 +36,15 @@ class VideoRemixerApp:
     
     def __init__(self, root):
         self.root = root
-        self.root.title("Video Snippet Remixer")
+        self.root.title("BEDROT SNIPPET REMIXER // CYBERCORE VIDEO MANIPULATION")
         
         # Initialize drag and drop support if available
         self.dnd_available = DND_AVAILABLE and hasattr(root, 'drop_target_register')
         if not self.dnd_available and DND_AVAILABLE:
             print("[WARNING] Root window doesn't support drag and drop")
+        
+        # Apply BEDROT theme
+        self.apply_bedrot_theme()
         
         # Set up logging
         log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
@@ -114,6 +117,180 @@ class VideoRemixerApp:
                 f"{' and '.join(missing)} not found in PATH.\\nPlease install FFmpeg and add it to your system's PATH.\\nRemix generation will fail."
             )
             self.status_var.set(f"Error: {'/'.join(missing)} not found!")
+    
+    def apply_bedrot_theme(self):
+        """Apply the BEDROT cyberpunk visual theme to the application."""
+        # Color definitions
+        BG_COLOR = '#121212'
+        BG_SECONDARY = '#1a1a1a'
+        BG_TERTIARY = '#202020'
+        BG_HOVER = '#252525'
+        FG_COLOR = '#e0e0e0'
+        FG_SECONDARY = '#cccccc'
+        ACCENT_GREEN = '#00ff88'
+        ACCENT_CYAN = '#00ffff'
+        ACCENT_MAGENTA = '#ff00ff'
+        ACCENT_PINK = '#ff00aa'
+        ACCENT_RED = '#ff0066'
+        ACCENT_ORANGE = '#ff8800'
+        BORDER_COLOR = '#404040'
+        
+        # Configure root window
+        self.root.configure(bg=BG_COLOR)
+        
+        # Configure ttk styles
+        style = ttk.Style()
+        style.theme_use('clam')  # Use clam as base for better customization
+        
+        # Configure Frame styles
+        style.configure('TFrame', background=BG_COLOR, borderwidth=0)
+        
+        # Configure LabelFrame with cyberpunk border
+        style.configure('TLabelFrame', 
+            background=BG_COLOR, 
+            foreground=ACCENT_CYAN, 
+            bordercolor=ACCENT_CYAN,
+            darkcolor=ACCENT_CYAN,
+            lightcolor=ACCENT_CYAN,
+            borderwidth=1,
+            relief='flat',
+            labelmargins=10)
+        style.configure('TLabelFrame.Label', 
+            background=BG_COLOR, 
+            foreground=ACCENT_CYAN, 
+            font=('Segoe UI', 10, 'bold'))
+        style.map('TLabelFrame',
+            bordercolor=[('focus', ACCENT_GREEN)],
+            darkcolor=[('focus', ACCENT_GREEN)],
+            lightcolor=[('focus', ACCENT_GREEN)])
+        
+        # Configure Labels
+        style.configure('TLabel', 
+            background=BG_COLOR, 
+            foreground=FG_COLOR, 
+            font=('Segoe UI', 10))
+        style.configure('Status.TLabel', 
+            background=BG_COLOR, 
+            foreground=ACCENT_GREEN, 
+            font=('Segoe UI', 9))
+        style.configure('Blue.TLabel',
+            background=BG_COLOR,
+            foreground=ACCENT_CYAN,
+            font=('Segoe UI', 9))
+        
+        # Configure Entry widgets
+        style.configure('TEntry',
+            fieldbackground=BG_SECONDARY,
+            background=BG_SECONDARY,
+            foreground=FG_COLOR,
+            insertcolor=ACCENT_CYAN,
+            borderwidth=1,
+            relief='solid')
+        style.map('TEntry',
+            fieldbackground=[('focus', BG_TERTIARY)],
+            bordercolor=[('focus', ACCENT_CYAN)])
+        
+        # Configure Combobox
+        style.configure('TCombobox',
+            fieldbackground=BG_SECONDARY,
+            background=BG_SECONDARY,
+            foreground=FG_COLOR,
+            selectbackground=ACCENT_CYAN,
+            selectforeground='#000000',
+            borderwidth=1,
+            arrowcolor=ACCENT_GREEN)
+        style.map('TCombobox',
+            fieldbackground=[('focus', BG_TERTIARY)],
+            bordercolor=[('focus', ACCENT_CYAN)])
+        
+        # Configure Buttons with BEDROT style
+        style.configure('TButton',
+            background=BG_SECONDARY,
+            foreground=FG_COLOR,
+            borderwidth=1,
+            focuscolor='none',
+            font=('Segoe UI', 11, 'bold'),
+            relief='solid')
+        style.map('TButton',
+            background=[('active', BG_HOVER), ('pressed', BG_COLOR)],
+            foreground=[('active', ACCENT_GREEN), ('pressed', ACCENT_CYAN)])
+        
+        # Generate button (green accent)
+        style.configure('Generate.TButton',
+            background=ACCENT_GREEN,
+            foreground='#000000',
+            borderwidth=0,
+            focuscolor='none',
+            font=('Segoe UI', 11, 'bold'))
+        style.map('Generate.TButton',
+            background=[('active', '#00ffaa'), ('pressed', '#00cc66')],
+            foreground=[('active', '#000000'), ('pressed', '#000000')])
+        
+        # Stop/Abort buttons (red accent)
+        style.configure('Stop.TButton',
+            background=ACCENT_RED,
+            foreground='#ffffff',
+            borderwidth=0,
+            focuscolor='none',
+            font=('Segoe UI', 11, 'bold'))
+        style.map('Stop.TButton',
+            background=[('active', '#ff3388'), ('pressed', '#cc0044')],
+            foreground=[('active', '#ffffff'), ('pressed', '#ffffff')])
+        
+        # Browse buttons (cyan border)
+        style.configure('Browse.TButton',
+            background=BG_SECONDARY,
+            foreground=ACCENT_CYAN,
+            borderwidth=1,
+            relief='solid',
+            focuscolor='none',
+            font=('Segoe UI', 10, 'bold'))
+        style.map('Browse.TButton',
+            background=[('active', BG_HOVER), ('pressed', BG_COLOR)],
+            foreground=[('active', '#66ffff'), ('pressed', ACCENT_CYAN)])
+        
+        # Configure Radiobuttons
+        style.configure('TRadiobutton',
+            background=BG_COLOR,
+            foreground=FG_COLOR,
+            focuscolor='none',
+            font=('Segoe UI', 10))
+        style.map('TRadiobutton',
+            background=[('active', BG_COLOR)],
+            foreground=[('active', ACCENT_GREEN), ('selected', ACCENT_CYAN)])
+        
+        # Configure Checkbuttons
+        style.configure('TCheckbutton',
+            background=BG_COLOR,
+            foreground=FG_COLOR,
+            focuscolor='none',
+            font=('Segoe UI', 10))
+        style.map('TCheckbutton',
+            background=[('active', BG_COLOR)],
+            foreground=[('active', ACCENT_GREEN), ('selected', ACCENT_CYAN)])
+        
+        # Configure Scale (slider)
+        style.configure('Horizontal.TScale',
+            background=BG_COLOR,
+            troughcolor=BG_SECONDARY,
+            borderwidth=1,
+            lightcolor=BG_COLOR,
+            darkcolor=BG_COLOR,
+            bordercolor=BORDER_COLOR,
+            sliderrelief='flat')
+        style.map('Horizontal.TScale',
+            troughcolor=[('active', BG_TERTIARY)])
+        
+        # Configure Scrollbar
+        style.configure('Vertical.TScrollbar',
+            background=BG_SECONDARY,
+            troughcolor='#0a0a0a',
+            borderwidth=1,
+            arrowcolor=ACCENT_GREEN,
+            width=14,
+            relief='flat')
+        style.map('Vertical.TScrollbar',
+            background=[('active', ACCENT_GREEN), ('pressed', ACCENT_CYAN)])
 
     def create_widgets(self):
         """Creates and arranges all the GUI elements."""
@@ -137,17 +314,42 @@ class VideoRemixerApp:
 
     def create_input_section(self, parent):
         """Create the input files section."""
-        input_frame = ttk.LabelFrame(parent, text="Input Videos", padding="10")
-        input_frame.pack(fill=tk.X, pady=5)
+        # Create custom frame with BEDROT styling
+        input_container = tk.Frame(parent, bg='#121212', bd=0)
+        input_container.pack(fill=tk.X, pady=5)
         
-        input_list_frame = ttk.Frame(input_frame)
+        # Label for the section
+        input_label = tk.Label(input_container, text=" INPUT VIDEOS ", bg='#121212', fg='#00ffff', 
+                               font=('Segoe UI', 10, 'bold'))
+        input_label.pack(anchor='w', padx=15)
+        
+        # Frame with border
+        input_frame = tk.Frame(input_container, bg='#121212', highlightbackground='#00ffff', 
+                              highlightthickness=1, bd=0)
+        input_frame.pack(fill=tk.X, padx=10, pady=(0, 5))
+        
+        # Inner padding frame
+        input_inner = tk.Frame(input_frame, bg='#121212', bd=0)
+        input_inner.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        input_list_frame = tk.Frame(input_inner, bg='#121212')
         input_list_frame.pack(fill=tk.BOTH, expand=True, side=tk.TOP, pady=(0, 5))
         
         self.queue_listbox = tk.Listbox(
             input_list_frame, 
             listvariable=self.input_file_paths, 
             height=8, 
-            selectmode=tk.EXTENDED
+            selectmode=tk.EXTENDED,
+            bg='#1a1a1a',
+            fg='#e0e0e0',
+            selectbackground='#00ffff',
+            selectforeground='#000000',
+            highlightbackground='#404040',
+            highlightcolor='#00ffff',
+            highlightthickness=1,
+            font=('Segoe UI', 10),
+            relief='solid',
+            bd=1
         )
         self.queue_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
@@ -159,27 +361,30 @@ class VideoRemixerApp:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.queue_listbox.config(yscrollcommand=scrollbar.set)
         
-        input_button_frame = ttk.Frame(input_frame)
+        input_button_frame = tk.Frame(input_inner, bg='#121212')
         input_button_frame.pack(fill=tk.X)
         
         browse_button = ttk.Button(
             input_button_frame, 
-            text="Browse Files...", 
-            command=self.browse_input_files
+            text="BROWSE FILES", 
+            command=self.browse_input_files,
+            style='Browse.TButton'
         )
         browse_button.pack(side=tk.LEFT, padx=(0, 5))
         
         clear_button = ttk.Button(
             input_button_frame, 
-            text="Clear Selected", 
-            command=self.clear_selected
+            text="CLEAR SELECTED", 
+            command=self.clear_selected,
+            style='TButton'
         )
         clear_button.pack(side=tk.LEFT, padx=5)
         
         clear_all_button = ttk.Button(
             input_button_frame, 
-            text="Clear All", 
-            command=self.clear_all
+            text="CLEAR ALL", 
+            command=self.clear_all,
+            style='TButton'
         )
         clear_all_button.pack(side=tk.LEFT, padx=5)
 
@@ -213,8 +418,8 @@ class VideoRemixerApp:
         """Add a visual hint that the listbox supports drag and drop."""
         if self.queue_listbox.size() == 0:
             # Add a placeholder message when the listbox is empty
-            self.queue_listbox.insert(0, "🎬 Drag and drop video files here or use Browse Files...")
-            self.queue_listbox.configure(fg='gray')
+            self.queue_listbox.insert(0, "Drag and drop video files here or use Browse Files...")
+            self.queue_listbox.configure(fg='#888888')  # Muted grey for placeholder
             self.queue_listbox.bind('<Button-1>', self.on_listbox_click)
             self._has_placeholder = True
         else:
@@ -225,9 +430,9 @@ class VideoRemixerApp:
         if hasattr(self, '_has_placeholder') and self._has_placeholder:
             if self.queue_listbox.size() > 0:
                 first_item = self.queue_listbox.get(0)
-                if first_item.startswith("🎬 Drag and drop"):
+                if "Drag and drop" in first_item:
                     self.queue_listbox.delete(0)
-                    self.queue_listbox.configure(fg='black')
+                    self.queue_listbox.configure(fg='#e0e0e0')  # Normal text color
                     self._has_placeholder = False
 
     def on_listbox_click(self, event):
@@ -285,48 +490,76 @@ class VideoRemixerApp:
     def on_drag_enter(self, event):
         """Visual feedback when files are dragged over the listbox."""
         if hasattr(self, 'original_listbox_bg'):
-            self.queue_listbox.configure(bg='#e6f3ff')  # Light blue background
+            self.queue_listbox.configure(bg='#252525')  # Slightly lighter dark for hover
 
     def on_drag_leave(self, event):
         """Reset visual feedback when drag leaves the listbox."""
         if hasattr(self, 'original_listbox_bg'):
-            self.queue_listbox.configure(bg=self.original_listbox_bg)
+            self.queue_listbox.configure(bg='#1a1a1a')  # Back to normal dark
 
     def create_output_section(self, parent):
         """Create the output settings section."""
-        output_frame = ttk.LabelFrame(parent, text="Output Settings", padding="10")
-        output_frame.pack(fill=tk.X, pady=5)
-        output_frame.columnconfigure(1, weight=1)
+        # Create custom frame with BEDROT styling
+        output_container = tk.Frame(parent, bg='#121212', bd=0)
+        output_container.pack(fill=tk.X, pady=5)
+        
+        # Label for the section
+        output_label = tk.Label(output_container, text=" OUTPUT SETTINGS ", bg='#121212', fg='#00ffff', 
+                               font=('Segoe UI', 10, 'bold'))
+        output_label.pack(anchor='w', padx=15)
+        
+        # Frame with border
+        output_frame = tk.Frame(output_container, bg='#121212', highlightbackground='#00ffff', 
+                                highlightthickness=1, bd=0)
+        output_frame.pack(fill=tk.X, padx=10, pady=(0, 5))
+        
+        # Inner padding frame with grid
+        output_inner = tk.Frame(output_frame, bg='#121212', bd=0)
+        output_inner.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        output_inner.columnconfigure(1, weight=1)
         
         # Output Folder
-        ttk.Label(output_frame, text="Output Folder:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
-        self.folder_label = ttk.Label(
-            output_frame, 
+        tk.Label(output_inner, text="Output Folder:", bg='#121212', fg='#e0e0e0', 
+                font=('Segoe UI', 10)).grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        
+        # Create a frame to hold the folder path with a border
+        folder_frame = tk.Frame(output_inner, bg='#1a1a1a', highlightbackground='#404040', highlightthickness=1, bd=0)
+        folder_frame.grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
+        
+        self.folder_label = tk.Label(
+            folder_frame, 
             textvariable=self.output_folder_var, 
-            relief=tk.SUNKEN, 
-            anchor=tk.W
+            bg='#1a1a1a',
+            fg='#e0e0e0',
+            font=('Segoe UI', 10),
+            anchor=tk.W,
+            padx=5,
+            pady=2
         )
-        self.folder_label.grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
+        self.folder_label.pack(fill=tk.BOTH, expand=True)
         browse_output_button = ttk.Button(
-            output_frame, 
-            text="Browse...", 
-            command=self.browse_output_folder
+            output_inner, 
+            text="BROWSE", 
+            command=self.browse_output_folder,
+            style='Browse.TButton'
         )
         browse_output_button.grid(row=0, column=2, padx=5, pady=5)
         
         # Add folder open button
         open_folder_button = ttk.Button(
-            output_frame,
-            text="📁",  # Folder icon
+            output_inner,
+            text="OPEN",
             command=self.open_output_folder,
-            width=3
+            style='TButton',
+            width=6
         )
         open_folder_button.grid(row=0, column=3, padx=2, pady=5)
 
         # Aspect Ratio
-        ttk.Label(output_frame, text="Aspect Ratio:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
+        tk.Label(output_inner, text="Aspect Ratio:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
         self.ar_combobox = ttk.Combobox(
-            output_frame, 
+            output_inner, 
             textvariable=self.aspect_ratio_var, 
             values=self.config_manager.get_aspect_ratios(), 
             state="readonly", 
@@ -336,19 +569,22 @@ class VideoRemixerApp:
         
         # Export Settings Button
         self.export_settings_button = ttk.Button(
-            output_frame,
-            text="Export Settings",
-            command=self.open_export_settings
+            output_inner,
+            text="EXPORT SETTINGS",
+            command=self.open_export_settings,
+            style='TButton'
         )
         self.export_settings_button.grid(row=1, column=2, padx=5, pady=5)
         
-        ttk.Label(output_frame, text="(All videos will be HD quality)").grid(row=1, column=3, padx=5, pady=5, sticky=tk.W)
+        tk.Label(output_inner, text="(All videos will be HD quality)", bg='#121212', fg='#888888',
+                font=('Segoe UI', 9, 'italic')).grid(row=1, column=3, padx=5, pady=5, sticky=tk.W)
         
         # Aspect Ratio Mode
-        ttk.Label(output_frame, text="Aspect Ratio Mode:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
+        tk.Label(output_inner, text="Aspect Ratio Mode:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
         
         # Radio buttons frame
-        mode_frame = ttk.Frame(output_frame)
+        mode_frame = tk.Frame(output_inner, bg='#121212')
         mode_frame.grid(row=2, column=1, columnspan=2, padx=5, pady=5, sticky=tk.W)
         
         self.crop_radio = ttk.Radiobutton(
@@ -369,15 +605,30 @@ class VideoRemixerApp:
 
     def create_length_section(self, parent):
         """Create the length control section."""
-        length_frame = ttk.LabelFrame(parent, text="Remix Length", padding="10")
-        length_frame.pack(fill=tk.X, pady=5)
+        # Create custom frame with BEDROT styling
+        length_container = tk.Frame(parent, bg='#121212', bd=0)
+        length_container.pack(fill=tk.X, pady=5)
         
-        mode_frame = ttk.Frame(length_frame)
+        # Label for the section
+        length_label = tk.Label(length_container, text=" REMIX LENGTH ", bg='#121212', fg='#00ffff', 
+                               font=('Segoe UI', 10, 'bold'))
+        length_label.pack(anchor='w', padx=15)
+        
+        # Frame with border
+        length_frame_outer = tk.Frame(length_container, bg='#121212', highlightbackground='#00ffff', 
+                                      highlightthickness=1, bd=0)
+        length_frame_outer.pack(fill=tk.X, padx=10, pady=(0, 5))
+        
+        # Inner padding frame
+        length_frame = tk.Frame(length_frame_outer, bg='#121212', bd=0)
+        length_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        mode_frame = tk.Frame(length_frame, bg='#121212')
         mode_frame.pack(fill=tk.X, pady=(0, 10))
         
         self.seconds_radio = ttk.Radiobutton(
             mode_frame, 
-            text="Length in Seconds:", 
+            text="Length in Seconds", 
             variable=self.length_mode_var, 
             value="Seconds"
         )
@@ -385,15 +636,16 @@ class VideoRemixerApp:
         
         self.bpm_radio = ttk.Radiobutton(
             mode_frame, 
-            text="Length by BPM:", 
+            text="Length by BPM", 
             variable=self.length_mode_var, 
             value="BPM"
         )
         self.bpm_radio.pack(side=tk.LEFT, padx=20)
         
         # Seconds input frame
-        self.seconds_input_frame = ttk.Frame(length_frame)
-        ttk.Label(self.seconds_input_frame, text="Total Duration (s):").pack(side=tk.LEFT, padx=5)
+        self.seconds_input_frame = tk.Frame(length_frame, bg='#121212')
+        tk.Label(self.seconds_input_frame, text="Total Duration (s):", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=5)
         self.seconds_entry = ttk.Entry(
             self.seconds_input_frame, 
             textvariable=self.duration_seconds_var, 
@@ -406,8 +658,9 @@ class VideoRemixerApp:
         self.seconds_entry.bind('<FocusOut>', self.on_entry_update)
         
         # BPM input frame
-        self.bpm_input_frame = ttk.Frame(length_frame)
-        ttk.Label(self.bpm_input_frame, text="BPM:").pack(side=tk.LEFT, padx=5)
+        self.bpm_input_frame = tk.Frame(length_frame, bg='#121212')
+        tk.Label(self.bpm_input_frame, text="BPM:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=5)
         self.bpm_entry = ttk.Entry(self.bpm_input_frame, textvariable=self.bpm_var, width=6)
         self.bpm_entry.pack(side=tk.LEFT, padx=5)
         
@@ -415,7 +668,8 @@ class VideoRemixerApp:
         self.bpm_entry.bind('<Return>', self.on_entry_update)
         self.bpm_entry.bind('<FocusOut>', self.on_entry_update)
         
-        ttk.Label(self.bpm_input_frame, text="Snippet Unit:").pack(side=tk.LEFT, padx=(15,5))
+        tk.Label(self.bpm_input_frame, text="Snippet Unit:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(15,5))
         self.bpm_unit_combo = ttk.Combobox(
             self.bpm_input_frame, 
             textvariable=self.bpm_unit_var, 
@@ -425,7 +679,8 @@ class VideoRemixerApp:
         )
         self.bpm_unit_combo.pack(side=tk.LEFT, padx=5)
         
-        ttk.Label(self.bpm_input_frame, text="Total Units:").pack(side=tk.LEFT, padx=(15, 5))
+        tk.Label(self.bpm_input_frame, text="Total Units:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(15, 5))
         self.num_units_entry = ttk.Entry(
             self.bpm_input_frame, 
             textvariable=self.num_units_var, 
@@ -441,12 +696,12 @@ class VideoRemixerApp:
         self.duration_estimate_label = ttk.Label(
             self.bpm_input_frame, 
             text="",
-            foreground="blue"
+            style='Blue.TLabel'
         )
         self.duration_estimate_label.pack(side=tk.LEFT, padx=(15, 5))
         
         # Jitter controls frame
-        jitter_frame = ttk.Frame(length_frame)
+        jitter_frame = tk.Frame(length_frame, bg='#121212')
         jitter_frame.pack(fill=tk.X, pady=(10, 0))
         
         # Jitter checkbox
@@ -461,7 +716,8 @@ class VideoRemixerApp:
         
         # Jitter intensity slider
         self.jitter_intensity_var = tk.IntVar(value=self.settings.get("jitter_intensity", 50))
-        self.jitter_slider_label = ttk.Label(jitter_frame, text="Intensity:")
+        self.jitter_slider_label = tk.Label(jitter_frame, text="Intensity:", bg='#121212', fg='#e0e0e0',
+                                           font=('Segoe UI', 10))
         self.jitter_slider_label.pack(side=tk.LEFT, padx=(10, 5))
         
         self.jitter_slider = ttk.Scale(
@@ -470,11 +726,13 @@ class VideoRemixerApp:
             to=100,
             orient=tk.HORIZONTAL,
             variable=self.jitter_intensity_var,
-            length=200
+            length=200,
+            style='Horizontal.TScale'
         )
         self.jitter_slider.pack(side=tk.LEFT, padx=5)
         
-        self.jitter_value_label = ttk.Label(jitter_frame, text="50%")
+        self.jitter_value_label = tk.Label(jitter_frame, text="50%", bg='#121212', fg='#00ff88',
+                                          font=('Segoe UI', 10))
         self.jitter_value_label.pack(side=tk.LEFT, padx=5)
         
         # Bind slider changes to update the value label
@@ -504,39 +762,56 @@ class VideoRemixerApp:
         self.continuous_label = ttk.Label(
             continuous_frame,
             text="",
-            foreground="blue"
+            style='Blue.TLabel'
         )
         self.continuous_label.pack(pady=(5, 0))
         
         # Generate button
         self.generate_button = ttk.Button(
             process_button_frame, 
-            text="Generate Remix", 
-            command=self.start_processing_thread
+            text="GENERATE REMIX", 
+            command=self.start_processing_thread,
+            style='Generate.TButton'
         )
         self.generate_button.pack(pady=10)
         
         # Abort button (initially hidden)
         self.abort_button = ttk.Button(
             process_button_frame,
-            text="Abort Processing",
-            command=self.abort_processing
+            text="ABORT PROCESSING",
+            command=self.abort_processing,
+            style='Stop.TButton'
         )
         # Don't pack initially
         
         # Stop button (initially hidden)
         self.stop_button = ttk.Button(
             process_button_frame,
-            text="[STOP] Stop Continuous Mode",
-            command=self.stop_continuous_mode
+            text="[STOP] STOP CONTINUOUS MODE",
+            command=self.stop_continuous_mode,
+            style='Stop.TButton'
         )
         # Don't pack initially
 
     def create_status_section(self, parent):
         """Create the status display section."""
-        # Create a simple frame for the status area
-        status_frame = ttk.LabelFrame(parent, text="Status", padding="10")
-        status_frame.pack(fill=tk.BOTH, expand=True, pady=(10,0))
+        # Create custom frame with BEDROT styling
+        status_container = tk.Frame(parent, bg='#121212', bd=0)
+        status_container.pack(fill=tk.BOTH, expand=True, pady=(10,0))
+        
+        # Label for the section
+        status_label = tk.Label(status_container, text=" STATUS ", bg='#121212', fg='#00ffff', 
+                               font=('Segoe UI', 10, 'bold'))
+        status_label.pack(anchor='w', padx=15)
+        
+        # Frame with border
+        status_frame_outer = tk.Frame(status_container, bg='#121212', highlightbackground='#00ffff', 
+                                      highlightthickness=1, bd=0)
+        status_frame_outer.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 5))
+        
+        # Inner padding frame
+        status_frame = tk.Frame(status_frame_outer, bg='#121212', bd=0)
+        status_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
         # Create a simple text widget for status messages
         import tkinter.scrolledtext as scrolledtext
@@ -545,11 +820,29 @@ class VideoRemixerApp:
             height=8, 
             wrap=tk.WORD, 
             state=tk.NORMAL,  # Start as normal so we can add initial text
-            font=('Courier', 9),
-            bg='white',
-            fg='black'
+            font=('Consolas', 10),
+            bg='#1a1a1a',
+            fg='#00ff88',
+            insertbackground='#00ffff',
+            selectbackground='#00ffff',
+            selectforeground='#000000',
+            highlightbackground='#404040',
+            highlightcolor='#00ffff',
+            highlightthickness=1,
+            relief='solid',
+            bd=1
         )
         self.status_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Configure scrollbar colors for the ScrolledText widget
+        self.status_text.vbar.configure(
+            bg='#1a1a1a',
+            troughcolor='#0a0a0a',
+            activebackground='#00ff88',
+            highlightthickness=0,
+            borderwidth=0,
+            width=12
+        )
         
         # Add initial message directly
         self.status_text.insert(tk.END, "=== Snippet Remixer Status ===\n")
@@ -557,14 +850,21 @@ class VideoRemixerApp:
         self.status_text.config(state=tk.DISABLED)
         
         # Simple status bar at bottom
-        self.status_bar = ttk.Label(
-            status_frame, 
+        status_bar_frame = tk.Frame(status_frame, bg='#1a1a1a', highlightbackground='#404040', 
+                                    highlightthickness=1, bd=0)
+        status_bar_frame.pack(fill=tk.X, pady=(5,0))
+        
+        self.status_bar = tk.Label(
+            status_bar_frame, 
             textvariable=self.status_var, 
-            relief=tk.SUNKEN, 
+            bg='#1a1a1a',
+            fg='#00ff88',
+            font=('Segoe UI', 9),
             anchor=tk.W, 
-            padding=5
+            padx=10,
+            pady=5
         )
-        self.status_bar.pack(fill=tk.X, pady=(5,0))
+        self.status_bar.pack(fill=tk.X)
         
         # Set initial status
         self.status_var.set("Ready to process videos")
