@@ -446,17 +446,24 @@ notebook_frame.pack(pady=(10, 0), padx=10, fill="x", expand=False)
 notebook = ttk.Notebook(notebook_frame)
 
 # --- Log Area Frame (Defined earlier so it can be passed to buttons) ---
-# Create a custom frame with border for better control
-log_container = tk.Frame(root, bg=BG_COLOR, highlightbackground=ACCENT_CYAN, highlightthickness=1, bd=0)
-log_container.pack(pady=10, padx=10, fill='both', expand=True)
+# Create outer container for proper label positioning
+log_outer_container = tk.Frame(root, bg=BG_COLOR, bd=0)
+log_outer_container.pack(pady=(5, 10), padx=10, fill='both', expand=True)
 
-# Add label for the frame
-log_label = tk.Label(log_container, text="LOG OUTPUT", bg=BG_COLOR, fg=ACCENT_CYAN, font=('Segoe UI', 10, 'bold'))
-log_label.place(x=20, y=-10)
+# Add label above the frame
+log_label_frame = tk.Frame(log_outer_container, bg=BG_COLOR, bd=0)
+log_label_frame.pack(fill='x', padx=15)
+
+log_label = tk.Label(log_label_frame, text=" LOG OUTPUT ", bg=BG_COLOR, fg=ACCENT_CYAN, font=('Segoe UI', 10, 'bold'))
+log_label.pack(side='left')
+
+# Create frame with border
+log_container = tk.Frame(log_outer_container, bg=BG_COLOR, highlightbackground=ACCENT_CYAN, highlightthickness=1, bd=0)
+log_container.pack(fill='both', expand=True, pady=(0, 0))
 
 # Inner frame for padding
 log_frame = tk.Frame(log_container, bg=BG_COLOR, bd=0)
-log_frame.pack(padx=10, pady=(15, 10), fill='both', expand=True)
+log_frame.pack(padx=10, pady=10, fill='both', expand=True)
 
 # Configure ScrolledText with dark theme
 log_area = scrolledtext.ScrolledText(
