@@ -349,23 +349,94 @@ def clear_log():
 
 # --- GUI Setup ---
 root = tk.Tk()
-root.title("Script Launcher")
+root.title("BEDROT MEDIA SUITE // LAUNCHER")
 # Increased height slightly for the new tab potentially
-root.geometry("700x600") # Adjust size as needed
+root.geometry("900x700") # Adjust size as needed
+root.configure(bg='#121212')
 
+# Apply BEDROT dark theme
 style = ttk.Style()
-try:
-    # Attempt to use platform-specific themes for a better look
-    if sys.platform == "win32": style.theme_use('vista')
-    elif sys.platform == "darwin": style.theme_use('aqua')
-    else: style.theme_use('clam') # A decent cross-platform default
-except tk.TclError:
-    print("Chosen theme not available, using default.")
-    # Fallback to default theme if others fail
-    try:
-       style.theme_use('default')
-    except tk.TclError:
-        print("Default theme also not available. Styling might be basic.")
+style.theme_use('clam')  # Use clam as base for better customization
+
+# Configure colors
+BG_COLOR = '#121212'
+BG_SECONDARY = '#1a1a1a'
+BG_HOVER = '#252525'
+FG_COLOR = '#e0e0e0'
+ACCENT_GREEN = '#00ff88'
+ACCENT_CYAN = '#00ffff'
+ACCENT_MAGENTA = '#ff00ff'
+ACCENT_PINK = '#ff00aa'
+ACCENT_ORANGE = '#ff8800'
+BORDER_COLOR = '#404040'
+
+# Configure root window style
+root.option_add('*TCombobox*Listbox.background', BG_SECONDARY)
+root.option_add('*TCombobox*Listbox.foreground', FG_COLOR)
+root.option_add('*TCombobox*Listbox.selectBackground', ACCENT_CYAN)
+root.option_add('*TCombobox*Listbox.selectForeground', '#000000')
+
+# Configure ttk styles
+style.configure('TFrame', background=BG_COLOR, borderwidth=0)
+style.configure('TLabelFrame', 
+    background=BG_COLOR, 
+    foreground=ACCENT_CYAN, 
+    bordercolor=ACCENT_CYAN,
+    borderwidth=1,
+    relief='solid',
+    labelmargins=10)
+style.configure('TLabelFrame.Label', 
+    background=BG_COLOR, 
+    foreground=ACCENT_CYAN, 
+    font=('Segoe UI', 10, 'bold'))
+style.configure('TLabel', background=BG_COLOR, foreground=FG_COLOR, font=('Segoe UI', 10))
+style.configure('Status.TLabel', background=BG_COLOR, foreground=ACCENT_GREEN, font=('Segoe UI', 9))
+style.configure('Note.TLabel', background=BG_COLOR, foreground='#888888', font=('Segoe UI', 9, 'italic'))
+
+# Configure Notebook (tabs)
+style.configure('TNotebook', background=BG_COLOR, borderwidth=0)
+style.configure('TNotebook.Tab', 
+    background=BG_SECONDARY,
+    foreground=FG_COLOR,
+    padding=[20, 10],
+    font=('Segoe UI', 9, 'bold'))
+style.map('TNotebook.Tab',
+    background=[('selected', BG_HOVER), ('active', '#202020')],
+    foreground=[('selected', ACCENT_CYAN), ('active', ACCENT_GREEN)],
+    expand=[('selected', [1, 1, 1, 0])])
+
+# Configure buttons with cyberpunk style
+style.configure('Run.TButton',
+    background=ACCENT_GREEN,
+    foreground='#000000',
+    borderwidth=0,
+    focuscolor='none',
+    font=('Segoe UI', 10, 'bold'))
+style.map('Run.TButton',
+    background=[('active', '#00ffaa'), ('pressed', '#00cc66')],
+    foreground=[('active', '#000000'), ('pressed', '#000000')])
+
+style.configure('Stop.TButton',
+    background='#ff0066',
+    foreground='#ffffff',
+    borderwidth=0,
+    focuscolor='none',
+    font=('Segoe UI', 10, 'bold'))
+style.map('Stop.TButton',
+    background=[('active', '#ff3388'), ('pressed', '#cc0044')],
+    foreground=[('active', '#ffffff'), ('pressed', '#ffffff')])
+
+style.configure('Clear.TButton',
+    background=BG_SECONDARY,
+    foreground=ACCENT_CYAN,
+    borderwidth=1,
+    relief='solid',
+    focuscolor='none',
+    font=('Segoe UI', 10, 'bold'))
+style.map('Clear.TButton',
+    background=[('active', BG_HOVER), ('pressed', BG_COLOR)],
+    foreground=[('active', '#66ffff'), ('pressed', ACCENT_CYAN)])
+# Theme is already set to 'clam' above for customization
 
 
 # --- Top Frame for Tabs ---
@@ -375,11 +446,47 @@ notebook_frame.pack(pady=(10, 0), padx=10, fill="x", expand=False)
 notebook = ttk.Notebook(notebook_frame)
 
 # --- Log Area Frame (Defined earlier so it can be passed to buttons) ---
-log_frame = ttk.LabelFrame(root, text="Log Output", padding="5")
-log_frame.pack(pady=10, padx=10, fill='both', expand=True)
+# Create a custom frame with border for better control
+log_container = tk.Frame(root, bg=BG_COLOR, highlightbackground=ACCENT_CYAN, highlightthickness=1, bd=0)
+log_container.pack(pady=10, padx=10, fill='both', expand=True)
 
-log_area = scrolledtext.ScrolledText(log_frame, height=15, wrap=tk.WORD, state='disabled', bd=0) # Set border width if needed
+# Add label for the frame
+log_label = tk.Label(log_container, text="LOG OUTPUT", bg=BG_COLOR, fg=ACCENT_CYAN, font=('Segoe UI', 10, 'bold'))
+log_label.place(x=20, y=-10)
+
+# Inner frame for padding
+log_frame = tk.Frame(log_container, bg=BG_COLOR, bd=0)
+log_frame.pack(padx=10, pady=(15, 10), fill='both', expand=True)
+
+# Configure ScrolledText with dark theme
+log_area = scrolledtext.ScrolledText(
+    log_frame, 
+    height=15, 
+    wrap=tk.WORD, 
+    state='disabled',
+    bg='#1a1a1a',
+    fg=ACCENT_GREEN,
+    insertbackground=ACCENT_CYAN,
+    selectbackground=ACCENT_CYAN,
+    selectforeground='#000000',
+    font=('Consolas', 10),
+    bd=1,
+    relief='solid',
+    highlightthickness=1,
+    highlightbackground=BORDER_COLOR,
+    highlightcolor=ACCENT_CYAN
+)
 log_area.pack(fill='both', expand=True)
+
+# Configure scrollbar colors
+log_area.vbar.configure(
+    bg=BG_SECONDARY,
+    troughcolor='#1a1a1a',
+    activebackground=ACCENT_CYAN,
+    highlightthickness=0,
+    borderwidth=0,
+    width=12
+)
 
 
 # --- Tab 1: Media Downloader ---
@@ -387,7 +494,7 @@ tab1 = ttk.Frame(notebook, padding="10")
 notebook.add(tab1, text='MP4 downloader/MP3 Converter')
 label1 = ttk.Label(tab1, text="Run the Media Downloader script.")
 label1.pack(pady=10)
-status_label1 = ttk.Label(tab1, text="Status: Idle", width=50, anchor="w") # Give status labels more width
+status_label1 = ttk.Label(tab1, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label1.pack(pady=5)
 
 # Button frame for Run/Stop buttons
@@ -397,16 +504,20 @@ button_frame1.pack(pady=20)
 # Run button
 run_button1 = ttk.Button(
     button_frame1,
-    text="Run Media Downloader",
-    command=lambda: run_script(SCRIPT_1_PATH, status_label1, log_area)
+    text="RUN",
+    command=lambda: run_script(SCRIPT_1_PATH, status_label1, log_area),
+    style='Run.TButton',
+    width=15
 )
 run_button1.pack(side=tk.LEFT, padx=5)
 
 # Stop button
 stop_button1 = ttk.Button(
     button_frame1,
-    text="Stop",
-    command=lambda: stop_script(SCRIPT_1_PATH, status_label1, log_area)
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_1_PATH, status_label1, log_area),
+    style='Stop.TButton',
+    width=15
 )
 stop_button1.pack(side=tk.LEFT, padx=5)
 
@@ -415,7 +526,7 @@ tab2 = ttk.Frame(notebook, padding="10")
 notebook.add(tab2, text='Snippet Remixer')
 label2 = ttk.Label(tab2, text="Run the Snippet Remixer script.")
 label2.pack(pady=10)
-status_label2 = ttk.Label(tab2, text="Status: Idle", width=50, anchor="w")
+status_label2 = ttk.Label(tab2, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label2.pack(pady=5)
 
 # Button frame for Run/Stop buttons
@@ -425,16 +536,20 @@ button_frame2.pack(pady=20)
 # Run button
 run_button2 = ttk.Button(
     button_frame2,
-    text="Run Snippet Remixer",
-    command=lambda: run_script(SCRIPT_2_PATH, status_label2, log_area)
+    text="RUN",
+    command=lambda: run_script(SCRIPT_2_PATH, status_label2, log_area),
+    style='Run.TButton',
+    width=15
 )
 run_button2.pack(side=tk.LEFT, padx=5)
 
 # Stop button
 stop_button2 = ttk.Button(
     button_frame2,
-    text="Stop",
-    command=lambda: stop_script(SCRIPT_2_PATH, status_label2, log_area)
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_2_PATH, status_label2, log_area),
+    style='Stop.TButton',
+    width=15
 )
 stop_button2.pack(side=tk.LEFT, padx=5)
 
@@ -443,7 +558,7 @@ tab3 = ttk.Frame(notebook, padding="10")
 notebook.add(tab3, text='Random Slideshow') # Set Tab Title
 label3 = ttk.Label(tab3, text="Run the Random Slideshow Generator script.")
 label3.pack(pady=10)
-status_label3 = ttk.Label(tab3, text="Status: Idle", width=50, anchor="w") # Create unique status label
+status_label3 = ttk.Label(tab3, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label3.pack(pady=5)
 
 # Button frame for Run/Stop buttons
@@ -453,16 +568,20 @@ button_frame3.pack(pady=20)
 # Run button
 run_button3 = ttk.Button(
     button_frame3,
-    text="Run Random Slideshow",
-    command=lambda: run_script(SCRIPT_3_PATH, status_label3, log_area)
+    text="RUN",
+    command=lambda: run_script(SCRIPT_3_PATH, status_label3, log_area),
+    style='Run.TButton',
+    width=15
 )
 run_button3.pack(side=tk.LEFT, padx=5)
 
 # Stop button
 stop_button3 = ttk.Button(
     button_frame3,
-    text="Stop",
-    command=lambda: stop_script(SCRIPT_3_PATH, status_label3, log_area)
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_3_PATH, status_label3, log_area),
+    style='Stop.TButton',
+    width=15
 )
 stop_button3.pack(side=tk.LEFT, padx=5)
 
@@ -471,7 +590,7 @@ tab4 = ttk.Frame(notebook, padding="10")
 notebook.add(tab4, text='Reel Tracker') # Set Tab Title
 label4 = ttk.Label(tab4, text="Run the Reel Tracker application for CSV-based reel management.")
 label4.pack(pady=10)
-status_label4 = ttk.Label(tab4, text="Status: Idle", width=50, anchor="w") # Create unique status label
+status_label4 = ttk.Label(tab4, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label4.pack(pady=5)
 
 # Button frame for Run/Stop buttons
@@ -481,16 +600,20 @@ button_frame4.pack(pady=20)
 # Run button
 run_button4 = ttk.Button(
     button_frame4,
-    text="Run Reel Tracker",
-    command=lambda: run_script(SCRIPT_4_PATH, status_label4, log_area)
+    text="RUN",
+    command=lambda: run_script(SCRIPT_4_PATH, status_label4, log_area),
+    style='Run.TButton',
+    width=15
 )
 run_button4.pack(side=tk.LEFT, padx=5)
 
 # Stop button
 stop_button4 = ttk.Button(
     button_frame4,
-    text="Stop",
-    command=lambda: stop_script(SCRIPT_4_PATH, status_label4, log_area)
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_4_PATH, status_label4, log_area),
+    style='Stop.TButton',
+    width=15
 )
 stop_button4.pack(side=tk.LEFT, padx=5)
 # --- END OF REEL TRACKER TAB ---
@@ -500,7 +623,7 @@ tab5 = ttk.Frame(notebook, padding="10")
 notebook.add(tab5, text='Caption Generator')
 label5 = ttk.Label(tab5, text="Generate time-synchronized captions for videos using AI speech recognition.")
 label5.pack(pady=10)
-status_label5 = ttk.Label(tab5, text="Status: Idle", width=50, anchor="w")
+status_label5 = ttk.Label(tab5, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label5.pack(pady=5)
 
 # Button frame for Run/Stop buttons
@@ -510,16 +633,20 @@ button_frame5.pack(pady=20)
 # Run button
 run_button5 = ttk.Button(
     button_frame5,
-    text="Run Caption Generator",
-    command=lambda: run_script(SCRIPT_5_PATH, status_label5, log_area)
+    text="RUN",
+    command=lambda: run_script(SCRIPT_5_PATH, status_label5, log_area),
+    style='Run.TButton',
+    width=15
 )
 run_button5.pack(side=tk.LEFT, padx=5)
 
 # Stop button
 stop_button5 = ttk.Button(
     button_frame5,
-    text="Stop",
-    command=lambda: stop_script(SCRIPT_5_PATH, status_label5, log_area)
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_5_PATH, status_label5, log_area),
+    style='Stop.TButton',
+    width=15
 )
 stop_button5.pack(side=tk.LEFT, padx=5)
 # --- END OF VIDEO CAPTION GENERATOR TAB ---
@@ -529,7 +656,7 @@ tab6 = ttk.Frame(notebook, padding="10")
 notebook.add(tab6, text='Release Calendar')
 label6 = ttk.Label(tab6, text="Manage music release schedules with comprehensive deliverable tracking.")
 label6.pack(pady=10)
-status_label6 = ttk.Label(tab6, text="Status: Idle", width=50, anchor="w")
+status_label6 = ttk.Label(tab6, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label6.pack(pady=5)
 
 # Button frame for Run/Stop buttons
@@ -539,21 +666,25 @@ button_frame6.pack(pady=20)
 # Run button
 run_button6 = ttk.Button(
     button_frame6,
-    text="Run Release Calendar",
-    command=lambda: run_script(SCRIPT_6_PATH, status_label6, log_area)
+    text="RUN",
+    command=lambda: run_script(SCRIPT_6_PATH, status_label6, log_area),
+    style='Run.TButton',
+    width=15
 )
 run_button6.pack(side=tk.LEFT, padx=5)
 
 # Stop button
 stop_button6 = ttk.Button(
     button_frame6,
-    text="Stop",
-    command=lambda: stop_script(SCRIPT_6_PATH, status_label6, log_area)
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_6_PATH, status_label6, log_area),
+    style='Stop.TButton',
+    width=15
 )
 stop_button6.pack(side=tk.LEFT, padx=5)
 
 # Note: Release Calendar requires PyQt6
-req_label6 = ttk.Label(tab6, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", foreground="gray")
+req_label6 = ttk.Label(tab6, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", style='Note.TLabel')
 req_label6.pack(pady=5)
 # --- END OF RELEASE CALENDAR TAB ---
 
@@ -565,7 +696,7 @@ notebook.pack(expand=True, fill='both') # Pack notebook after adding all tabs
 bottom_frame = ttk.Frame(root)
 bottom_frame.pack(pady=(0, 10), padx=10, fill='x', side=tk.BOTTOM) # Pack bottom frame last
 
-clear_button = ttk.Button(bottom_frame, text="Clear Log", command=clear_log)
+clear_button = ttk.Button(bottom_frame, text="CLEAR LOG", command=clear_log, style='Clear.TButton', width=15)
 # Pack to the right side
 clear_button.pack(side=tk.RIGHT)
 
