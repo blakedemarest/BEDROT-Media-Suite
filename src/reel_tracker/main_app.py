@@ -47,6 +47,7 @@ from .bulk_edit_dialog import BulkEditDialog
 from .default_metadata_dialog import DefaultMetadataDialog
 from .file_organization_dialog import FileOrganizationDialog
 from .backup_manager import BackupManager
+from .custom_item_manager import CustomItemManagerDialog
 from .utils import safe_print
 
 
@@ -293,7 +294,7 @@ class ReelTrackerApp(QMainWindow):
         # Initialize CSV protection manager
         self.csv_protection = CSVProtectionManager()
         
-        self.setWindowTitle("Reel Tracker - Enhanced with Configuration Management")
+        self.setWindowTitle("BEDROT REEL TRACKER // CYBERCORE CONTENT MANAGEMENT")
         self.setGeometry(100, 100, 1600, 800)
         
         # Define exact column order as required (Visual Template removed)
@@ -322,9 +323,246 @@ class ReelTrackerApp(QMainWindow):
         # Auto-load last CSV if enabled and config manager is available
         if self.config_manager:
             self.auto_load_last_csv()
+    
+    def apply_bedrot_theme(self):
+        """Apply BEDROT's cyberpunk dark theme to the application."""
+        dark_theme = """
+        QMainWindow {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        QWidget {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        
+        QTableWidget {
+            background-color: #151515;
+            color: #cccccc;
+            gridline-color: #2a2a2a;
+            selection-background-color: rgba(0, 255, 255, 0.3);
+            selection-color: #ffffff;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            font-size: 12px;
+            alternate-background-color: #1a1a1a;
+        }
+        
+        QTableWidget::item {
+            padding: 5px;
+            border: none;
+            background-color: #1a1a1a;
+            color: #cccccc;
+        }
+        
+        QTableWidget::item:alternate {
+            background-color: #202020;
+        }
+        
+        QTableWidget::item:selected {
+            background-color: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            border: 1px solid #00ffff;
+        }
+        
+        QTableWidget::item:hover {
+            background-color: #252525;
+            color: #00ff88;
+        }
+        
+        QHeaderView::section {
+            background-color: #0f0f0f;
+            color: #00ffff;
+            padding: 8px;
+            border: none;
+            border-bottom: 2px solid #00ffff;
+            border-right: 1px solid #2a2a2a;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        QHeaderView::section:hover {
+            background-color: #2a2a2a;
+        }
+        
+        QPushButton {
+            background-color: #2a2a2a;
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            min-width: 80px;
+        }
+        
+        QPushButton:hover {
+            background-color: #3a3a3a;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+        }
+        
+        QPushButton:pressed {
+            background-color: #1a1a1a;
+        }
+        
+        QPushButton:disabled {
+            background-color: #1a1a1a;
+            color: #555555;
+            border: 1px solid #333333;
+        }
+        
+        QLabel {
+            color: #ffffff;
+            background-color: transparent;
+        }
+        
+        QLineEdit, QTextEdit, QPlainTextEdit {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            padding: 5px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+            border: 1px solid #00ffff;
+            background-color: #222222;
+        }
+        
+        QComboBox {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            padding: 5px;
+            min-width: 100px;
+        }
+        
+        QComboBox:hover {
+            border: 1px solid #00ffff;
+        }
+        
+        QComboBox:focus {
+            border: 1px solid #ff00ff;
+        }
+        
+        QComboBox::drop-down {
+            border: none;
+            width: 20px;
+        }
+        
+        QComboBox::down-arrow {
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #00ff88;
+            margin-right: 5px;
+        }
+        
+        QComboBox QAbstractItemView {
+            background-color: #1a1a1a;
+            color: #00ff88;
+            border: 1px solid #00ffff;
+            selection-background-color: #ff00ff;
+            selection-color: #000000;
+        }
+        
+        QMenuBar {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            border-bottom: 1px solid #333333;
+        }
+        
+        QMenuBar::item:selected {
+            background-color: #2a2a2a;
+            color: #00ffff;
+        }
+        
+        QMenu {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #00ffff;
+        }
+        
+        QMenu::item:selected {
+            background-color: #ff00ff;
+            color: #000000;
+        }
+        
+        QScrollBar:vertical {
+            background-color: #1a1a1a;
+            width: 12px;
+            border: none;
+            border-radius: 6px;
+        }
+        
+        QScrollBar::handle:vertical {
+            background-color: #00ff88;
+            border-radius: 6px;
+            min-height: 20px;
+        }
+        
+        QScrollBar::handle:vertical:hover {
+            background-color: #00ffff;
+        }
+        
+        QScrollBar:horizontal {
+            background-color: #1a1a1a;
+            height: 12px;
+            border: none;
+            border-radius: 6px;
+        }
+        
+        QScrollBar::handle:horizontal {
+            background-color: #00ff88;
+            border-radius: 6px;
+            min-width: 20px;
+        }
+        
+        QScrollBar::handle:horizontal:hover {
+            background-color: #00ffff;
+        }
+        
+        QProgressBar {
+            background-color: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            text-align: center;
+            color: #ffffff;
+        }
+        
+        QProgressBar::chunk {
+            background-color: #00ff88;
+            border-radius: 3px;
+        }
+        
+        QStatusBar {
+            background-color: #0a0a0a;
+            color: #00ff88;
+            border-top: 1px solid #333333;
+        }
+        
+        QFrame[frameShape="4"] {
+            color: #333333;
+            max-height: 2px;
+        }
+        
+        QFrame[frameShape="5"] {
+            color: #333333;
+            max-width: 2px;
+        }
+        """
+        self.setStyleSheet(dark_theme)
         
     def init_ui(self):
         """Initialize the user interface components."""
+        # Apply BEDROT dark theme
+        self.apply_bedrot_theme()
+        
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
@@ -353,34 +591,195 @@ class ReelTrackerApp(QMainWindow):
         # Row operations
         self.add_row_button = QPushButton("➕ Add New Reel")
         self.add_row_button.clicked.connect(self.add_new_reel)
-        self.add_row_button.setStyleSheet("background-color: #27ae60; color: white; font-weight: bold;")
+        self.add_row_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(0, 255, 136, 0.8);
+                color: #000000;
+                font-weight: bold;
+                padding: 6px 10px;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 120px;
+            }
+            QPushButton:hover {
+                background-color: rgba(0, 255, 136, 0.9);
+                box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: #00cc66;
+            }
+        """)
         button_layout.addWidget(self.add_row_button)
         
         self.randomize_reel_button = QPushButton("🎲 Random Reel")
         self.randomize_reel_button.clicked.connect(self.add_random_reel)
-        self.randomize_reel_button.setStyleSheet("background-color: #3498db; color: white; font-weight: bold;")
+        self.randomize_reel_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(0, 255, 255, 0.8);
+                color: #000000;
+                font-weight: bold;
+                padding: 6px 10px;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 120px;
+            }
+            QPushButton:hover {
+                background-color: rgba(0, 255, 255, 0.9);
+                box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: #00cccc;
+            }
+        """)
         button_layout.addWidget(self.randomize_reel_button)
         
-        self.edit_row_button = QPushButton("✏️ Edit Selected")
-        self.edit_row_button.clicked.connect(self.edit_selected_reel)
-        button_layout.addWidget(self.edit_row_button)
+        self.manage_release_button = QPushButton("📋 Manage Release Values")
+        self.manage_release_button.clicked.connect(self.manage_release_values)
+        self.manage_release_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 0, 255, 0.8);
+                color: #000000;
+                font-weight: bold;
+                padding: 6px 8px;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 180px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 0, 255, 0.9);
+                box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: #cc00cc;
+            }
+        """)
+        button_layout.addWidget(self.manage_release_button)
         
         self.default_metadata_button = QPushButton("🏷️ Default Metadata")
         self.default_metadata_button.clicked.connect(self.open_default_metadata)
-        self.default_metadata_button.setStyleSheet("background-color: #9b59b6; color: white; font-weight: bold;")
+        self.default_metadata_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 0, 170, 0.8);
+                color: #000000;
+                font-weight: bold;
+                padding: 6px 8px;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 150px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 0, 170, 0.9);
+                box-shadow: 0 0 8px rgba(255, 0, 170, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: #cc0088;
+            }
+        """)
         button_layout.addWidget(self.default_metadata_button)
         
         self.file_organization_button = QPushButton("📁 Organize Files")
         self.file_organization_button.clicked.connect(self.open_file_organization)
-        self.file_organization_button.setStyleSheet("background-color: #e67e22; color: white; font-weight: bold;")
+        self.file_organization_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 136, 0, 0.8);
+                color: #000000;
+                font-weight: bold;
+                padding: 6px 10px;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 130px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 136, 0, 0.9);
+                box-shadow: 0 0 8px rgba(255, 136, 0, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: #cc6600;
+            }
+        """)
         button_layout.addWidget(self.file_organization_button)
+        
+        self.edit_row_button = QPushButton("✏️ Edit Selected")
+        self.edit_row_button.clicked.connect(self.edit_selected_reel)
+        self.edit_row_button.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #00ffff;
+                border: 1px solid #00ffff;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 120px;
+            }
+            QPushButton:hover {
+                background-color: rgba(0, 255, 255, 0.1);
+                box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: rgba(0, 255, 255, 0.2);
+            }
+        """)
+        button_layout.addWidget(self.edit_row_button)
         
         self.duplicate_row_button = QPushButton("[COPY] Duplicate")
         self.duplicate_row_button.clicked.connect(self.duplicate_selected_reel)
+        self.duplicate_row_button.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #00ff88;
+                border: 1px solid #00ff88;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 130px;
+            }
+            QPushButton:hover {
+                background-color: rgba(0, 255, 136, 0.1);
+                box-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: rgba(0, 255, 136, 0.2);
+            }
+        """)
         button_layout.addWidget(self.duplicate_row_button)
         
         self.delete_row_button = QPushButton("🗑️ Delete")
         self.delete_row_button.clicked.connect(self.delete_selected_reel)
+        self.delete_row_button.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #ff0066;
+                border: 1px solid #ff0066;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 0, 102, 0.1);
+                box-shadow: 0 0 5px rgba(255, 0, 102, 0.3);
+                color: #ff3388;
+            }
+            QPushButton:pressed {
+                background-color: rgba(255, 0, 102, 0.2);
+            }
+        """)
         button_layout.addWidget(self.delete_row_button)
         
         # Separator
@@ -394,21 +793,30 @@ class ReelTrackerApp(QMainWindow):
         self.add_empty_row_button.clicked.connect(self.add_empty_row)
         button_layout.addWidget(self.add_empty_row_button)
         
-        self.clear_table_button = QPushButton("🗑️ Clear All")
-        self.clear_table_button.clicked.connect(self.clear_all_data)
-        button_layout.addWidget(self.clear_table_button)
-        
         # Add stretch to push buttons to the left
         button_layout.addStretch()
         
         # Row counter and stats
         self.row_count_label = QLabel("Rows: 0")
-        self.row_count_label.setStyleSheet("font-weight: bold;")
+        self.row_count_label.setStyleSheet("font-weight: bold; color: #00ff88;")
         button_layout.addWidget(self.row_count_label)
         
         # Release reel counter (now a clickable button)
         self.release_counter_button = QPushButton("Reels: 0/124")
-        self.release_counter_button.setStyleSheet("font-weight: bold; color: #3498db; padding: 4px 8px; border: 1px solid #3498db; border-radius: 4px; background: transparent;")
+        self.release_counter_button.setStyleSheet("""
+            QPushButton {
+                font-weight: bold;
+                color: #00ffff;
+                padding: 4px 8px;
+                border: 1px solid #00ffff;
+                border-radius: 4px;
+                background: transparent;
+            }
+            QPushButton:hover {
+                background-color: rgba(0, 255, 255, 0.1);
+                border: 1px solid #66ffff;
+            }
+        """)
         self.release_counter_button.clicked.connect(self.show_release_breakdown)
         button_layout.addWidget(self.release_counter_button)
         
@@ -417,13 +825,13 @@ class ReelTrackerApp(QMainWindow):
         
         # CSV path display
         self.csv_path_label = QLabel("No CSV loaded")
-        self.csv_path_label.setStyleSheet("color: #7f8c8d; font-size: 10px; max-width: 300px;")
+        self.csv_path_label.setStyleSheet("color: #888888; font-size: 10px; max-width: 300px;")
         self.csv_path_label.setWordWrap(True)
         button_layout.addWidget(self.csv_path_label)
         
         # Config status indicator
         self.config_status_label = QLabel("[CONFIG] Ready")
-        self.config_status_label.setStyleSheet("color: green; font-size: 10px;")
+        self.config_status_label.setStyleSheet("color: #00ff88; font-size: 10px;")
         button_layout.addWidget(self.config_status_label)
         
         main_layout.addLayout(button_layout)
@@ -575,6 +983,9 @@ class ReelTrackerApp(QMainWindow):
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Interactive)
         
+        # Enable alternating row colors
+        self.table.setAlternatingRowColors(True)
+        
         # Set specific column widths for better media display (Visual Template removed)
         self.table.setColumnWidth(0, 140)  # Reel ID
         self.table.setColumnWidth(1, 130)  # Persona
@@ -685,31 +1096,73 @@ class ReelTrackerApp(QMainWindow):
         if self.current_release_filter and reel_count >= goal:
             # Goal achieved for specific release - change styling and add achievement badge
             self.release_counter_button.setText(f"🎉 {counter_text} - GOAL ACHIEVED! 🎉")
-            self.release_counter_button.setStyleSheet(
-                "font-weight: bold; color: white; background-color: #27ae60; "
-                "padding: 4px 8px; border: 2px solid #27ae60; border-radius: 4px;"
-            )
+            self.release_counter_button.setStyleSheet("""
+                QPushButton {
+                    font-weight: bold;
+                    color: #000000;
+                    background-color: #00ff88;
+                    padding: 4px 8px;
+                    border: 2px solid #00ff88;
+                    border-radius: 4px;
+                    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+                }
+                QPushButton:hover {
+                    background-color: #00ffaa;
+                    box-shadow: 0 0 30px rgba(0, 255, 136, 0.7);
+                }
+            """)
         elif self.current_release_filter and reel_count >= goal * 0.9:  # 90% of goal for specific release
             # Close to goal - orange styling
             self.release_counter_button.setText(f"🔥 {counter_text}")
-            self.release_counter_button.setStyleSheet(
-                "font-weight: bold; color: white; background-color: #f39c12; "
-                "padding: 4px 8px; border: 1px solid #f39c12; border-radius: 4px;"
-            )
+            self.release_counter_button.setStyleSheet("""
+                QPushButton {
+                    font-weight: bold;
+                    color: #000000;
+                    background-color: #ff8800;
+                    padding: 4px 8px;
+                    border: 2px solid #ff8800;
+                    border-radius: 4px;
+                    box-shadow: 0 0 15px rgba(255, 136, 0, 0.5);
+                }
+                QPushButton:hover {
+                    background-color: #ffaa00;
+                    box-shadow: 0 0 20px rgba(255, 136, 0, 0.7);
+                }
+            """)
         elif self.current_release_filter and reel_count >= goal * 0.75:  # 75% of goal for specific release
             # Good progress - yellow styling
             self.release_counter_button.setText(f"⚡ {counter_text}")
-            self.release_counter_button.setStyleSheet(
-                "font-weight: bold; color: #f39c12; "
-                "padding: 4px 8px; border: 1px solid #f39c12; border-radius: 4px; background: transparent;"
-            )
+            self.release_counter_button.setStyleSheet("""
+                QPushButton {
+                    font-weight: bold;
+                    color: #ffaa00;
+                    padding: 4px 8px;
+                    border: 1px solid #ffaa00;
+                    border-radius: 4px;
+                    background: transparent;
+                }
+                QPushButton:hover {
+                    background-color: rgba(255, 170, 0, 0.1);
+                    border: 1px solid #ffcc00;
+                }
+            """)
         else:
             # Normal progress - blue styling (for both global count and individual releases)
             self.release_counter_button.setText(counter_text)
-            self.release_counter_button.setStyleSheet(
-                "font-weight: bold; color: #3498db; "
-                "padding: 4px 8px; border: 1px solid #3498db; border-radius: 4px; background: transparent;"
-            )
+            self.release_counter_button.setStyleSheet("""
+                QPushButton {
+                    font-weight: bold;
+                    color: #00ffff;
+                    padding: 4px 8px;
+                    border: 1px solid #00ffff;
+                    border-radius: 4px;
+                    background: transparent;
+                }
+                QPushButton:hover {
+                    background-color: rgba(0, 255, 255, 0.1);
+                    border: 1px solid #66ffff;
+                }
+            """)
     
     def update_release_filter(self):
         """Update the current release filter based on selected row."""
@@ -978,6 +1431,14 @@ class ReelTrackerApp(QMainWindow):
                 
         except Exception as e:
             safe_print(f"[CSV_UPDATE] Error updating CSV for reel {reel_id}: {e}")
+    
+    def manage_release_values(self):
+        """Open the custom item manager dialog to manage release dropdown values."""
+        dialog = CustomItemManagerDialog(self, "release", self.config_manager)
+        if dialog.exec_() == QDialog.Accepted:
+            # Refresh the table delegates to show updated dropdown values
+            self.setup_dropdown_delegates()
+            self.statusBar().showMessage("Release values updated successfully")
     
     def add_file_row(self, file_path):
         """Add a new row to the table with file information and default metadata."""

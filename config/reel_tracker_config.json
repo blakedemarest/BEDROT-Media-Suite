@@ -12,13 +12,15 @@
             "THE STATE OF THE WORLD",
             "THE SCALE",
             "ICONIC BETA",
-            "THE SOURCE"
+            "THE SOURCE",
+            "HIS LAST WORDS"
         ],
         "reel_type": [
             "",
             "GLITCH VISUAL",
             "Tutorial",
-            "GLITCH VISUAL V2"
+            "GLITCH VISUAL V2",
+            "GLITCH VISUAL 9:16"
         ]
     },
     "last_csv_path": "E:/VIDEOS/RELEASE CONTENT/bedrot-reel-tracker.csv",
@@ -41,131 +43,11 @@
     },
     "default_metadata": {
         "persona": "ZONE A0",
-        "release": "THE SOURCE",
-        "reel_type": "GLITCH VISUAL V2",
+        "release": "HIS LAST WORDS",
+        "reel_type": "GLITCH VISUAL 9:16",
         "caption_template": ""
     },
     "version_history": [
-        {
-            "timestamp": "2025-07-04 08:03:57",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
-        {
-            "timestamp": "2025-07-04 08:03:57",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-07-04 08:03:57",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-07-04 08:04:46",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-07-04 08:04:46",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
-        {
-            "timestamp": "2025-07-04 08:04:46",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-07-04 08:04:46",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-07-04 08:07:09",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-07-04 08:07:09",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
-        {
-            "timestamp": "2025-07-04 08:07:09",
-            "action": "file_org_setting_updated",
-            "setting": "overwrite_protection",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-07-04 08:07:09",
-            "action": "file_org_setting_updated",
-            "setting": "auto_organize_enabled",
-            "previous": true,
-            "new": true
-        },
-        {
-            "timestamp": "2025-07-04 08:10:50",
-            "action": "default_metadata_updated",
-            "previous": {
-                "persona": "ZONE A0",
-                "release": "ICONIC BETA",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            },
-            "new": {
-                "persona": "ZONE A0",
-                "release": "THE SCALE",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            }
-        },
-        {
-            "timestamp": "2025-07-04 08:12:13",
-            "action": "default_metadata_updated",
-            "previous": {
-                "persona": "ZONE A0",
-                "release": "THE SCALE",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            },
-            "new": {
-                "persona": "PIG1987",
-                "release": "THE SCALE",
-                "reel_type": "GLITCH VISUAL",
-                "caption_template": ""
-            }
-        },
-        {
-            "timestamp": "2025-07-04 08:12:23",
-            "action": "export_folder_updated",
-            "previous": "E:/VIDEOS/RELEASE CONTENT",
-            "new": "E:/VIDEOS/RELEASE CONTENT"
-        },
-        {
-            "timestamp": "2025-07-04 08:12:23",
-            "action": "file_org_setting_updated",
-            "setting": "safe_testing_mode",
-            "previous": false,
-            "new": false
-        },
         {
             "timestamp": "2025-07-04 08:12:23",
             "action": "file_org_setting_updated",
@@ -535,6 +417,64 @@
             "setting": "auto_organize_enabled",
             "previous": true,
             "new": true
+        },
+        {
+            "timestamp": "2025-08-13 08:57:11",
+            "action": "dropdown_added",
+            "dropdown_type": "release",
+            "changed_value": "HIS LAST WORDS",
+            "previous_values": [
+                "",
+                "RENEGADE PIPELINE",
+                "THE STATE OF THE WORLD",
+                "THE SCALE",
+                "ICONIC BETA",
+                "THE SOURCE"
+            ],
+            "new_values": [
+                "",
+                "RENEGADE PIPELINE",
+                "THE STATE OF THE WORLD",
+                "THE SCALE",
+                "ICONIC BETA",
+                "THE SOURCE",
+                "HIS LAST WORDS"
+            ]
+        },
+        {
+            "timestamp": "2025-08-13 08:57:35",
+            "action": "dropdown_added",
+            "dropdown_type": "reel_type",
+            "changed_value": "GLITCH VISUAL 9:16",
+            "previous_values": [
+                "",
+                "GLITCH VISUAL",
+                "Tutorial",
+                "GLITCH VISUAL V2"
+            ],
+            "new_values": [
+                "",
+                "GLITCH VISUAL",
+                "Tutorial",
+                "GLITCH VISUAL V2",
+                "GLITCH VISUAL 9:16"
+            ]
+        },
+        {
+            "timestamp": "2025-08-13 08:57:35",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "ZONE A0",
+                "release": "THE SOURCE",
+                "reel_type": "GLITCH VISUAL V2",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "ZONE A0",
+                "release": "HIS LAST WORDS",
+                "reel_type": "GLITCH VISUAL 9:16",
+                "caption_template": ""
+            }
         }
     ],
     "file_organization": {
