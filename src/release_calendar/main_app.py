@@ -626,6 +626,7 @@ class CalendarApp(QMainWindow):
         self.visual_calendar.release_clicked.connect(self.on_release_clicked)
         self.visual_calendar.release_deleted.connect(self.on_release_deleted)
         self.visual_calendar.release_added.connect(self.on_release_added)
+        self.visual_calendar.artwork_updated.connect(self.on_artwork_updated)
         
         # Add to tabs
         self.tabs.addTab(self.visual_calendar, "Visual Calendar")
@@ -1255,6 +1256,21 @@ class CalendarApp(QMainWindow):
             self.refresh_all_views()
             self.status_bar.showMessage(f"Deleted release: {artist} - {title}", 3000)
             
+    def on_artwork_updated(self, artist: str, title: str, file_path: str):
+        """Handle artwork update from visual calendar."""
+        # Update the release data
+        releases = self.data_manager.get_artist_releases(artist)
+        for release in releases:
+            if release.get('title') == title:
+                release['artwork_path'] = file_path
+                # Save the updated data
+                self.data_manager.save_data()
+                # Log the update
+                logger.info(f"Updated artwork for {artist} - {title}: {file_path}")
+                # Refresh the visual calendar
+                self.refresh_calendar_view()
+                break
+                
     def on_release_added(self, date: datetime, artist: str):
         """Handle quick add from calendar."""
         # Pre-fill the form

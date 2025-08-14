@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (
     QScrollArea, QFrame, QGraphicsDropShadowEffect, QSizePolicy,
     QMenu, QFileDialog, QMessageBox, QGridLayout
 )
-from PyQt6.QtCore import Qt, QDate, QRect, QPoint, QSize, pyqtSignal, QMimeData, QPropertyAnimation, QEasingCurve
+from PyQt6.QtCore import Qt, QDate, QRect, QPoint, QSize, pyqtSignal, QMimeData, QPropertyAnimation, QEasingCurve, QUrl
 from PyQt6.QtGui import (
     QPainter, QColor, QPen, QBrush, QFont, QPalette,
     QDragEnterEvent, QDragMoveEvent, QDropEvent, QMouseEvent,
@@ -23,6 +23,124 @@ from PyQt6.QtGui import (
 )
 
 from .utils import logger, format_deliverable_name, days_until
+
+
+class ArtworkLabel(QLabel):
+    """A label that accepts artwork file drops and displays images."""
+    
+    artwork_dropped = pyqtSignal(str, str, str)  # artist, title, file_path
+    
+    def __init__(self, release: Dict[str, Any], parent=None):
+        super().__init__(parent)
+        self.release = release
+        self.setAcceptDrops(True)
+        self.setScaledContents(True)
+        self.setMinimumSize(40, 40)
+        self.setMaximumSize(60, 60)
+        
+        # Initial display
+        artwork_path = release.get('artwork_path')
+        if artwork_path and Path(artwork_path).exists():
+            self.set_artwork(artwork_path)
+        else:
+            # Show emoji if no artwork
+            artist_config = release.get('artist_config', {})
+            emoji = artist_config.get('emoji', '[?]')
+            self.setText(emoji)
+            self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
+        # Visual feedback style
+        self.setStyleSheet("""
+            ArtworkLabel {
+                border: 2px dashed transparent;
+                border-radius: 4px;
+                padding: 2px;
+                font-size: 14px;
+            }
+            ArtworkLabel:hover {
+                border-color: #00ffff;
+                background-color: rgba(0, 255, 255, 0.1);
+            }
+        """)
+        
+    def set_artwork(self, file_path: str):
+        """Set and display artwork image."""
+        try:
+            pixmap = QPixmap(file_path)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(
+                    self.size(), 
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+                self.setPixmap(scaled_pixmap)
+                self.setToolTip(f"Artwork: {Path(file_path).name}")
+        except Exception as e:
+            logger.error(f"Failed to load artwork: {e}")
+            
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        """Handle drag enter events for file drops."""
+        if event.mimeData().hasUrls():
+            urls = event.mimeData().urls()
+            if urls and urls[0].isLocalFile():
+                file_path = urls[0].toLocalFile()
+                # Accept image files
+                if file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')):
+                    event.acceptProposedAction()
+                    self.setStyleSheet("""
+                        ArtworkLabel {
+                            border: 2px solid #00ff88;
+                            background-color: rgba(0, 255, 136, 0.2);
+                            border-radius: 4px;
+                            padding: 2px;
+                        }
+                    """)
+                    return
+        event.ignore()
+        
+    def dragLeaveEvent(self, event):
+        """Handle drag leave events."""
+        self.setStyleSheet("""
+            ArtworkLabel {
+                border: 2px dashed transparent;
+                border-radius: 4px;
+                padding: 2px;
+                font-size: 14px;
+            }
+            ArtworkLabel:hover {
+                border-color: #00ffff;
+                background-color: rgba(0, 255, 255, 0.1);
+            }
+        """)
+        
+    def dropEvent(self, event: QDropEvent):
+        """Handle drop events for artwork files."""
+        if event.mimeData().hasUrls():
+            urls = event.mimeData().urls()
+            if urls and urls[0].isLocalFile():
+                file_path = urls[0].toLocalFile()
+                if file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')):
+                    self.set_artwork(file_path)
+                    # Emit signal with artist, title, and file path
+                    artist = self.release.get('artist', '')
+                    title = self.release.get('title', '')
+                    self.artwork_dropped.emit(artist, title, file_path)
+                    event.acceptProposedAction()
+                    
+                    # Reset style
+                    self.setStyleSheet("""
+                        ArtworkLabel {
+                            border: 2px dashed transparent;
+                            border-radius: 4px;
+                            padding: 2px;
+                        }
+                        ArtworkLabel:hover {
+                            border-color: #00ffff;
+                            background-color: rgba(0, 255, 255, 0.1);
+                        }
+                    """)
+                    return
+        event.ignore()
 
 
 class DayCell(QFrame):
@@ -141,6 +259,16 @@ class DayCell(QFrame):
         self.releases.append(release_data)
         self.update_releases_display()
         
+    def on_artwork_dropped(self, artist: str, title: str, file_path: str):
+        """Handle artwork drop event from ArtworkLabel."""
+        # Update the release data
+        for release in self.releases:
+            if release.get('artist') == artist and release.get('title') == title:
+                release['artwork_path'] = file_path
+                break
+        # Emit signal to notify parent
+        self.artwork_updated.emit(artist, title, file_path)
+        
     def add_deadline(self, deadline_data: Dict[str, Any]):
         """Add a deadline badge to this day."""
         self.deadlines.append(deadline_data)
@@ -200,12 +328,12 @@ class DayCell(QFrame):
         layout.setContentsMargins(4, 2, 4, 2)
         layout.setSpacing(4)
         
-        # Artist emoji/icon
-        artist_config = release.get('artist_config', {})
-        emoji = artist_config.get('emoji', '[?]')
-        emoji_label = QLabel(emoji)
-        emoji_label.setStyleSheet("font-size: 14px;")
-        layout.addWidget(emoji_label)
+        # Artist emoji/icon with artwork drop support
+        artwork_label = ArtworkLabel(release)
+        # Connect to parent's artwork update handler if available
+        if hasattr(self, 'on_artwork_dropped'):
+            artwork_label.artwork_dropped.connect(self.on_artwork_dropped)
+        layout.addWidget(artwork_label)
         
         # Title
         title = release.get('title', 'Untitled')
@@ -374,6 +502,7 @@ class VisualCalendarWidget(QWidget):
     release_clicked = pyqtSignal(str, str)
     release_deleted = pyqtSignal(str, str)
     release_added = pyqtSignal(datetime, str)
+    artwork_updated = pyqtSignal(str, str, str)  # artist, title, file_path
     month_changed = pyqtSignal(int, int)  # year, month
     
     def __init__(self, parent=None):
@@ -519,6 +648,7 @@ class VisualCalendarWidget(QWidget):
                 cell.release_clicked.connect(self.release_clicked)
                 cell.release_deleted.connect(self.release_deleted)
                 cell.release_added.connect(self.release_added)
+                cell.artwork_updated.connect(self.on_artwork_updated)
                 
                 # Add to grid
                 self.calendar_layout.addWidget(cell, week_num, day_num)
@@ -526,6 +656,11 @@ class VisualCalendarWidget(QWidget):
                 
         # Populate with release data
         self.populate_releases()
+        
+    def on_artwork_updated(self, artist: str, title: str, file_path: str):
+        """Handle artwork update from day cell."""
+        # Forward the signal to parent
+        self.artwork_updated.emit(artist, title, file_path)
         
     def populate_releases(self):
         """Populate the calendar with release data."""
@@ -541,6 +676,7 @@ class VisualCalendarWidget(QWidget):
                 # Add to appropriate day cell
                 if release_date.date() in self.day_cells:
                     release_with_config = release.copy()
+                    release_with_config['artist'] = artist  # Add the artist name
                     release_with_config['artist_config'] = artist_config
                     self.day_cells[release_date.date()].add_release(release_with_config)
                     
