@@ -14,14 +14,9 @@ from typing import Dict, Any, Optional
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-try:
-    from core import get_config_manager as get_core_config_manager
-    from core import resolve_config_path
-    from core.path_utils import validate_path
-    CORE_AVAILABLE = True
-except ImportError:
-    CORE_AVAILABLE = False
-    print("[Release Calendar] Warning: Core config utilities not available, using fallback")
+from core import get_config_manager as get_core_config_manager
+from core import resolve_config_path
+from core.path_utils import validate_path
 
 
 class ConfigManager:
@@ -43,10 +38,7 @@ class ConfigManager:
             Configuration dictionary
         """
         try:
-            if CORE_AVAILABLE:
-                config_path = resolve_config_path(os.path.basename(self.config_file))
-            else:
-                config_path = self.config_file
+            config_path = resolve_config_path(os.path.basename(self.config_file))
                 
             if os.path.exists(config_path):
                 with open(config_path, 'r', encoding='utf-8') as f:
@@ -72,10 +64,7 @@ class ConfigManager:
             if config_data is None:
                 config_data = self.config
                 
-            if CORE_AVAILABLE:
-                config_path = resolve_config_path(os.path.basename(self.config_file))
-            else:
-                config_path = self.config_file
+            config_path = resolve_config_path(os.path.basename(self.config_file))
                 
             # Ensure directory exists
             os.makedirs(os.path.dirname(config_path), exist_ok=True)

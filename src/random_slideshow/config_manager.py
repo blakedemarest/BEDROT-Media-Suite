@@ -22,7 +22,11 @@ class ConfigManager:
     """
     
     def __init__(self, config_file="combined_random_config.json"):
-        self.config_file = config_file
+        # Use absolute path to centralized config directory
+        import os
+        # Get project root (3 levels up from this file)
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        self.config_file = os.path.join(project_root, 'config', config_file)
         self.config = self.load_config()
     
     def load_config(self):

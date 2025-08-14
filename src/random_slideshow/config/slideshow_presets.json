@@ -10,7 +10,7 @@
                 "auto_start": true
             },
             "is_default": true,
-            "created_at": "2025-06-27T08:16:38.751112"
+            "created_at": "2025-08-14T03:35:18.367881"
         },
         "Quick Landscape": {
             "description": "Quick generation for landscape videos (16:9)",
@@ -22,7 +22,7 @@
                 "auto_start": true
             },
             "is_default": true,
-            "created_at": "2025-06-27T08:16:38.751122"
+            "created_at": "2025-08-14T03:35:18.367895"
         },
         "High Performance": {
             "description": "Maximum performance with all CPU cores",
@@ -36,40 +36,8 @@
                 "auto_start": false
             },
             "is_default": true,
-            "created_at": "2025-06-27T08:16:38.751125"
-        },
-        "RENEGADEPIPELINE": {
-            "image_folder": "C:/Users/Earth/OneDrive/Desktop/IMAGES4RANDOMSLIDESHOW/RENEGADEPIPELINE",
-            "output_folder": "E:/VIDEOS/RandomSlideshows",
-            "aspect_ratio": "9:16",
-            "batch_settings": {
-                "max_workers": 4,
-                "max_memory_mb": 2048,
-                "cache_size": 100,
-                "auto_start": false,
-                "preserve_completed_jobs": true,
-                "completed_jobs_limit": 50
-            },
-            "name": "RENEGADEPIPELINE",
-            "description": "",
-            "created_at": "2025-06-27T08:17:08.144750",
-            "modified_at": "2025-06-27T08:17:08.144770",
-            "is_default": false
-        },
-        "THE SCALE": {
-            "image_folder": "",
-            "output_folder": "",
-            "aspect_ratio": "16:9",
-            "batch_settings": {
-                "max_workers": 2,
-                "auto_start": false
-            },
-            "name": "THE SCALE",
-            "description": "New preset",
-            "created_at": "2025-07-04T07:30:36.964228",
-            "modified_at": "2025-07-04T07:30:36.964234",
-            "is_default": false
+            "created_at": "2025-08-14T03:35:18.368046"
         }
     },
-    "last_used": "RENEGADEPIPELINE"
+    "last_used": "Quick Portrait"
 }

@@ -14,7 +14,7 @@ try:
 except ImportError:
     pass
 
-from config_manager import ConfigManager
+from .config_manager import ConfigManager
 
 # Import modules with dependencies only when needed
 def get_image_processor():

@@ -14,15 +14,10 @@ import os
 from .utils import safe_print
 
 # Import centralized configuration system
-try:
-    import sys
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-    from core.path_utils import resolve_config_path, resolve_output_path
-    from core.env_loader import get_env_var
-    CORE_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Could not import core configuration system: {e}")
-    CORE_AVAILABLE = False
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from core.path_utils import resolve_config_path, resolve_output_path
+from core.env_loader import get_env_var
 
 # Constants
 BPM_UNITS = {
@@ -54,20 +49,9 @@ class ConfigManager:
         # Always set script_dir first for compatibility
         self.script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         
-        # Use centralized path resolution if available
-        if CORE_AVAILABLE:
-            try:
-                self.settings_file_path = str(resolve_config_path(config_file))
-                self.config_dir = os.path.dirname(self.settings_file_path)
-            except Exception as e:
-                safe_print(f"Warning: Could not resolve config path, using fallback: {e}")
-                # Fallback to original complex path navigation
-                self.config_dir = os.path.join(self.script_dir, '..', 'config')
-                self.settings_file_path = os.path.join(self.config_dir, config_file)
-        else:
-            # Fallback to original complex path navigation
-            self.config_dir = os.path.join(self.script_dir, '..', 'config')
-            self.settings_file_path = os.path.join(self.config_dir, config_file)
+        # Use centralized path resolution
+        self.settings_file_path = str(resolve_config_path(config_file))
+        self.config_dir = os.path.dirname(self.settings_file_path)
         
         self.config_file = config_file
         self.config = self.load_config()
@@ -75,33 +59,8 @@ class ConfigManager:
     def get_default_config(self):
         """Returns the default configuration settings."""
         # Get default paths using centralized configuration
-        if CORE_AVAILABLE:
-            try:
-                default_output = str(resolve_output_path())
-                default_input = default_output  # Use same for input initially
-            except Exception as e:
-                safe_print(f"Warning: Could not resolve default paths: {e}")
-                # Use user's Videos folder as default if available
-                user_home = os.path.expanduser("~")
-                videos_dir = os.path.join(user_home, "Videos", "RemixedVideos")
-                if os.path.exists(os.path.join(user_home, "Videos")):
-                    default_output = videos_dir
-                    os.makedirs(videos_dir, exist_ok=True)
-                else:
-                    default_output = os.path.join(user_home, "RemixedVideos")
-                    os.makedirs(default_output, exist_ok=True)
-                default_input = default_output
-        else:
-            # Use user's Videos folder as default if available
-            user_home = os.path.expanduser("~")
-            videos_dir = os.path.join(user_home, "Videos", "RemixedVideos")
-            if os.path.exists(os.path.join(user_home, "Videos")):
-                default_output = videos_dir
-                os.makedirs(videos_dir, exist_ok=True)
-            else:
-                default_output = os.path.join(user_home, "RemixedVideos")
-                os.makedirs(default_output, exist_ok=True)
-            default_input = default_output
+        default_output = str(resolve_output_path())
+        default_input = default_output  # Use same for input initially
         
         return {
             "last_input_folder": default_input,
@@ -111,7 +70,7 @@ class ConfigManager:
             "bpm": 120.0,
             "bpm_unit": DEFAULT_BPM_UNIT,
             "num_units": 16,
-            "aspect_ratio": get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', DEFAULT_ASPECT_RATIO) if CORE_AVAILABLE else DEFAULT_ASPECT_RATIO,
+            "aspect_ratio": get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', DEFAULT_ASPECT_RATIO),
             "continuous_mode": False,
             "jitter_enabled": False,
             "jitter_intensity": 50,

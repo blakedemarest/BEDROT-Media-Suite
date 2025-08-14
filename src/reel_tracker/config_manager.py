@@ -14,15 +14,10 @@ import datetime
 from .utils import safe_print
 
 # Import centralized configuration system
-try:
-    import sys
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-    from core.path_utils import resolve_config_path, resolve_output_path
-    from core.env_loader import get_env_var
-    CORE_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Could not import core configuration system: {e}")
-    CORE_AVAILABLE = False
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from core.path_utils import resolve_config_path, resolve_output_path
+from core.env_loader import get_env_var
 
 
 class ConfigManager:
@@ -32,20 +27,9 @@ class ConfigManager:
     
     def __init__(self, config_file="reel_tracker_config.json"):
         try:
-            # Use centralized path resolution if available
-            if CORE_AVAILABLE:
-                try:
-                    self.config_file = str(resolve_config_path(config_file))
-                    self.config_dir = os.path.dirname(self.config_file)
-                except Exception as e:
-                    safe_print(f"Warning: Could not resolve config path, using fallback: {e}")
-                    # Fallback to original hardcoded path
-                    self.config_file = f"config/{config_file}"
-                    self.config_dir = os.path.dirname(self.config_file)
-            else:
-                # Fallback to original hardcoded path
-                self.config_file = f"config/{config_file}"
-                self.config_dir = os.path.dirname(self.config_file)
+            # Use centralized path resolution
+            self.config_file = str(resolve_config_path(config_file))
+            self.config_dir = os.path.dirname(self.config_file)
             
             self.config = self.load_config()
             # Remove duplicate dropdown entries if any
