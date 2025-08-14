@@ -319,6 +319,7 @@ class ProcessingWorker:
         
         self.processing_active = True
         self.abort_requested = False  # Reset abort flag
+        self.video_processor.abort_requested = False  # Reset video processor's abort flag
         
         self.thread = threading.Thread(
             target=self.process_videos,

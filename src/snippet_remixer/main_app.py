@@ -18,6 +18,7 @@ from .config_manager import ConfigManager
 from .processing_worker import ProcessingWorker
 from .utils import safe_print, validate_directory_path
 from .logging_config import setup_logging, get_logger
+from .job_queue import JobQueue, ProcessingJob, JobStatus
 
 # Import drag and drop support
 try:
@@ -81,6 +82,16 @@ class VideoRemixerApp:
         self.continuous_processing = False
         self.continuous_count = 0
         self._last_continuous_settings = {}
+        
+        # Initialize job queue for non-continuous mode
+        self.job_queue = JobQueue(max_history=50)
+        self.job_queue.set_callbacks(
+            on_queue_update=self.update_queue_display,
+            on_job_start=self.on_job_started,
+            on_job_complete=self.on_job_completed,
+            on_job_progress=self.on_job_progress
+        )
+        self.queue_processor_active = False
 
         # Bindings
         self.length_mode_var.trace_add("write", self.toggle_length_mode_ui)
@@ -97,9 +108,9 @@ class VideoRemixerApp:
         self.duration_seconds_var.trace_add("write", self.update_continuous_counter_on_change)
         self.length_mode_var.trace_add("write", self.update_continuous_counter_on_change)
 
-        # Window Setup - compact size that fits all elements
-        self.root.geometry("700x680")  # Sized to fit all controls
-        self.root.minsize(650, 650)    # Minimum size to prevent UI cutoff
+        # Window Setup - compact size that fits all elements including queue status
+        self.root.geometry("700x720")  # Sized to fit all controls with queue status
+        self.root.minsize(650, 700)    # Minimum size to prevent UI cutoff
         
         # Track window state for status section visibility
         self.window_maximized = False
@@ -107,6 +118,9 @@ class VideoRemixerApp:
         
         self.create_widgets()
         self.toggle_length_mode_ui()
+        
+        # Initialize queue display based on mode
+        self.root.after(50, self.update_queue_display)
             
         # Initialize duration estimate if in BPM mode
         self.root.after(100, self.update_duration_estimate)
@@ -777,6 +791,25 @@ class VideoRemixerApp:
         )
         self.continuous_label.pack(pady=(5, 0))
         
+        # Queue status display (shows when not in continuous mode)
+        queue_frame = ttk.Frame(process_button_frame)
+        queue_frame.pack(pady=(5, 5))
+        
+        self.queue_status_label = ttk.Label(
+            queue_frame,
+            text="Queue: Empty",
+            style='Blue.TLabel'
+        )
+        self.queue_status_label.pack()
+        
+        # Queue details label
+        self.queue_details_label = ttk.Label(
+            queue_frame,
+            text="",
+            style='TLabel'
+        )
+        self.queue_details_label.pack(pady=(2, 0))
+        
         # Main Generate/Abort button
         self.generate_button = ttk.Button(
             process_button_frame, 
@@ -1135,15 +1168,22 @@ class VideoRemixerApp:
 
     
     def start_processing_thread(self):
-        """Enhanced processing thread starter with continuous mode support."""
+        """Enhanced processing thread starter with queue support for non-continuous mode."""
         # Check if starting continuous mode
-        if self.continuous_mode_var.get() and not self.continuous_processing:
-            self.continuous_processing = True
-            self.continuous_count = 0
-            self.update_continuous_counter()
-        
-        # Original processing logic
-        self._original_start_processing_thread()
+        if self.continuous_mode_var.get():
+            if not self.continuous_processing:
+                self.continuous_processing = True
+                self.continuous_count = 0
+                self.update_continuous_counter()
+            # Process immediately in continuous mode
+            self._original_start_processing_thread()
+        else:
+            # Non-continuous mode: Add job to queue
+            self._add_job_to_queue()
+            
+            # Start queue processor if not already running
+            if not self.queue_processor_active and not self.processing_worker.is_processing():
+                self.process_next_queued_job()
     
     def _original_start_processing_thread(self):
         """Validates inputs, generates filename, and launches processing thread."""
@@ -1382,11 +1422,14 @@ class VideoRemixerApp:
                 self.continuous_count = 0
                 self.update_continuous_counter()
         else:
-            self.update_status("Continuous mode disabled")
+            self.update_status("Continuous mode disabled - Queue mode active")
             # Only stop processing if it was actually running
             if self.continuous_processing:
                 self.continuous_processing = False
             # Generate button is always visible
+        
+        # Update queue display based on mode
+        self.update_queue_display()
     
     def start_next_continuous_remix(self):
         """Start the next remix in continuous mode with dynamic settings update."""
@@ -1558,6 +1601,247 @@ class VideoRemixerApp:
                 self.root.focus()
             else:
                 event.widget.tk_focusNext().focus()
+
+    
+    def _add_job_to_queue(self):
+        """Add a new job to the processing queue with current settings."""
+        # Validate inputs first
+        if not self._validate_inputs_for_queue():
+            return
+        
+        try:
+            # Get current settings
+            input_files = list(self.queue_listbox.get(0, tk.END))
+            
+            # Filter out placeholder hint if present
+            if hasattr(self, '_has_placeholder') and self._has_placeholder and input_files:
+                input_files = [f for f in input_files if not f.startswith("🎬 Drag and drop")]
+            
+            output_folder = self.output_folder_var.get()
+            length_mode = self.length_mode_var.get()
+            aspect_ratio_selection = self.aspect_ratio_var.get()
+            
+            # Calculate durations
+            settings = {
+                "duration_seconds": self.duration_seconds_var.get(),
+                "bpm": self.bpm_var.get(),
+                "num_units": self.num_units_var.get(),
+                "bpm_unit": self.bpm_unit_var.get(),
+                "jitter_enabled": self.jitter_enabled_var.get(),
+                "jitter_intensity": self.jitter_intensity_var.get()
+            }
+            
+            target_total_duration_sec, snippet_duration_sec = self.processing_worker.calculate_durations(
+                length_mode, settings
+            )
+            
+            # Generate unique filename
+            final_output_path = self.processing_worker.generate_output_filename(
+                aspect_ratio_selection, output_folder
+            )
+            
+            # Get export settings
+            export_settings = self.config_manager.get_export_settings()
+            export_settings["jitter_enabled"] = settings.get("jitter_enabled", False)
+            export_settings["jitter_intensity"] = settings.get("jitter_intensity", 50)
+            export_settings["aspect_ratio_mode"] = self.aspect_ratio_mode_var.get()
+            
+            # Create job
+            job = ProcessingJob(
+                input_files=input_files.copy(),
+                output_path=final_output_path,
+                target_duration=target_total_duration_sec,
+                snippet_duration=snippet_duration_sec,
+                aspect_ratio=aspect_ratio_selection,
+                export_settings=export_settings.copy(),
+                length_mode=length_mode,
+                bpm=float(self.bpm_var.get()),
+                num_units=int(self.num_units_var.get()),
+                bpm_unit=self.bpm_unit_var.get(),
+                jitter_enabled=self.jitter_enabled_var.get(),
+                jitter_intensity=self.jitter_intensity_var.get()
+            )
+            
+            # Add to queue
+            job_id = self.job_queue.add_job(job)
+            
+            # Show feedback
+            queue_status = self.job_queue.get_queue_status()
+            self.update_status(f"Added to queue: {job.get_display_name()}")
+            safe_print(f"[QUEUE] Job added: {job.get_display_name()}")
+            self.logger.info(f"Job {job_id} added to queue: {job.get_duration_text()}")
+            
+        except ValueError as e:
+            messagebox.showerror("Invalid Input", f"Please check settings:\\n{e}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to add job to queue:\\n{e}")
+    
+    def _validate_inputs_for_queue(self):
+        """Validate inputs before adding to queue."""
+        # Check FFmpeg tools
+        ffmpeg_found, ffprobe_found = self.processing_worker.get_video_processor().are_tools_available()
+        if not ffmpeg_found or not ffprobe_found:
+            messagebox.showerror("Missing Dependency", "Cannot process. FFmpeg/FFprobe not found.")
+            return False
+        
+        input_files = list(self.queue_listbox.get(0, tk.END))
+        
+        # Filter out placeholder hint if present
+        if hasattr(self, '_has_placeholder') and self._has_placeholder and input_files:
+            input_files = [f for f in input_files if not f.startswith("🎬 Drag and drop")]
+        
+        if not input_files:
+            messagebox.showwarning("Input Required", "Please add video files to the queue.")
+            return False
+        
+        output_folder = self.output_folder_var.get()
+        if not output_folder or not validate_directory_path(output_folder):
+            messagebox.showerror("Invalid Path", f"Output folder is invalid or not set:\\n{output_folder}")
+            return False
+        
+        aspect_ratio_selection = self.aspect_ratio_var.get()
+        if aspect_ratio_selection not in self.config_manager.get_aspect_ratios():
+            messagebox.showerror("Invalid Input", "Invalid Aspect Ratio selected.")
+            return False
+        
+        return True
+    
+    def process_next_queued_job(self):
+        """Process the next job in the queue."""
+        # Check if already processing
+        if self.processing_worker.is_processing():
+            return
+        
+        # Get next job
+        job = self.job_queue.get_next_job()
+        if not job:
+            self.queue_processor_active = False
+            self.update_status("Queue processing complete")
+            return
+        
+        self.queue_processor_active = True
+        
+        # Update UI
+        self.enable_generate_button(False)  # Changes to ABORT button
+        output_msg = f"Processing: {os.path.basename(job.output_path)}"
+        self.update_status(output_msg)
+        safe_print(f"[QUEUE] Processing job {job.job_id}: {job.get_display_name()}")
+        self.logger.info(f"Starting job {job.job_id} from queue")
+        
+        # Define callbacks for this job
+        def progress_callback(message):
+            self.job_queue.update_job_progress(message)
+            self.update_status(f"[Job {job.job_id}] {message}")
+            safe_print(f"[Job {job.job_id}] {message}")
+            self.logger.info(f"Job {job.job_id} progress: {message}")
+        
+        def error_callback(error_type, title, message):
+            if error_type == "warning":
+                safe_print(f"[WARNING] Job {job.job_id}: {title}: {message}")
+                self.logger.warning(f"Job {job.job_id}: {title}: {message}")
+                self.update_status_warning(f"Job {job.job_id}: {title}: {message}")
+            else:
+                safe_print(f"[ERROR] Job {job.job_id}: {title}: {message}")
+                self.logger.error(f"Job {job.job_id}: {title}: {message}")
+                self.update_status_error(f"Job {job.job_id}: {title}: {message}")
+                self.job_queue.complete_current_job(success=False, error_message=message)
+        
+        def completion_callback(success, output_path):
+            self.job_queue.complete_current_job(success=success)
+            
+            if success:
+                success_msg = f"Job {job.job_id} completed: {os.path.basename(output_path)}"
+                self.update_status_success(success_msg)
+                safe_print(f"[SUCCESS] {success_msg}")
+                self.logger.info(success_msg)
+            else:
+                failure_msg = f"Job {job.job_id} failed"
+                self.update_status_error(failure_msg)
+                safe_print(f"[FAILED] {failure_msg}")
+                self.logger.error(failure_msg)
+            
+            # Enable button again
+            self.enable_generate_button(True)
+            
+            # Process next job after a short delay
+            self.root.after(1000, self.process_next_queued_job)
+        
+        # Start processing
+        self.processing_worker.start_processing_thread(
+            job.input_files, job.output_path, job.target_duration,
+            job.snippet_duration, job.aspect_ratio,
+            job.export_settings,
+            progress_callback, error_callback, completion_callback
+        )
+    
+    def update_queue_display(self):
+        """Update the queue status display."""
+        status = self.job_queue.get_queue_status()
+        
+        # Update main queue status
+        if status['queue_empty']:
+            self.queue_status_label.config(text="Queue: Empty")
+            self.queue_details_label.config(text="")
+            # Hide details label when empty to save space
+            self.queue_details_label.pack_forget()
+        else:
+            pending = status['pending_count']
+            if status['current_job']:
+                # Combine into single line to save space
+                self.queue_status_label.config(text=f"Queue: Processing ({pending} pending)")
+                self.queue_details_label.config(text=status['current_job'])
+                self.queue_details_label.pack(pady=(2, 0))
+            else:
+                if pending == 1:
+                    # Single pending job - show on one line
+                    pending_jobs = self.job_queue.get_pending_jobs()
+                    if pending_jobs:
+                        next_job = pending_jobs[0]
+                        self.queue_status_label.config(text=f"Queue: 1 job - {next_job.get_display_name()}")
+                        self.queue_details_label.config(text="")
+                        self.queue_details_label.pack_forget()
+                    else:
+                        self.queue_status_label.config(text=f"Queue: {pending} jobs pending")
+                        self.queue_details_label.config(text="")
+                        self.queue_details_label.pack_forget()
+                else:
+                    # Multiple pending jobs
+                    self.queue_status_label.config(text=f"Queue: {pending} jobs pending")
+                    pending_jobs = self.job_queue.get_pending_jobs()
+                    if pending_jobs:
+                        next_job = pending_jobs[0]
+                        self.queue_details_label.config(text=f"Next: {next_job.get_display_name()}")
+                        self.queue_details_label.pack(pady=(2, 0))
+                    else:
+                        self.queue_details_label.config(text="")
+                        self.queue_details_label.pack_forget()
+        
+        # Toggle visibility based on mode
+        if self.continuous_mode_var.get():
+            # Hide queue display in continuous mode
+            self.queue_status_label.pack_forget()
+            self.queue_details_label.pack_forget()
+        else:
+            # Show queue display in queue mode
+            self.queue_status_label.pack()
+    
+    def on_job_started(self, job):
+        """Callback when a job starts processing."""
+        safe_print(f"[QUEUE] Started processing job {job.job_id}")
+        self.update_queue_display()
+    
+    def on_job_completed(self, job):
+        """Callback when a job completes."""
+        if job.status == JobStatus.COMPLETED:
+            safe_print(f"[QUEUE] Job {job.job_id} completed successfully")
+        else:
+            safe_print(f"[QUEUE] Job {job.job_id} failed: {job.error_message}")
+        self.update_queue_display()
+    
+    def on_job_progress(self, job, message):
+        """Callback for job progress updates."""
+        # Progress is already handled in progress_callback
+        pass
 
 
 def main():

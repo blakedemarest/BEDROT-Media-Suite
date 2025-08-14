@@ -24,6 +24,7 @@ from PyQt5.QtGui import QFont, QColor
 from .config_manager import ConfigManager
 from .file_organizer import FileOrganizer
 from .utils import safe_print
+from .ui_styles import apply_dialog_theme, style_button, style_header_label, get_dialog_button_box_style
 
 
 class FileOrganizationThread(QThread):
@@ -75,6 +76,9 @@ class FileOrganizationDialog(QDialog):
         self.setModal(True)
         self.resize(900, 700)
         
+        # Apply BEDROT theme
+        apply_dialog_theme(self)
+        
         # Initialize components
         self.config_manager = config_manager or ConfigManager()
         self.file_organizer = FileOrganizer(self.config_manager)
@@ -95,8 +99,8 @@ class FileOrganizationDialog(QDialog):
         self.setLayout(layout)
         
         # Header
-        header_label = QLabel("📁 File Organization Pipeline")
-        header_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #2c3e50; margin: 10px;")
+        header_label = QLabel("FILE ORGANIZATION PIPELINE")
+        style_header_label(header_label)
         header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(header_label)
         
@@ -114,6 +118,7 @@ class FileOrganizationDialog(QDialog):
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             Qt.Horizontal, self
         )
+        button_box.setStyleSheet(get_dialog_button_box_style())
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
@@ -124,7 +129,7 @@ class FileOrganizationDialog(QDialog):
         layout = QVBoxLayout(settings_widget)
         
         # Master Export Folder Section
-        export_group = QGroupBox("📂 Master Export Folder")
+        export_group = QGroupBox("MASTER EXPORT FOLDER")
         export_layout = QFormLayout()
         
         # Export folder path
@@ -132,6 +137,7 @@ class FileOrganizationDialog(QDialog):
         self.export_folder_edit = QLineEdit()
         self.export_folder_edit.setPlaceholderText("Select the master folder where organized files will be stored...")
         self.browse_folder_btn = QPushButton("Browse...")
+        style_button(self.browse_folder_btn, 'primary')
         self.browse_folder_btn.clicked.connect(self.browse_export_folder)
         folder_layout.addWidget(self.export_folder_edit)
         folder_layout.addWidget(self.browse_folder_btn)
@@ -139,14 +145,15 @@ class FileOrganizationDialog(QDialog):
         
         # Export folder info
         self.folder_info_label = QLabel("No folder selected")
-        self.folder_info_label.setStyleSheet("color: #7f8c8d; font-size: 11px; margin: 5px;")
+        from .ui_styles import style_status_label
+        style_status_label(self.folder_info_label, 'info')
         export_layout.addRow("Status:", self.folder_info_label)
         
         export_group.setLayout(export_layout)
         layout.addWidget(export_group)
         
         # File Organization Settings
-        settings_group = QGroupBox("⚙️ Organization Settings")
+        settings_group = QGroupBox("ORGANIZATION SETTINGS")
         settings_layout = QFormLayout()
         
         # Safe testing mode
@@ -168,7 +175,7 @@ class FileOrganizationDialog(QDialog):
         layout.addWidget(settings_group)
         
         # Naming Convention Info
-        naming_group = QGroupBox("📝 Naming Convention")
+        naming_group = QGroupBox("NAMING CONVENTION")
         naming_layout = QVBoxLayout()
         
         naming_info = QLabel(
@@ -182,7 +189,7 @@ class FileOrganizationDialog(QDialog):
             "<b>📊 CSV Updates:</b> FilePath and Clip Filename columns are automatically updated after organization"
         )
         naming_info.setWordWrap(True)
-        naming_info.setStyleSheet("background: #f8f9fa; padding: 10px; border: 1px solid #dee2e6; border-radius: 4px;")
+        naming_info.setStyleSheet("background: #1a1a1a; padding: 10px; border: 1px solid #404040; border-radius: 4px; color: #cccccc;")
         naming_layout.addWidget(naming_info)
         
         naming_group.setLayout(naming_layout)
@@ -198,7 +205,7 @@ class FileOrganizationDialog(QDialog):
         
         # Preview info
         preview_info = QLabel("Preview shows how files will be organized without actually moving them.")
-        preview_info.setStyleSheet("color: #7f8c8d; font-style: italic; margin: 5px;")
+        preview_info.setStyleSheet("color: #888888; font-style: italic; margin: 5px;")
         layout.addWidget(preview_info)
         
         # Preview table

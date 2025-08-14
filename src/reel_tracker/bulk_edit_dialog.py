@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
     QDialogButtonBox,
 )
 from PyQt5.QtCore import Qt
+from .ui_styles import apply_dialog_theme, get_dialog_button_box_style
 
 
 class BulkEditDialog(QDialog):
@@ -25,6 +26,9 @@ class BulkEditDialog(QDialog):
         self.setWindowTitle("Bulk Edit Reels")
         self.setModal(True)
         self.config_manager = config_manager
+        
+        # Apply BEDROT theme
+        apply_dialog_theme(self)
 
         layout = QFormLayout(self)
         self.setLayout(layout)

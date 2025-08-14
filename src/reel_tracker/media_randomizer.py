@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from .utils import safe_print
+from .ui_styles import apply_dialog_theme, style_button, style_header_label
 
 
 class MediaRandomizerWorker(QThread):
@@ -112,6 +113,9 @@ class MediaRandomizerDialog(QDialog):
         self.setModal(True)
         self.resize(800, 600)
         
+        # Apply BEDROT theme
+        apply_dialog_theme(self)
+        
         # Store randomized results
         self.randomized_files = []
         self.selected_file = None
@@ -125,8 +129,8 @@ class MediaRandomizerDialog(QDialog):
         self.setLayout(layout)
         
         # Header
-        header_label = QLabel("🎲 Media Randomizer")
-        header_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #2c3e50; margin: 10px;")
+        header_label = QLabel("MEDIA RANDOMIZER")
+        style_header_label(header_label)
         header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(header_label)
         

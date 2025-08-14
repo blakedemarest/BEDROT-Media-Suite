@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from .config_manager import ConfigManager
 from .utils import safe_print
+from .ui_styles import apply_dialog_theme, style_button, get_dialog_button_box_style
 
 
 class DefaultMetadataDialog(QDialog):
@@ -31,6 +32,9 @@ class DefaultMetadataDialog(QDialog):
         self.setWindowTitle("Default Metadata Settings")
         self.setModal(True)
         self.resize(600, 500)
+        
+        # Apply BEDROT theme
+        apply_dialog_theme(self)
         
         # Use config manager or create one
         self.config_manager = config_manager or ConfigManager()

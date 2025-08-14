@@ -86,9 +86,10 @@ class FileOrganizer:
             
         except Exception as e:
             safe_print(f"[FILE_ORG] Error generating filename: {e}")
-            # Fallback filename
-            timestamp = str(int(os.path.getmtime(original_filepath)))
-            return f"REEL_{timestamp}.mp4"
+            # Fallback filename - use a simpler format
+            import random
+            fallback_num = random.randint(1000, 9999)
+            return f"REEL_{fallback_num}.mp4"
     
     def generate_folder_name(self, persona, release):
         """Generate folder name using PERSONA_RELEASE convention."""

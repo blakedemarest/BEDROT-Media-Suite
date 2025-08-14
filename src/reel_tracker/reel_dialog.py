@@ -23,6 +23,7 @@ from .config_manager import ConfigManager
 from .media_randomizer import MediaRandomizerDialog
 from .custom_item_manager import CustomItemManagerDialog
 from .utils import safe_print
+from .ui_styles import apply_dialog_theme, style_button, get_dialog_button_box_style
 
 
 class ReelEntryDialog(QDialog):
@@ -36,6 +37,9 @@ class ReelEntryDialog(QDialog):
         self.setWindowTitle("Add/Edit Reel Entry")
         self.setModal(True)
         self.resize(700, 600)
+        
+        # Apply BEDROT theme
+        apply_dialog_theme(self)
         
         # Use config manager or create one
         self.config_manager = config_manager or ConfigManager()
@@ -271,9 +275,34 @@ class ReelEntryDialog(QDialog):
             self.release_options = updated_options
     
     def generate_reel_id(self):
-        """Generate a unique reel ID based on timestamp."""
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        reel_id = f"REEL_{timestamp}"
+        """Generate a unique reel ID with sequential numbering."""
+        # Get the parent window if available to check existing IDs
+        parent = self.parent()
+        if hasattr(parent, 'table'):
+            # Find the highest existing REEL_XXX number
+            max_num = 0
+            reel_id_col = 0  # Reel ID is first column
+            
+            for row in range(parent.table.rowCount()):
+                item = parent.table.item(row, reel_id_col)
+                if item:
+                    reel_id = item.text()
+                    # Extract number from patterns like REEL_001, RP_001, etc.
+                    import re
+                    match = re.search(r'_(\d+)$', reel_id)
+                    if match:
+                        num = int(match.group(1))
+                        max_num = max(max_num, num)
+            
+            # Generate next ID
+            next_num = max_num + 1
+            reel_id = f"REEL_{next_num:03d}"
+        else:
+            # Fallback: use simple counter or timestamp
+            # For safety, still use timestamp but shorter format
+            timestamp = datetime.datetime.now().strftime("%H%M%S")
+            reel_id = f"REEL_{timestamp}"
+        
         self.reel_id_edit.setText(reel_id)
     
     def randomize_media(self):

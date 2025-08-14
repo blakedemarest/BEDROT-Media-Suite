@@ -1496,9 +1496,25 @@ class ReelTrackerApp(QMainWindow):
         reel_type_col = self.columns.index("Reel Type")
         caption_col = self.columns.index("Caption")
         
-        # Auto-generate Reel ID
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        reel_id = f"REEL_{timestamp}_{row_count:03d}"
+        # Auto-generate Reel ID with sequential numbering
+        # Find the highest existing REEL_XXX number
+        max_num = 0
+        for row in range(self.table.rowCount()):
+            if row == row_count:  # Skip the row we just added
+                continue
+            item = self.table.item(row, reel_id_col)
+            if item:
+                existing_id = item.text()
+                # Extract number from patterns like REEL_001, RP_001, etc.
+                import re
+                match = re.search(r'_(\d+)$', existing_id)
+                if match:
+                    num = int(match.group(1))
+                    max_num = max(max_num, num)
+        
+        # Generate next ID
+        next_num = max_num + 1
+        reel_id = f"REEL_{next_num:03d}"
         self.table.item(row_count, reel_id_col).setText(reel_id)
         
         # Populate file path & name

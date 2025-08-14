@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 from .utils import safe_print
+from .ui_styles import apply_dialog_theme, style_button, style_header_label, get_dialog_button_box_style
 
 
 class CustomItemManagerDialog(QDialog):
@@ -31,6 +32,9 @@ class CustomItemManagerDialog(QDialog):
         self.setModal(True)
         self.resize(400, 500)
         
+        # Apply BEDROT theme
+        apply_dialog_theme(self)
+        
         # Get current items
         self.items = self.config_manager.get_dropdown_values(item_type) if config_manager else []
         
@@ -43,8 +47,8 @@ class CustomItemManagerDialog(QDialog):
         self.setLayout(layout)
         
         # Header
-        header_label = QLabel(f"Manage {self.item_type.title()} Items")
-        header_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #2c3e50; margin: 10px;")
+        header_label = QLabel(f"MANAGE {self.item_type.upper()} ITEMS")
+        style_header_label(header_label)
         header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(header_label)
         
