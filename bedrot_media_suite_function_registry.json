@@ -2,10 +2,10 @@
   "metadata": {
     "generated_at": "1754563681.2579336",
     "project_root": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite",
-    "total_files": 94,
-    "total_functions": 187,
+    "total_files": 91,
+    "total_functions": 181,
     "total_classes": 111,
-    "total_methods": 1043
+    "total_methods": 1055
   },
   "files": {
     "fix_and_test_gui.py": {
@@ -264,7 +264,7 @@
           "type": "function",
           "name": "initial_log",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-          "line": 577,
+          "line": 715,
           "args": [],
           "docstring": "",
           "is_async": false,
@@ -397,246 +397,56 @@
           "name": "PYTHON_EXECUTABLE",
           "value": "<complex_expression>",
           "line": 55
-        }
-      ]
-    },
-    "test_fixed_gui.py": {
-      "functions": {
-        "run_test": {
-          "type": "function",
-          "name": "run_test",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
-          "line": 31,
-          "args": [],
-          "docstring": "",
-          "is_async": false,
-          "language": "python"
-        },
-        "start_download": {
-          "type": "function",
-          "name": "start_download",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
-          "line": 57,
-          "args": [],
-          "docstring": "",
-          "is_async": false,
-          "language": "python"
-        },
-        "monitor_download": {
-          "type": "function",
-          "name": "monitor_download",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
-          "line": 72,
-          "args": [
-            "start_time"
-          ],
-          "docstring": "",
-          "is_async": false,
-          "language": "python"
-        }
-      },
-      "classes": {},
-      "imports": [
-        {
-          "module": "os",
-          "alias": null,
-          "type": "import"
         },
         {
-          "module": "sys",
-          "alias": null,
-          "type": "import"
+          "name": "BG_COLOR",
+          "value": "#121212",
+          "line": 362
         },
         {
-          "module": "time",
-          "alias": null,
-          "type": "import"
+          "name": "BG_SECONDARY",
+          "value": "#1a1a1a",
+          "line": 363
         },
         {
-          "module": "glob",
-          "alias": null,
-          "type": "import"
+          "name": "BG_HOVER",
+          "value": "#252525",
+          "line": 364
         },
         {
-          "module": "tkinter",
-          "alias": "tk",
-          "type": "import"
+          "name": "FG_COLOR",
+          "value": "#e0e0e0",
+          "line": 365
         },
         {
-          "module": "media_download_app",
-          "name": "MediaDownloaderApp",
-          "alias": null,
-          "type": "from_import"
-        }
-      ],
-      "constants": [
-        {
-          "name": "SCRIPT_DIR",
-          "value": "<complex_expression>",
-          "line": 10
-        }
-      ]
-    },
-    "test_gui_simple.py": {
-      "functions": {
-        "test_sequence": {
-          "type": "function",
-          "name": "test_sequence",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-          "line": 38,
-          "args": [],
-          "docstring": "Run a test download sequence",
-          "is_async": false,
-          "language": "python"
-        },
-        "start_download": {
-          "type": "function",
-          "name": "start_download",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-          "line": 63,
-          "args": [],
-          "docstring": "Start download after queue is populated",
-          "is_async": false,
-          "language": "python"
-        },
-        "monitor_status": {
-          "type": "function",
-          "name": "monitor_status",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-          "line": 84,
-          "args": [],
-          "docstring": "Monitor download status",
-          "is_async": false,
-          "language": "python"
-        }
-      },
-      "classes": {
-        "Logger": {
-          "type": "class",
-          "name": "Logger",
-          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-          "line": 14,
-          "docstring": "",
-          "bases": [],
-          "methods": [
-            {
-              "name": "__init__",
-              "args": [
-                "self",
-                "filename"
-              ],
-              "docstring": "",
-              "line": 15,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "write",
-              "args": [
-                "self",
-                "message"
-              ],
-              "docstring": "",
-              "line": 19,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            },
-            {
-              "name": "flush",
-              "args": [
-                "self"
-              ],
-              "docstring": "",
-              "line": 28,
-              "is_async": false,
-              "is_property": false,
-              "is_staticmethod": false,
-              "is_classmethod": false
-            }
-          ],
-          "language": "python"
-        }
-      },
-      "imports": [
-        {
-          "module": "os",
-          "alias": null,
-          "type": "import"
+          "name": "ACCENT_GREEN",
+          "value": "#00ff88",
+          "line": 366
         },
         {
-          "module": "sys",
-          "alias": null,
-          "type": "import"
+          "name": "ACCENT_CYAN",
+          "value": "#00ffff",
+          "line": 367
         },
         {
-          "module": "time",
-          "alias": null,
-          "type": "import"
+          "name": "ACCENT_MAGENTA",
+          "value": "#ff00ff",
+          "line": 368
         },
         {
-          "module": "tkinter",
-          "alias": "tk",
-          "type": "import"
+          "name": "ACCENT_PINK",
+          "value": "#ff00aa",
+          "line": 369
         },
         {
-          "module": "media_download_app",
-          "name": "MediaDownloaderApp",
-          "alias": null,
-          "type": "from_import"
+          "name": "ACCENT_ORANGE",
+          "value": "#ff8800",
+          "line": 370
         },
         {
-          "module": "glob",
-          "alias": null,
-          "type": "import"
-        }
-      ],
-      "constants": [
-        {
-          "name": "SCRIPT_DIR",
-          "value": "<complex_expression>",
-          "line": 10
-        }
-      ]
-    },
-    "test_mp3_fix.py": {
-      "functions": {},
-      "classes": {},
-      "imports": [
-        {
-          "module": "os",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "sys",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "subprocess",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "time",
-          "alias": null,
-          "type": "import"
-        },
-        {
-          "module": "glob",
-          "alias": null,
-          "type": "import"
-        }
-      ],
-      "constants": [
-        {
-          "name": "SCRIPT_DIR",
-          "value": "<complex_expression>",
-          "line": 11
+          "name": "BORDER_COLOR",
+          "value": "#404040",
+          "line": 371
         }
       ]
     },
@@ -760,12 +570,24 @@
               "is_classmethod": false
             },
             {
+              "name": "apply_bedrot_theme",
+              "args": [
+                "self"
+              ],
+              "docstring": "Apply the BEDROT cyberpunk visual theme to all tkinter/ttk widgets.",
+              "line": 434,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
               "name": "create_widgets",
               "args": [
                 "self"
               ],
               "docstring": "",
-              "line": 430,
+              "line": 504,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -778,7 +600,7 @@
                 "*args"
               ],
               "docstring": "",
-              "line": 529,
+              "line": 643,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -791,7 +613,7 @@
                 "*args"
               ],
               "docstring": "",
-              "line": 537,
+              "line": 651,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -804,7 +626,7 @@
                 "*args"
               ],
               "docstring": "",
-              "line": 545,
+              "line": 659,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -816,7 +638,7 @@
                 "self"
               ],
               "docstring": "Starts the URL expansion and adding process in a separate thread.",
-              "line": 554,
+              "line": 668,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -829,7 +651,7 @@
                 "url_to_process"
               ],
               "docstring": "Expands the URL and adds results to the queue listbox. Runs in a separate thread.",
-              "line": 576,
+              "line": 690,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -841,7 +663,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 624,
+              "line": 738,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -853,7 +675,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 632,
+              "line": 746,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -865,7 +687,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 641,
+              "line": 755,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -878,7 +700,7 @@
                 "message"
               ],
               "docstring": "",
-              "line": 645,
+              "line": 759,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -890,7 +712,7 @@
                 "self"
               ],
               "docstring": "",
-              "line": 652,
+              "line": 766,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -902,7 +724,7 @@
                 "self"
               ],
               "docstring": "Abort the current download operation.",
-              "line": 763,
+              "line": 877,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -914,7 +736,7 @@
                 "self"
               ],
               "docstring": "Re-enable download buttons after completion or abort.",
-              "line": 783,
+              "line": 897,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -932,7 +754,7 @@
                 "chop_settings"
               ],
               "docstring": "Processes queue item by item: Download -> Apply Unique Suffix -> Remove Audio -> Adjust AR -> Cut -> Chop -> Finalize.\n        Manages intermediate files. Receives only INDIVIDUAL video URLs.",
-              "line": 791,
+              "line": 905,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -945,7 +767,7 @@
                 "url"
               ],
               "docstring": "",
-              "line": 1415,
+              "line": 1529,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -957,7 +779,7 @@
                 "self"
               ],
               "docstring": "Enables both Download and Add buttons.",
-              "line": 1427,
+              "line": 1541,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -969,7 +791,7 @@
                 "self"
               ],
               "docstring": "Called when the user tries to close the window.",
-              "line": 1437,
+              "line": 1551,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -9930,7 +9752,19 @@
                 "error_msg"
               ],
               "docstring": "Show error UI when initialization fails.",
-              "line": 87,
+              "line": 90,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "apply_bedrot_theme",
+              "args": [
+                "self"
+              ],
+              "docstring": "Apply the BEDROT cyberpunk visual theme.",
+              "line": 104,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -9942,7 +9776,7 @@
                 "self"
               ],
               "docstring": "Setup the user interface.",
-              "line": 101,
+              "line": 350,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -9954,7 +9788,7 @@
                 "self"
               ],
               "docstring": "Browse for image folder.",
-              "line": 208,
+              "line": 460,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -9966,7 +9800,7 @@
                 "self"
               ],
               "docstring": "Browse for output folder.",
-              "line": 218,
+              "line": 470,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -9978,7 +9812,7 @@
                 "self"
               ],
               "docstring": "Get the selected aspect ratio.",
-              "line": 228,
+              "line": 480,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -9990,7 +9824,7 @@
                 "self"
               ],
               "docstring": "Start or stop the worker thread.",
-              "line": 235,
+              "line": 487,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10003,7 +9837,7 @@
                 "enabled"
               ],
               "docstring": "Enable/disable controls during generation.",
-              "line": 290,
+              "line": 542,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10016,7 +9850,7 @@
                 "message"
               ],
               "docstring": "Update status label.",
-              "line": 299,
+              "line": 551,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10029,7 +9863,7 @@
                 "count"
               ],
               "docstring": "Update generation count.",
-              "line": 303,
+              "line": 555,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10042,7 +9876,7 @@
                 "error_message"
               ],
               "docstring": "Handle worker error.",
-              "line": 308,
+              "line": 560,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10054,7 +9888,7 @@
                 "self"
               ],
               "docstring": "Handle worker finished.",
-              "line": 313,
+              "line": 565,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10066,7 +9900,7 @@
                 "self"
               ],
               "docstring": "Reset UI after worker stops.",
-              "line": 318,
+              "line": 570,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10078,7 +9912,7 @@
                 "self"
               ],
               "docstring": "Update the preset combo box with available presets.",
-              "line": 326,
+              "line": 578,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10091,7 +9925,7 @@
                 "preset_name"
               ],
               "docstring": "Handle preset selection from combo box.",
-              "line": 349,
+              "line": 601,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10104,7 +9938,7 @@
                 "preset_name"
               ],
               "docstring": "Load a preset and apply its settings.",
-              "line": 356,
+              "line": 608,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10116,7 +9950,7 @@
                 "self"
               ],
               "docstring": "Save current settings to the selected preset.",
-              "line": 376,
+              "line": 628,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10128,7 +9962,7 @@
                 "self"
               ],
               "docstring": "Save current settings as a new preset.",
-              "line": 391,
+              "line": 643,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10140,7 +9974,7 @@
                 "self"
               ],
               "docstring": "Open the preset management dialog.",
-              "line": 417,
+              "line": 669,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -10153,7 +9987,7 @@
                 "event"
               ],
               "docstring": "Handle window close.",
-              "line": 428,
+              "line": 680,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13715,7 +13549,7 @@
           "type": "function",
           "name": "main",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-          "line": 1520,
+          "line": 2017,
           "args": [],
           "docstring": "Main function to run the application.",
           "is_async": false,
@@ -13727,7 +13561,7 @@
           "type": "class",
           "name": "CSVProtectionManager",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-          "line": 53,
+          "line": 54,
           "docstring": "Enhanced CSV protection manager with file locking, data validation, and auto-save debouncing.\n    Prevents CSV corruption by ensuring atomic writes and validating data before saving.",
           "bases": [],
           "methods": [
@@ -13738,7 +13572,7 @@
                 "csv_path"
               ],
               "docstring": "",
-              "line": 59,
+              "line": 60,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13751,7 +13585,7 @@
                 "file_handle"
               ],
               "docstring": "Cross-platform file locking with fallback.",
-              "line": 67,
+              "line": 68,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13764,7 +13598,7 @@
                 "file_handle"
               ],
               "docstring": "Cross-platform file unlocking with fallback.",
-              "line": 83,
+              "line": 84,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13778,7 +13612,7 @@
                 "columns"
               ],
               "docstring": "Validate data before saving to prevent empty or corrupted CSV writes.",
-              "line": 93,
+              "line": 94,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13794,7 +13628,7 @@
                 "backup_manager"
               ],
               "docstring": "Safely write CSV with file locking, validation, and backup protection.",
-              "line": 124,
+              "line": 125,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13811,7 +13645,7 @@
                 "callback"
               ],
               "docstring": "Debounced save to prevent multiple rapid saves from corrupting the file.",
-              "line": 182,
+              "line": 183,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13824,7 +13658,7 @@
           "type": "class",
           "name": "DropdownDelegate",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-          "line": 202,
+          "line": 203,
           "docstring": "Custom delegate for dropdown editing in table cells.",
           "bases": [
             "QItemDelegate"
@@ -13839,7 +13673,7 @@
                 "config_manager"
               ],
               "docstring": "",
-              "line": 207,
+              "line": 208,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13854,7 +13688,7 @@
                 "index"
               ],
               "docstring": "Create dropdown editor for the cell.",
-              "line": 213,
+              "line": 214,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13868,7 +13702,7 @@
                 "index"
               ],
               "docstring": "Set the current value in the editor.",
-              "line": 231,
+              "line": 232,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13883,7 +13717,7 @@
                 "index"
               ],
               "docstring": "Set the value from editor back to model.",
-              "line": 243,
+              "line": 244,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13898,7 +13732,7 @@
                 "index"
               ],
               "docstring": "Update editor geometry.",
-              "line": 263,
+              "line": 264,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13911,7 +13745,7 @@
           "type": "class",
           "name": "ReelTrackerApp",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-          "line": 272,
+          "line": 273,
           "docstring": "PyQt5 application for tracking reels with CSV import/export and drag-drop functionality.\n    Enhanced with robust manual data entry methods, media randomization support, and configuration management.",
           "bases": [
             "QMainWindow"
@@ -13923,7 +13757,19 @@
                 "self"
               ],
               "docstring": "",
-              "line": 278,
+              "line": 279,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "apply_bedrot_theme",
+              "args": [
+                "self"
+              ],
+              "docstring": "Apply BEDROT's cyberpunk dark theme to the application.",
+              "line": 327,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13935,7 +13781,7 @@
                 "self"
               ],
               "docstring": "Initialize the user interface components.",
-              "line": 326,
+              "line": 593,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13947,7 +13793,7 @@
                 "self"
               ],
               "docstring": "Create menu bar with configuration options.",
-              "line": 446,
+              "line": 886,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13959,7 +13805,7 @@
                 "self"
               ],
               "docstring": "Show current dropdown configuration.",
-              "line": 478,
+              "line": 918,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13971,7 +13817,7 @@
                 "self"
               ],
               "docstring": "Reset dropdown values to defaults.",
-              "line": 508,
+              "line": 948,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13983,7 +13829,7 @@
                 "self"
               ],
               "docstring": "Toggle auto-load CSV setting.",
-              "line": 536,
+              "line": 976,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -13995,7 +13841,7 @@
                 "self"
               ],
               "docstring": "Show the location of the configuration file.",
-              "line": 552,
+              "line": 992,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14007,7 +13853,7 @@
                 "self"
               ],
               "docstring": "Setup the table widget with proper columns and drag-drop support.",
-              "line": 564,
+              "line": 1004,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14019,7 +13865,7 @@
                 "self"
               ],
               "docstring": "Setup dropdown delegates for specific columns.",
-              "line": 612,
+              "line": 1059,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14031,7 +13877,7 @@
                 "self"
               ],
               "docstring": "Update button enabled states based on selection.",
-              "line": 635,
+              "line": 1082,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14043,7 +13889,7 @@
                 "self"
               ],
               "docstring": "Update the row count display with statistics.",
-              "line": 642,
+              "line": 1089,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14056,7 +13902,7 @@
                 "total_count"
               ],
               "docstring": "Update the release counter display with goal achievement acknowledgement.",
-              "line": 672,
+              "line": 1119,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14068,7 +13914,7 @@
                 "self"
               ],
               "docstring": "Update the current release filter based on selected row.",
-              "line": 714,
+              "line": 1203,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14081,7 +13927,7 @@
                 "item"
               ],
               "docstring": "Handle direct cell edits and trigger auto-save.",
-              "line": 732,
+              "line": 1221,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14094,7 +13940,7 @@
                 "release_name"
               ],
               "docstring": "Count reels for a specific release.",
-              "line": 744,
+              "line": 1233,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14106,7 +13952,7 @@
                 "self"
               ],
               "docstring": "Get all unique releases with their reel counts.",
-              "line": 756,
+              "line": 1245,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14118,7 +13964,7 @@
                 "self"
               ],
               "docstring": "Show dialog with breakdown of reels by release.",
-              "line": 770,
+              "line": 1259,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14130,7 +13976,7 @@
                 "self"
               ],
               "docstring": "Automatically save CSV with enhanced protection against corruption.\n        Uses file locking, data validation, and debouncing to prevent issues.",
-              "line": 782,
+              "line": 1271,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14142,7 +13988,7 @@
                 "self"
               ],
               "docstring": "Add a new reel using the media randomizer.",
-              "line": 849,
+              "line": 1338,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14155,7 +14001,7 @@
                 "event"
               ],
               "docstring": "Handle drag enter events for file drops.",
-              "line": 879,
+              "line": 1368,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14168,7 +14014,7 @@
                 "event"
               ],
               "docstring": "Handle drag move events for file drops.",
-              "line": 886,
+              "line": 1375,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14181,7 +14027,7 @@
                 "event"
               ],
               "docstring": "Handle file drop events and add new rows to the table.",
-              "line": 893,
+              "line": 1382,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14193,7 +14039,7 @@
                 "self"
               ],
               "docstring": "Open the default metadata settings dialog.",
-              "line": 911,
+              "line": 1400,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14205,7 +14051,7 @@
                 "self"
               ],
               "docstring": "Open the file organization dialog.",
-              "line": 917,
+              "line": 1406,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14220,7 +14066,19 @@
                 "new_filename"
               ],
               "docstring": "Update CSV after successful file organization.",
-              "line": 939,
+              "line": 1428,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "manage_release_values",
+              "args": [
+                "self"
+              ],
+              "docstring": "Open the custom item manager dialog to manage release dropdown values.",
+              "line": 1471,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14233,7 +14091,7 @@
                 "file_path"
               ],
               "docstring": "Add a new row to the table with file information and default metadata.",
-              "line": 982,
+              "line": 1479,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14245,7 +14103,7 @@
                 "self"
               ],
               "docstring": "Open dialog to add a new reel with all data.",
-              "line": 1048,
+              "line": 1545,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14257,7 +14115,7 @@
                 "self"
               ],
               "docstring": "Edit one or many selected reels.",
-              "line": 1058,
+              "line": 1555,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14269,7 +14127,7 @@
                 "self"
               ],
               "docstring": "Duplicate the selected reel.",
-              "line": 1094,
+              "line": 1591,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14281,7 +14139,7 @@
                 "self"
               ],
               "docstring": "Delete the selected reel(s).",
-              "line": 1117,
+              "line": 1614,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14293,7 +14151,7 @@
                 "self"
               ],
               "docstring": "Add an empty row to the table.",
-              "line": 1144,
+              "line": 1641,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14305,7 +14163,7 @@
                 "self"
               ],
               "docstring": "Clear all data from the table with CRITICAL backup protection.",
-              "line": 1159,
+              "line": 1656,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14318,7 +14176,7 @@
                 "row_index"
               ],
               "docstring": "Remember last used Persona/Release/Reel Type values from a given row",
-              "line": 1197,
+              "line": 1694,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14331,7 +14189,7 @@
                 "data"
               ],
               "docstring": "Add a reel to the table with the provided data.",
-              "line": 1208,
+              "line": 1705,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14345,7 +14203,7 @@
                 "data"
               ],
               "docstring": "Update a specific row in the table with new data.",
-              "line": 1221,
+              "line": 1718,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14357,7 +14215,7 @@
                 "self"
               ],
               "docstring": "Load CSV file and populate the table.",
-              "line": 1234,
+              "line": 1731,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14369,7 +14227,7 @@
                 "self"
               ],
               "docstring": "Save current table contents to CSV file with enhanced protection.",
-              "line": 1281,
+              "line": 1778,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14382,7 +14240,7 @@
                 "df"
               ],
               "docstring": "Populate table widget from pandas DataFrame.",
-              "line": 1344,
+              "line": 1841,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14394,7 +14252,7 @@
                 "self"
               ],
               "docstring": "Auto-load the last CSV file if enabled and file exists.",
-              "line": 1366,
+              "line": 1863,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14407,7 +14265,7 @@
                 "csv_path"
               ],
               "docstring": "Update the CSV path display label.",
-              "line": 1411,
+              "line": 1908,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14420,7 +14278,7 @@
           "type": "class",
           "name": "ReleaseBreakdownDialog",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-          "line": 1425,
+          "line": 1922,
           "docstring": "Dialog showing breakdown of reels by release.",
           "bases": [
             "QDialog"
@@ -14434,7 +14292,7 @@
                 "release_counts"
               ],
               "docstring": "",
-              "line": 1428,
+              "line": 1925,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14446,7 +14304,7 @@
                 "self"
               ],
               "docstring": "Setup the breakdown dialog UI.",
-              "line": 1437,
+              "line": 1934,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -14706,6 +14564,12 @@
         {
           "module": "backup_manager",
           "name": "BackupManager",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "custom_item_manager",
+          "name": "CustomItemManagerDialog",
           "alias": null,
           "type": "from_import"
         },
@@ -16844,7 +16708,7 @@
           "type": "function",
           "name": "main",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/main_app.py",
-          "line": 954,
+          "line": 1430,
           "args": [],
           "docstring": "Main entry point for the calendar application.",
           "is_async": false,
@@ -16887,12 +16751,24 @@
               "is_classmethod": false
             },
             {
+              "name": "apply_bedrot_theme",
+              "args": [
+                "self"
+              ],
+              "docstring": "Apply comprehensive BEDROT cyberpunk visual theme.",
+              "line": 96,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
               "name": "create_menu_bar",
               "args": [
                 "self"
               ],
               "docstring": "Create application menu bar.",
-              "line": 93,
+              "line": 553,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16904,7 +16780,7 @@
                 "self"
               ],
               "docstring": "Create application toolbar.",
-              "line": 134,
+              "line": 594,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16916,7 +16792,7 @@
                 "self"
               ],
               "docstring": "Create the visual calendar tab.",
-              "line": 159,
+              "line": 619,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16928,7 +16804,7 @@
                 "self"
               ],
               "docstring": "Create overview tab with summary statistics.",
-              "line": 173,
+              "line": 634,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16940,7 +16816,7 @@
                 "self"
               ],
               "docstring": "Create releases management tab.",
-              "line": 220,
+              "line": 681,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16952,7 +16828,7 @@
                 "self"
               ],
               "docstring": "Create deliverables tracking tab.",
-              "line": 242,
+              "line": 703,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16964,7 +16840,7 @@
                 "self"
               ],
               "docstring": "Create add release form tab.",
-              "line": 270,
+              "line": 731,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16976,7 +16852,7 @@
                 "self"
               ],
               "docstring": "Load initial calendar data.",
-              "line": 325,
+              "line": 786,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -16988,7 +16864,7 @@
                 "self"
               ],
               "docstring": "Refresh all views with current data.",
-              "line": 330,
+              "line": 791,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17000,7 +16876,7 @@
                 "self"
               ],
               "docstring": "Refresh the visual calendar.",
-              "line": 338,
+              "line": 799,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17012,7 +16888,7 @@
                 "self"
               ],
               "docstring": "Refresh the overview tab.",
-              "line": 352,
+              "line": 813,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17024,7 +16900,7 @@
                 "self"
               ],
               "docstring": "Refresh the upcoming releases table.",
-              "line": 385,
+              "line": 846,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17036,7 +16912,7 @@
                 "self"
               ],
               "docstring": "Refresh the overdue deliverables table.",
-              "line": 427,
+              "line": 888,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17048,7 +16924,7 @@
                 "self"
               ],
               "docstring": "Refresh the releases table.",
-              "line": 471,
+              "line": 932,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17060,7 +16936,7 @@
                 "self"
               ],
               "docstring": "Refresh the deliverables table.",
-              "line": 537,
+              "line": 998,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17072,7 +16948,7 @@
                 "self"
               ],
               "docstring": "Update the statistics label.",
-              "line": 630,
+              "line": 1091,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17084,7 +16960,7 @@
                 "self"
               ],
               "docstring": "Add a new release from the form.",
-              "line": 657,
+              "line": 1118,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17098,7 +16974,7 @@
                 "title: str"
               ],
               "docstring": "Handle release click - open checklist dialog.",
-              "line": 716,
+              "line": 1177,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17113,7 +16989,7 @@
                 "checklist: Dict"
               ],
               "docstring": "Handle checklist update from dialog.",
-              "line": 738,
+              "line": 1199,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17128,7 +17004,7 @@
                 "new_date: datetime"
               ],
               "docstring": "Handle release drag and drop.",
-              "line": 751,
+              "line": 1212,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17142,7 +17018,22 @@
                 "title: str"
               ],
               "docstring": "Handle release deletion.",
-              "line": 783,
+              "line": 1244,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "on_artwork_updated",
+              "args": [
+                "self",
+                "artist: str",
+                "title: str",
+                "file_path: str"
+              ],
+              "docstring": "Handle artwork update from visual calendar.",
+              "line": 1259,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17156,7 +17047,7 @@
                 "artist: str"
               ],
               "docstring": "Handle quick add from calendar.",
-              "line": 798,
+              "line": 1274,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17169,7 +17060,7 @@
                 "item: QTableWidgetItem"
               ],
               "docstring": "Handle double-click on releases table.",
-              "line": 813,
+              "line": 1289,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17181,7 +17072,7 @@
                 "self"
               ],
               "docstring": "Save calendar data.",
-              "line": 820,
+              "line": 1296,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17193,7 +17084,7 @@
                 "self"
               ],
               "docstring": "Export calendar to Excel file.",
-              "line": 827,
+              "line": 1303,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17205,7 +17096,7 @@
                 "self"
               ],
               "docstring": "Export calendar to iCal file.",
-              "line": 865,
+              "line": 1341,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17217,7 +17108,7 @@
                 "self"
               ],
               "docstring": "Show about dialog.",
-              "line": 936,
+              "line": 1412,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17230,7 +17121,7 @@
                 "event"
               ],
               "docstring": "Handle window close event.",
-              "line": 947,
+              "line": 1423,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17829,11 +17720,90 @@
     "src/release_calendar/visual_calendar.py": {
       "functions": {},
       "classes": {
+        "ArtworkLabel": {
+          "type": "class",
+          "name": "ArtworkLabel",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/visual_calendar.py",
+          "line": 28,
+          "docstring": "A label that accepts artwork file drops and displays images.",
+          "bases": [
+            "QLabel"
+          ],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self",
+                "release: Dict[str, Any]",
+                "parent"
+              ],
+              "docstring": "",
+              "line": 33,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "set_artwork",
+              "args": [
+                "self",
+                "file_path: str"
+              ],
+              "docstring": "Set and display artwork image.",
+              "line": 66,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "dragEnterEvent",
+              "args": [
+                "self",
+                "event: QDragEnterEvent"
+              ],
+              "docstring": "Handle drag enter events for file drops.",
+              "line": 81,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "dragLeaveEvent",
+              "args": [
+                "self",
+                "event"
+              ],
+              "docstring": "Handle drag leave events.",
+              "line": 101,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "dropEvent",
+              "args": [
+                "self",
+                "event: QDropEvent"
+              ],
+              "docstring": "Handle drop events for artwork files.",
+              "line": 116,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        },
         "DayCell": {
           "type": "class",
           "name": "DayCell",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/visual_calendar.py",
-          "line": 28,
+          "line": 146,
           "docstring": "A single day cell in the calendar grid.",
           "bases": [
             "QFrame"
@@ -17847,7 +17817,7 @@
                 "parent"
               ],
               "docstring": "Initialize a day cell.\n        \n        Args:\n            date: The date this cell represents\n            parent: Parent widget",
-              "line": 38,
+              "line": 156,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17859,7 +17829,7 @@
                 "self"
               ],
               "docstring": "Initialize the day cell UI.",
-              "line": 56,
+              "line": 174,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17870,8 +17840,8 @@
               "args": [
                 "self"
               ],
-              "docstring": "Apply styling based on day type.",
-              "line": 95,
+              "docstring": "Apply BEDROT cyberpunk styling based on day type.",
+              "line": 213,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17884,7 +17854,22 @@
                 "release_data: Dict[str, Any]"
               ],
               "docstring": "Add a release to this day.",
-              "line": 136,
+              "line": 257,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "on_artwork_dropped",
+              "args": [
+                "self",
+                "artist: str",
+                "title: str",
+                "file_path: str"
+              ],
+              "docstring": "Handle artwork drop event from ArtworkLabel.",
+              "line": 262,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17897,7 +17882,7 @@
                 "deadline_data: Dict[str, Any]"
               ],
               "docstring": "Add a deadline badge to this day.",
-              "line": 141,
+              "line": 272,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17909,7 +17894,7 @@
                 "self"
               ],
               "docstring": "Update the visual display of releases.",
-              "line": 146,
+              "line": 277,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17921,7 +17906,7 @@
                 "self"
               ],
               "docstring": "Update the deadline badges display.",
-              "line": 165,
+              "line": 296,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17933,8 +17918,8 @@
                 "self",
                 "release: Dict[str, Any]"
               ],
-              "docstring": "Create a visual card for a release.",
-              "line": 178,
+              "docstring": "Create a visual card for a release with BEDROT styling.",
+              "line": 309,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17946,8 +17931,8 @@
                 "self",
                 "deadline: Dict[str, Any]"
               ],
-              "docstring": "Create a deadline badge.",
-              "line": 232,
+              "docstring": "Create a deadline badge with BEDROT styling.",
+              "line": 364,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17961,7 +17946,7 @@
                 "release: Dict[str, Any]"
               ],
               "docstring": "Start dragging a release.",
-              "line": 267,
+              "line": 399,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17974,7 +17959,7 @@
                 "event: QDragEnterEvent"
               ],
               "docstring": "Handle drag enter events.",
-              "line": 296,
+              "line": 429,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -17987,7 +17972,7 @@
                 "event"
               ],
               "docstring": "Handle drag leave events.",
-              "line": 307,
+              "line": 440,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18000,7 +17985,7 @@
                 "event: QDropEvent"
               ],
               "docstring": "Handle drop events.",
-              "line": 311,
+              "line": 444,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18013,7 +17998,7 @@
                 "event"
               ],
               "docstring": "Show context menu.",
-              "line": 328,
+              "line": 461,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18026,7 +18011,7 @@
           "type": "class",
           "name": "VisualCalendarWidget",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/visual_calendar.py",
-          "line": 364,
+          "line": 497,
           "docstring": "Main visual calendar widget.",
           "bases": [
             "QWidget"
@@ -18039,7 +18024,7 @@
                 "parent"
               ],
               "docstring": "Initialize the visual calendar widget.",
-              "line": 374,
+              "line": 508,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18051,7 +18036,7 @@
                 "self"
               ],
               "docstring": "Set up the calendar UI.",
-              "line": 384,
+              "line": 518,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18063,7 +18048,7 @@
                 "self"
               ],
               "docstring": "Create the calendar header with navigation.",
-              "line": 416,
+              "line": 551,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18075,7 +18060,7 @@
                 "self"
               ],
               "docstring": "Navigate to previous month.",
-              "line": 447,
+              "line": 580,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18087,7 +18072,7 @@
                 "self"
               ],
               "docstring": "Navigate to next month.",
-              "line": 460,
+              "line": 593,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18099,7 +18084,7 @@
                 "self"
               ],
               "docstring": "Navigate to current month.",
-              "line": 473,
+              "line": 606,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18111,7 +18096,22 @@
                 "self"
               ],
               "docstring": "Update the calendar display.",
-              "line": 479,
+              "line": 612,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "on_artwork_updated",
+              "args": [
+                "self",
+                "artist: str",
+                "title: str",
+                "file_path: str"
+              ],
+              "docstring": "Handle artwork update from day cell.",
+              "line": 660,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18123,7 +18123,7 @@
                 "self"
               ],
               "docstring": "Populate the calendar with release data.",
-              "line": 526,
+              "line": 665,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18137,7 +18137,7 @@
                 "config: Dict"
               ],
               "docstring": "Set the release data to display.",
-              "line": 560,
+              "line": 700,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18330,6 +18330,12 @@
         {
           "module": "PyQt6.QtCore",
           "name": "QEasingCurve",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt6.QtCore",
+          "name": "QUrl",
           "alias": null,
           "type": "from_import"
         },
@@ -18570,7 +18576,7 @@
                 "self"
               ],
               "docstring": "Loads configuration from JSON file or creates default.",
-              "line": 117,
+              "line": 133,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18583,7 +18589,7 @@
                 "settings_dict"
               ],
               "docstring": "Saves settings to the JSON file.",
-              "line": 180,
+              "line": 196,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18597,7 +18603,7 @@
                 "default"
               ],
               "docstring": "Get a specific setting value.",
-              "line": 247,
+              "line": 263,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18611,7 +18617,7 @@
                 "value"
               ],
               "docstring": "Set a specific setting value.",
-              "line": 251,
+              "line": 267,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18623,7 +18629,7 @@
                 "self"
               ],
               "docstring": "Returns the BPM units dictionary.",
-              "line": 255,
+              "line": 271,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18635,7 +18641,7 @@
                 "self"
               ],
               "docstring": "Returns the available aspect ratios list.",
-              "line": 259,
+              "line": 275,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18647,7 +18653,7 @@
                 "self"
               ],
               "docstring": "Returns the script directory path.",
-              "line": 263,
+              "line": 279,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18659,7 +18665,7 @@
                 "self"
               ],
               "docstring": "Returns the export settings.",
-              "line": 267,
+              "line": 283,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -18672,7 +18678,7 @@
                 "settings"
               ],
               "docstring": "Updates and saves export settings.",
-              "line": 271,
+              "line": 287,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19403,7 +19409,7 @@
           "type": "function",
           "name": "main",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/snippet_remixer/main_app.py",
-          "line": 1210,
+          "line": 1540,
           "args": [],
           "docstring": "Main entry point for the application.",
           "is_async": false,
@@ -19415,7 +19421,7 @@
           "type": "class",
           "name": "VideoRemixerApp",
           "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/snippet_remixer/main_app.py",
-          "line": 31,
+          "line": 32,
           "docstring": "Main application window for the Video Snippet Remixer.",
           "bases": [],
           "methods": [
@@ -19426,7 +19432,19 @@
                 "root"
               ],
               "docstring": "",
-              "line": 36,
+              "line": 37,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "apply_bedrot_theme",
+              "args": [
+                "self"
+              ],
+              "docstring": "Apply the BEDROT cyberpunk visual theme to the application.",
+              "line": 121,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19438,7 +19456,7 @@
                 "self"
               ],
               "docstring": "Creates and arranges all the GUI elements.",
-              "line": 117,
+              "line": 295,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19451,7 +19469,7 @@
                 "parent"
               ],
               "docstring": "Create the input files section.",
-              "line": 137,
+              "line": 315,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19463,7 +19481,7 @@
                 "self"
               ],
               "docstring": "Set up drag and drop functionality for the input listbox.",
-              "line": 185,
+              "line": 391,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19475,7 +19493,7 @@
                 "self"
               ],
               "docstring": "Add a visual hint that the listbox supports drag and drop.",
-              "line": 211,
+              "line": 417,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19487,7 +19505,7 @@
                 "self"
               ],
               "docstring": "Remove the drag and drop hint if present.",
-              "line": 222,
+              "line": 428,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19500,7 +19518,7 @@
                 "event"
               ],
               "docstring": "Handle clicks on the listbox to remove placeholder and browse files.",
-              "line": 232,
+              "line": 438,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19513,7 +19531,7 @@
                 "event"
               ],
               "docstring": "Handle file drop events on the listbox.",
-              "line": 239,
+              "line": 445,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19526,7 +19544,7 @@
                 "event"
               ],
               "docstring": "Visual feedback when files are dragged over the listbox.",
-              "line": 284,
+              "line": 490,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19539,7 +19557,7 @@
                 "event"
               ],
               "docstring": "Reset visual feedback when drag leaves the listbox.",
-              "line": 289,
+              "line": 495,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19552,7 +19570,7 @@
                 "parent"
               ],
               "docstring": "Create the output settings section.",
-              "line": 294,
+              "line": 500,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19565,7 +19583,7 @@
                 "parent"
               ],
               "docstring": "Create the length control section.",
-              "line": 360,
+              "line": 606,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19578,7 +19596,7 @@
                 "parent"
               ],
               "docstring": "Create the process button section.",
-              "line": 476,
+              "line": 744,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19591,7 +19609,7 @@
                 "parent"
               ],
               "docstring": "Create the status display section.",
-              "line": 525,
+              "line": 796,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19604,7 +19622,7 @@
                 "*args"
               ],
               "docstring": "Toggle between seconds and BPM input modes.",
-              "line": 562,
+              "line": 872,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19616,7 +19634,7 @@
                 "self"
               ],
               "docstring": "Toggle jitter slider visibility based on checkbox state.",
-              "line": 578,
+              "line": 888,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19629,7 +19647,7 @@
                 "*args"
               ],
               "docstring": "Update the jitter intensity value label.",
-              "line": 590,
+              "line": 900,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19642,7 +19660,7 @@
                 "*args"
               ],
               "docstring": "Update the duration estimate label when BPM settings change.",
-              "line": 595,
+              "line": 905,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19654,7 +19672,7 @@
                 "self"
               ],
               "docstring": "Browse for input video files.",
-              "line": 639,
+              "line": 949,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19667,7 +19685,7 @@
                 "filepaths"
               ],
               "docstring": "Add files to the processing queue.",
-              "line": 658,
+              "line": 968,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19679,7 +19697,19 @@
                 "self"
               ],
               "docstring": "Browse for output folder.",
-              "line": 681,
+              "line": 991,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "open_output_folder",
+              "args": [
+                "self"
+              ],
+              "docstring": "Open the output folder in File Explorer.",
+              "line": 1008,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19691,7 +19721,7 @@
                 "self"
               ],
               "docstring": "Clear selected items from the queue.",
-              "line": 694,
+              "line": 1024,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19703,7 +19733,7 @@
                 "self"
               ],
               "docstring": "Clear all items from the queue.",
-              "line": 710,
+              "line": 1040,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19715,7 +19745,7 @@
                 "self"
               ],
               "docstring": "Open the export settings dialog.",
-              "line": 721,
+              "line": 1051,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19728,7 +19758,7 @@
                 "message"
               ],
               "docstring": "Update the status display with message.",
-              "line": 739,
+              "line": 1069,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19742,7 +19772,7 @@
                 "msg_type"
               ],
               "docstring": "Append message to the status text area.",
-              "line": 749,
+              "line": 1079,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19755,7 +19785,7 @@
                 "message"
               ],
               "docstring": "Update status with an error message.",
-              "line": 774,
+              "line": 1104,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19768,7 +19798,7 @@
                 "message"
               ],
               "docstring": "Update status with a warning message.",
-              "line": 779,
+              "line": 1109,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19781,7 +19811,7 @@
                 "message"
               ],
               "docstring": "Update status with a success message.",
-              "line": 784,
+              "line": 1114,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19794,7 +19824,7 @@
                 "enable"
               ],
               "docstring": "Enable or disable the generate button.",
-              "line": 789,
+              "line": 1119,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19806,7 +19836,7 @@
                 "self"
               ],
               "docstring": "Enhanced processing thread starter with continuous mode support.",
-              "line": 798,
+              "line": 1128,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19818,7 +19848,7 @@
                 "self"
               ],
               "docstring": "Validates inputs, generates filename, and launches processing thread.",
-              "line": 811,
+              "line": 1141,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19836,7 +19866,7 @@
                 "settings"
               ],
               "docstring": "Helper to start the thread after a short GUI delay.",
-              "line": 889,
+              "line": 1219,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19848,7 +19878,7 @@
                 "self"
               ],
               "docstring": "Handles window closing: saves settings, prompts if processing.",
-              "line": 966,
+              "line": 1296,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19860,7 +19890,7 @@
                 "self"
               ],
               "docstring": "Toggle continuous mode on/off.",
-              "line": 1010,
+              "line": 1340,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19872,7 +19902,7 @@
                 "self"
               ],
               "docstring": "Start the next remix in continuous mode with dynamic settings update.",
-              "line": 1040,
+              "line": 1370,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19884,7 +19914,7 @@
                 "self"
               ],
               "docstring": "Get current settings from GUI controls.",
-              "line": 1074,
+              "line": 1404,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19898,7 +19928,7 @@
                 "new_settings"
               ],
               "docstring": "Detect and describe changes between settings.",
-              "line": 1088,
+              "line": 1418,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19910,7 +19940,7 @@
                 "self"
               ],
               "docstring": "Stop continuous mode.",
-              "line": 1121,
+              "line": 1451,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19922,7 +19952,7 @@
                 "self"
               ],
               "docstring": "Abort the current processing operation.",
-              "line": 1130,
+              "line": 1460,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19934,7 +19964,7 @@
                 "self"
               ],
               "docstring": "Update the continuous mode counter display with current settings.",
-              "line": 1137,
+              "line": 1467,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19947,7 +19977,7 @@
                 "*args"
               ],
               "docstring": "Update the continuous mode counter display when any relevant setting changes.",
-              "line": 1160,
+              "line": 1490,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19960,7 +19990,7 @@
                 "event"
               ],
               "docstring": "Handle immediate updates when user finishes editing input fields (Enter or focus loss).",
-              "line": 1165,
+              "line": 1495,
               "is_async": false,
               "is_property": false,
               "is_staticmethod": false,
@@ -19996,6 +20026,11 @@
         },
         {
           "module": "os",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "sys",
           "alias": null,
           "type": "import"
         },
@@ -25990,71 +26025,9 @@
       "type": "function",
       "name": "initial_log",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/launcher.py",
-      "line": 577,
+      "line": 715,
       "args": [],
       "docstring": "",
-      "is_async": false,
-      "language": "python"
-    },
-    "test_fixed_gui.py::run_test": {
-      "type": "function",
-      "name": "run_test",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
-      "line": 31,
-      "args": [],
-      "docstring": "",
-      "is_async": false,
-      "language": "python"
-    },
-    "test_fixed_gui.py::start_download": {
-      "type": "function",
-      "name": "start_download",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
-      "line": 57,
-      "args": [],
-      "docstring": "",
-      "is_async": false,
-      "language": "python"
-    },
-    "test_fixed_gui.py::monitor_download": {
-      "type": "function",
-      "name": "monitor_download",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_fixed_gui.py",
-      "line": 72,
-      "args": [
-        "start_time"
-      ],
-      "docstring": "",
-      "is_async": false,
-      "language": "python"
-    },
-    "test_gui_simple.py::test_sequence": {
-      "type": "function",
-      "name": "test_sequence",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-      "line": 38,
-      "args": [],
-      "docstring": "Run a test download sequence",
-      "is_async": false,
-      "language": "python"
-    },
-    "test_gui_simple.py::start_download": {
-      "type": "function",
-      "name": "start_download",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-      "line": 63,
-      "args": [],
-      "docstring": "Start download after queue is populated",
-      "is_async": false,
-      "language": "python"
-    },
-    "test_gui_simple.py::monitor_status": {
-      "type": "function",
-      "name": "monitor_status",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-      "line": 84,
-      "args": [],
-      "docstring": "Monitor download status",
       "is_async": false,
       "language": "python"
     },
@@ -27348,7 +27321,7 @@
       "type": "function",
       "name": "main",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-      "line": 1520,
+      "line": 2017,
       "args": [],
       "docstring": "Main function to run the application.",
       "is_async": false,
@@ -27370,7 +27343,7 @@
       "type": "function",
       "name": "main",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/main_app.py",
-      "line": 954,
+      "line": 1430,
       "args": [],
       "docstring": "Main entry point for the calendar application.",
       "is_async": false,
@@ -27609,7 +27582,7 @@
       "type": "function",
       "name": "main",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/snippet_remixer/main_app.py",
-      "line": 1210,
+      "line": 1540,
       "args": [],
       "docstring": "Main entry point for the application.",
       "is_async": false,
@@ -28122,55 +28095,6 @@
       ],
       "language": "python"
     },
-    "test_gui_simple.py::Logger": {
-      "type": "class",
-      "name": "Logger",
-      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/test_gui_simple.py",
-      "line": 14,
-      "docstring": "",
-      "bases": [],
-      "methods": [
-        {
-          "name": "__init__",
-          "args": [
-            "self",
-            "filename"
-          ],
-          "docstring": "",
-          "line": 15,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "write",
-          "args": [
-            "self",
-            "message"
-          ],
-          "docstring": "",
-          "line": 19,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        },
-        {
-          "name": "flush",
-          "args": [
-            "self"
-          ],
-          "docstring": "",
-          "line": 28,
-          "is_async": false,
-          "is_property": false,
-          "is_staticmethod": false,
-          "is_classmethod": false
-        }
-      ],
-      "language": "python"
-    },
     "src/media_download_app.py::MediaDownloaderApp": {
       "type": "class",
       "name": "MediaDownloaderApp",
@@ -28193,12 +28117,24 @@
           "is_classmethod": false
         },
         {
+          "name": "apply_bedrot_theme",
+          "args": [
+            "self"
+          ],
+          "docstring": "Apply the BEDROT cyberpunk visual theme to all tkinter/ttk widgets.",
+          "line": 434,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
           "name": "create_widgets",
           "args": [
             "self"
           ],
           "docstring": "",
-          "line": 430,
+          "line": 504,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28211,7 +28147,7 @@
             "*args"
           ],
           "docstring": "",
-          "line": 529,
+          "line": 643,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28224,7 +28160,7 @@
             "*args"
           ],
           "docstring": "",
-          "line": 537,
+          "line": 651,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28237,7 +28173,7 @@
             "*args"
           ],
           "docstring": "",
-          "line": 545,
+          "line": 659,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28249,7 +28185,7 @@
             "self"
           ],
           "docstring": "Starts the URL expansion and adding process in a separate thread.",
-          "line": 554,
+          "line": 668,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28262,7 +28198,7 @@
             "url_to_process"
           ],
           "docstring": "Expands the URL and adds results to the queue listbox. Runs in a separate thread.",
-          "line": 576,
+          "line": 690,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28274,7 +28210,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 624,
+          "line": 738,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28286,7 +28222,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 632,
+          "line": 746,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28298,7 +28234,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 641,
+          "line": 755,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28311,7 +28247,7 @@
             "message"
           ],
           "docstring": "",
-          "line": 645,
+          "line": 759,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28323,7 +28259,7 @@
             "self"
           ],
           "docstring": "",
-          "line": 652,
+          "line": 766,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28335,7 +28271,7 @@
             "self"
           ],
           "docstring": "Abort the current download operation.",
-          "line": 763,
+          "line": 877,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28347,7 +28283,7 @@
             "self"
           ],
           "docstring": "Re-enable download buttons after completion or abort.",
-          "line": 783,
+          "line": 897,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28365,7 +28301,7 @@
             "chop_settings"
           ],
           "docstring": "Processes queue item by item: Download -> Apply Unique Suffix -> Remove Audio -> Adjust AR -> Cut -> Chop -> Finalize.\n        Manages intermediate files. Receives only INDIVIDUAL video URLs.",
-          "line": 791,
+          "line": 905,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28378,7 +28314,7 @@
             "url"
           ],
           "docstring": "",
-          "line": 1415,
+          "line": 1529,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28390,7 +28326,7 @@
             "self"
           ],
           "docstring": "Enables both Download and Add buttons.",
-          "line": 1427,
+          "line": 1541,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -28402,7 +28338,7 @@
             "self"
           ],
           "docstring": "Called when the user tries to close the window.",
-          "line": 1437,
+          "line": 1551,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33227,7 +33163,19 @@
             "error_msg"
           ],
           "docstring": "Show error UI when initialization fails.",
-          "line": 87,
+          "line": 90,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "apply_bedrot_theme",
+          "args": [
+            "self"
+          ],
+          "docstring": "Apply the BEDROT cyberpunk visual theme.",
+          "line": 104,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33239,7 +33187,7 @@
             "self"
           ],
           "docstring": "Setup the user interface.",
-          "line": 101,
+          "line": 350,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33251,7 +33199,7 @@
             "self"
           ],
           "docstring": "Browse for image folder.",
-          "line": 208,
+          "line": 460,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33263,7 +33211,7 @@
             "self"
           ],
           "docstring": "Browse for output folder.",
-          "line": 218,
+          "line": 470,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33275,7 +33223,7 @@
             "self"
           ],
           "docstring": "Get the selected aspect ratio.",
-          "line": 228,
+          "line": 480,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33287,7 +33235,7 @@
             "self"
           ],
           "docstring": "Start or stop the worker thread.",
-          "line": 235,
+          "line": 487,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33300,7 +33248,7 @@
             "enabled"
           ],
           "docstring": "Enable/disable controls during generation.",
-          "line": 290,
+          "line": 542,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33313,7 +33261,7 @@
             "message"
           ],
           "docstring": "Update status label.",
-          "line": 299,
+          "line": 551,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33326,7 +33274,7 @@
             "count"
           ],
           "docstring": "Update generation count.",
-          "line": 303,
+          "line": 555,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33339,7 +33287,7 @@
             "error_message"
           ],
           "docstring": "Handle worker error.",
-          "line": 308,
+          "line": 560,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33351,7 +33299,7 @@
             "self"
           ],
           "docstring": "Handle worker finished.",
-          "line": 313,
+          "line": 565,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33363,7 +33311,7 @@
             "self"
           ],
           "docstring": "Reset UI after worker stops.",
-          "line": 318,
+          "line": 570,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33375,7 +33323,7 @@
             "self"
           ],
           "docstring": "Update the preset combo box with available presets.",
-          "line": 326,
+          "line": 578,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33388,7 +33336,7 @@
             "preset_name"
           ],
           "docstring": "Handle preset selection from combo box.",
-          "line": 349,
+          "line": 601,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33401,7 +33349,7 @@
             "preset_name"
           ],
           "docstring": "Load a preset and apply its settings.",
-          "line": 356,
+          "line": 608,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33413,7 +33361,7 @@
             "self"
           ],
           "docstring": "Save current settings to the selected preset.",
-          "line": 376,
+          "line": 628,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33425,7 +33373,7 @@
             "self"
           ],
           "docstring": "Save current settings as a new preset.",
-          "line": 391,
+          "line": 643,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33437,7 +33385,7 @@
             "self"
           ],
           "docstring": "Open the preset management dialog.",
-          "line": 417,
+          "line": 669,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -33450,7 +33398,7 @@
             "event"
           ],
           "docstring": "Handle window close.",
-          "line": 428,
+          "line": 680,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35750,7 +35698,7 @@
       "type": "class",
       "name": "CSVProtectionManager",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-      "line": 53,
+      "line": 54,
       "docstring": "Enhanced CSV protection manager with file locking, data validation, and auto-save debouncing.\n    Prevents CSV corruption by ensuring atomic writes and validating data before saving.",
       "bases": [],
       "methods": [
@@ -35761,7 +35709,7 @@
             "csv_path"
           ],
           "docstring": "",
-          "line": 59,
+          "line": 60,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35774,7 +35722,7 @@
             "file_handle"
           ],
           "docstring": "Cross-platform file locking with fallback.",
-          "line": 67,
+          "line": 68,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35787,7 +35735,7 @@
             "file_handle"
           ],
           "docstring": "Cross-platform file unlocking with fallback.",
-          "line": 83,
+          "line": 84,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35801,7 +35749,7 @@
             "columns"
           ],
           "docstring": "Validate data before saving to prevent empty or corrupted CSV writes.",
-          "line": 93,
+          "line": 94,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35817,7 +35765,7 @@
             "backup_manager"
           ],
           "docstring": "Safely write CSV with file locking, validation, and backup protection.",
-          "line": 124,
+          "line": 125,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35834,7 +35782,7 @@
             "callback"
           ],
           "docstring": "Debounced save to prevent multiple rapid saves from corrupting the file.",
-          "line": 182,
+          "line": 183,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35847,7 +35795,7 @@
       "type": "class",
       "name": "DropdownDelegate",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-      "line": 202,
+      "line": 203,
       "docstring": "Custom delegate for dropdown editing in table cells.",
       "bases": [
         "QItemDelegate"
@@ -35862,7 +35810,7 @@
             "config_manager"
           ],
           "docstring": "",
-          "line": 207,
+          "line": 208,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35877,7 +35825,7 @@
             "index"
           ],
           "docstring": "Create dropdown editor for the cell.",
-          "line": 213,
+          "line": 214,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35891,7 +35839,7 @@
             "index"
           ],
           "docstring": "Set the current value in the editor.",
-          "line": 231,
+          "line": 232,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35906,7 +35854,7 @@
             "index"
           ],
           "docstring": "Set the value from editor back to model.",
-          "line": 243,
+          "line": 244,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35921,7 +35869,7 @@
             "index"
           ],
           "docstring": "Update editor geometry.",
-          "line": 263,
+          "line": 264,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35934,7 +35882,7 @@
       "type": "class",
       "name": "ReelTrackerApp",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-      "line": 272,
+      "line": 273,
       "docstring": "PyQt5 application for tracking reels with CSV import/export and drag-drop functionality.\n    Enhanced with robust manual data entry methods, media randomization support, and configuration management.",
       "bases": [
         "QMainWindow"
@@ -35946,7 +35894,19 @@
             "self"
           ],
           "docstring": "",
-          "line": 278,
+          "line": 279,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "apply_bedrot_theme",
+          "args": [
+            "self"
+          ],
+          "docstring": "Apply BEDROT's cyberpunk dark theme to the application.",
+          "line": 327,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35958,7 +35918,7 @@
             "self"
           ],
           "docstring": "Initialize the user interface components.",
-          "line": 326,
+          "line": 593,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35970,7 +35930,7 @@
             "self"
           ],
           "docstring": "Create menu bar with configuration options.",
-          "line": 446,
+          "line": 886,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35982,7 +35942,7 @@
             "self"
           ],
           "docstring": "Show current dropdown configuration.",
-          "line": 478,
+          "line": 918,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -35994,7 +35954,7 @@
             "self"
           ],
           "docstring": "Reset dropdown values to defaults.",
-          "line": 508,
+          "line": 948,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36006,7 +35966,7 @@
             "self"
           ],
           "docstring": "Toggle auto-load CSV setting.",
-          "line": 536,
+          "line": 976,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36018,7 +35978,7 @@
             "self"
           ],
           "docstring": "Show the location of the configuration file.",
-          "line": 552,
+          "line": 992,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36030,7 +35990,7 @@
             "self"
           ],
           "docstring": "Setup the table widget with proper columns and drag-drop support.",
-          "line": 564,
+          "line": 1004,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36042,7 +36002,7 @@
             "self"
           ],
           "docstring": "Setup dropdown delegates for specific columns.",
-          "line": 612,
+          "line": 1059,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36054,7 +36014,7 @@
             "self"
           ],
           "docstring": "Update button enabled states based on selection.",
-          "line": 635,
+          "line": 1082,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36066,7 +36026,7 @@
             "self"
           ],
           "docstring": "Update the row count display with statistics.",
-          "line": 642,
+          "line": 1089,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36079,7 +36039,7 @@
             "total_count"
           ],
           "docstring": "Update the release counter display with goal achievement acknowledgement.",
-          "line": 672,
+          "line": 1119,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36091,7 +36051,7 @@
             "self"
           ],
           "docstring": "Update the current release filter based on selected row.",
-          "line": 714,
+          "line": 1203,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36104,7 +36064,7 @@
             "item"
           ],
           "docstring": "Handle direct cell edits and trigger auto-save.",
-          "line": 732,
+          "line": 1221,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36117,7 +36077,7 @@
             "release_name"
           ],
           "docstring": "Count reels for a specific release.",
-          "line": 744,
+          "line": 1233,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36129,7 +36089,7 @@
             "self"
           ],
           "docstring": "Get all unique releases with their reel counts.",
-          "line": 756,
+          "line": 1245,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36141,7 +36101,7 @@
             "self"
           ],
           "docstring": "Show dialog with breakdown of reels by release.",
-          "line": 770,
+          "line": 1259,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36153,7 +36113,7 @@
             "self"
           ],
           "docstring": "Automatically save CSV with enhanced protection against corruption.\n        Uses file locking, data validation, and debouncing to prevent issues.",
-          "line": 782,
+          "line": 1271,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36165,7 +36125,7 @@
             "self"
           ],
           "docstring": "Add a new reel using the media randomizer.",
-          "line": 849,
+          "line": 1338,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36178,7 +36138,7 @@
             "event"
           ],
           "docstring": "Handle drag enter events for file drops.",
-          "line": 879,
+          "line": 1368,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36191,7 +36151,7 @@
             "event"
           ],
           "docstring": "Handle drag move events for file drops.",
-          "line": 886,
+          "line": 1375,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36204,7 +36164,7 @@
             "event"
           ],
           "docstring": "Handle file drop events and add new rows to the table.",
-          "line": 893,
+          "line": 1382,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36216,7 +36176,7 @@
             "self"
           ],
           "docstring": "Open the default metadata settings dialog.",
-          "line": 911,
+          "line": 1400,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36228,7 +36188,7 @@
             "self"
           ],
           "docstring": "Open the file organization dialog.",
-          "line": 917,
+          "line": 1406,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36243,7 +36203,19 @@
             "new_filename"
           ],
           "docstring": "Update CSV after successful file organization.",
-          "line": 939,
+          "line": 1428,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "manage_release_values",
+          "args": [
+            "self"
+          ],
+          "docstring": "Open the custom item manager dialog to manage release dropdown values.",
+          "line": 1471,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36256,7 +36228,7 @@
             "file_path"
           ],
           "docstring": "Add a new row to the table with file information and default metadata.",
-          "line": 982,
+          "line": 1479,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36268,7 +36240,7 @@
             "self"
           ],
           "docstring": "Open dialog to add a new reel with all data.",
-          "line": 1048,
+          "line": 1545,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36280,7 +36252,7 @@
             "self"
           ],
           "docstring": "Edit one or many selected reels.",
-          "line": 1058,
+          "line": 1555,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36292,7 +36264,7 @@
             "self"
           ],
           "docstring": "Duplicate the selected reel.",
-          "line": 1094,
+          "line": 1591,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36304,7 +36276,7 @@
             "self"
           ],
           "docstring": "Delete the selected reel(s).",
-          "line": 1117,
+          "line": 1614,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36316,7 +36288,7 @@
             "self"
           ],
           "docstring": "Add an empty row to the table.",
-          "line": 1144,
+          "line": 1641,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36328,7 +36300,7 @@
             "self"
           ],
           "docstring": "Clear all data from the table with CRITICAL backup protection.",
-          "line": 1159,
+          "line": 1656,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36341,7 +36313,7 @@
             "row_index"
           ],
           "docstring": "Remember last used Persona/Release/Reel Type values from a given row",
-          "line": 1197,
+          "line": 1694,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36354,7 +36326,7 @@
             "data"
           ],
           "docstring": "Add a reel to the table with the provided data.",
-          "line": 1208,
+          "line": 1705,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36368,7 +36340,7 @@
             "data"
           ],
           "docstring": "Update a specific row in the table with new data.",
-          "line": 1221,
+          "line": 1718,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36380,7 +36352,7 @@
             "self"
           ],
           "docstring": "Load CSV file and populate the table.",
-          "line": 1234,
+          "line": 1731,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36392,7 +36364,7 @@
             "self"
           ],
           "docstring": "Save current table contents to CSV file with enhanced protection.",
-          "line": 1281,
+          "line": 1778,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36405,7 +36377,7 @@
             "df"
           ],
           "docstring": "Populate table widget from pandas DataFrame.",
-          "line": 1344,
+          "line": 1841,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36417,7 +36389,7 @@
             "self"
           ],
           "docstring": "Auto-load the last CSV file if enabled and file exists.",
-          "line": 1366,
+          "line": 1863,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36430,7 +36402,7 @@
             "csv_path"
           ],
           "docstring": "Update the CSV path display label.",
-          "line": 1411,
+          "line": 1908,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36443,7 +36415,7 @@
       "type": "class",
       "name": "ReleaseBreakdownDialog",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/reel_tracker/main_app.py",
-      "line": 1425,
+      "line": 1922,
       "docstring": "Dialog showing breakdown of reels by release.",
       "bases": [
         "QDialog"
@@ -36457,7 +36429,7 @@
             "release_counts"
           ],
           "docstring": "",
-          "line": 1428,
+          "line": 1925,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -36469,7 +36441,7 @@
             "self"
           ],
           "docstring": "Setup the breakdown dialog UI.",
-          "line": 1437,
+          "line": 1934,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37843,12 +37815,24 @@
           "is_classmethod": false
         },
         {
+          "name": "apply_bedrot_theme",
+          "args": [
+            "self"
+          ],
+          "docstring": "Apply comprehensive BEDROT cyberpunk visual theme.",
+          "line": 96,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
           "name": "create_menu_bar",
           "args": [
             "self"
           ],
           "docstring": "Create application menu bar.",
-          "line": 93,
+          "line": 553,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37860,7 +37844,7 @@
             "self"
           ],
           "docstring": "Create application toolbar.",
-          "line": 134,
+          "line": 594,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37872,7 +37856,7 @@
             "self"
           ],
           "docstring": "Create the visual calendar tab.",
-          "line": 159,
+          "line": 619,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37884,7 +37868,7 @@
             "self"
           ],
           "docstring": "Create overview tab with summary statistics.",
-          "line": 173,
+          "line": 634,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37896,7 +37880,7 @@
             "self"
           ],
           "docstring": "Create releases management tab.",
-          "line": 220,
+          "line": 681,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37908,7 +37892,7 @@
             "self"
           ],
           "docstring": "Create deliverables tracking tab.",
-          "line": 242,
+          "line": 703,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37920,7 +37904,7 @@
             "self"
           ],
           "docstring": "Create add release form tab.",
-          "line": 270,
+          "line": 731,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37932,7 +37916,7 @@
             "self"
           ],
           "docstring": "Load initial calendar data.",
-          "line": 325,
+          "line": 786,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37944,7 +37928,7 @@
             "self"
           ],
           "docstring": "Refresh all views with current data.",
-          "line": 330,
+          "line": 791,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37956,7 +37940,7 @@
             "self"
           ],
           "docstring": "Refresh the visual calendar.",
-          "line": 338,
+          "line": 799,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37968,7 +37952,7 @@
             "self"
           ],
           "docstring": "Refresh the overview tab.",
-          "line": 352,
+          "line": 813,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37980,7 +37964,7 @@
             "self"
           ],
           "docstring": "Refresh the upcoming releases table.",
-          "line": 385,
+          "line": 846,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -37992,7 +37976,7 @@
             "self"
           ],
           "docstring": "Refresh the overdue deliverables table.",
-          "line": 427,
+          "line": 888,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38004,7 +37988,7 @@
             "self"
           ],
           "docstring": "Refresh the releases table.",
-          "line": 471,
+          "line": 932,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38016,7 +38000,7 @@
             "self"
           ],
           "docstring": "Refresh the deliverables table.",
-          "line": 537,
+          "line": 998,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38028,7 +38012,7 @@
             "self"
           ],
           "docstring": "Update the statistics label.",
-          "line": 630,
+          "line": 1091,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38040,7 +38024,7 @@
             "self"
           ],
           "docstring": "Add a new release from the form.",
-          "line": 657,
+          "line": 1118,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38054,7 +38038,7 @@
             "title: str"
           ],
           "docstring": "Handle release click - open checklist dialog.",
-          "line": 716,
+          "line": 1177,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38069,7 +38053,7 @@
             "checklist: Dict"
           ],
           "docstring": "Handle checklist update from dialog.",
-          "line": 738,
+          "line": 1199,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38084,7 +38068,7 @@
             "new_date: datetime"
           ],
           "docstring": "Handle release drag and drop.",
-          "line": 751,
+          "line": 1212,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38098,7 +38082,22 @@
             "title: str"
           ],
           "docstring": "Handle release deletion.",
-          "line": 783,
+          "line": 1244,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "on_artwork_updated",
+          "args": [
+            "self",
+            "artist: str",
+            "title: str",
+            "file_path: str"
+          ],
+          "docstring": "Handle artwork update from visual calendar.",
+          "line": 1259,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38112,7 +38111,7 @@
             "artist: str"
           ],
           "docstring": "Handle quick add from calendar.",
-          "line": 798,
+          "line": 1274,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38125,7 +38124,7 @@
             "item: QTableWidgetItem"
           ],
           "docstring": "Handle double-click on releases table.",
-          "line": 813,
+          "line": 1289,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38137,7 +38136,7 @@
             "self"
           ],
           "docstring": "Save calendar data.",
-          "line": 820,
+          "line": 1296,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38149,7 +38148,7 @@
             "self"
           ],
           "docstring": "Export calendar to Excel file.",
-          "line": 827,
+          "line": 1303,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38161,7 +38160,7 @@
             "self"
           ],
           "docstring": "Export calendar to iCal file.",
-          "line": 865,
+          "line": 1341,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38173,7 +38172,7 @@
             "self"
           ],
           "docstring": "Show about dialog.",
-          "line": 936,
+          "line": 1412,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38186,7 +38185,7 @@
             "event"
           ],
           "docstring": "Handle window close event.",
-          "line": 947,
+          "line": 1423,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38285,11 +38284,90 @@
       ],
       "language": "python"
     },
+    "src/release_calendar/visual_calendar.py::ArtworkLabel": {
+      "type": "class",
+      "name": "ArtworkLabel",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/visual_calendar.py",
+      "line": 28,
+      "docstring": "A label that accepts artwork file drops and displays images.",
+      "bases": [
+        "QLabel"
+      ],
+      "methods": [
+        {
+          "name": "__init__",
+          "args": [
+            "self",
+            "release: Dict[str, Any]",
+            "parent"
+          ],
+          "docstring": "",
+          "line": 33,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "set_artwork",
+          "args": [
+            "self",
+            "file_path: str"
+          ],
+          "docstring": "Set and display artwork image.",
+          "line": 66,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "dragEnterEvent",
+          "args": [
+            "self",
+            "event: QDragEnterEvent"
+          ],
+          "docstring": "Handle drag enter events for file drops.",
+          "line": 81,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "dragLeaveEvent",
+          "args": [
+            "self",
+            "event"
+          ],
+          "docstring": "Handle drag leave events.",
+          "line": 101,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "dropEvent",
+          "args": [
+            "self",
+            "event: QDropEvent"
+          ],
+          "docstring": "Handle drop events for artwork files.",
+          "line": 116,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        }
+      ],
+      "language": "python"
+    },
     "src/release_calendar/visual_calendar.py::DayCell": {
       "type": "class",
       "name": "DayCell",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/visual_calendar.py",
-      "line": 28,
+      "line": 146,
       "docstring": "A single day cell in the calendar grid.",
       "bases": [
         "QFrame"
@@ -38303,7 +38381,7 @@
             "parent"
           ],
           "docstring": "Initialize a day cell.\n        \n        Args:\n            date: The date this cell represents\n            parent: Parent widget",
-          "line": 38,
+          "line": 156,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38315,7 +38393,7 @@
             "self"
           ],
           "docstring": "Initialize the day cell UI.",
-          "line": 56,
+          "line": 174,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38326,8 +38404,8 @@
           "args": [
             "self"
           ],
-          "docstring": "Apply styling based on day type.",
-          "line": 95,
+          "docstring": "Apply BEDROT cyberpunk styling based on day type.",
+          "line": 213,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38340,7 +38418,22 @@
             "release_data: Dict[str, Any]"
           ],
           "docstring": "Add a release to this day.",
-          "line": 136,
+          "line": 257,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "on_artwork_dropped",
+          "args": [
+            "self",
+            "artist: str",
+            "title: str",
+            "file_path: str"
+          ],
+          "docstring": "Handle artwork drop event from ArtworkLabel.",
+          "line": 262,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38353,7 +38446,7 @@
             "deadline_data: Dict[str, Any]"
           ],
           "docstring": "Add a deadline badge to this day.",
-          "line": 141,
+          "line": 272,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38365,7 +38458,7 @@
             "self"
           ],
           "docstring": "Update the visual display of releases.",
-          "line": 146,
+          "line": 277,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38377,7 +38470,7 @@
             "self"
           ],
           "docstring": "Update the deadline badges display.",
-          "line": 165,
+          "line": 296,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38389,8 +38482,8 @@
             "self",
             "release: Dict[str, Any]"
           ],
-          "docstring": "Create a visual card for a release.",
-          "line": 178,
+          "docstring": "Create a visual card for a release with BEDROT styling.",
+          "line": 309,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38402,8 +38495,8 @@
             "self",
             "deadline: Dict[str, Any]"
           ],
-          "docstring": "Create a deadline badge.",
-          "line": 232,
+          "docstring": "Create a deadline badge with BEDROT styling.",
+          "line": 364,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38417,7 +38510,7 @@
             "release: Dict[str, Any]"
           ],
           "docstring": "Start dragging a release.",
-          "line": 267,
+          "line": 399,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38430,7 +38523,7 @@
             "event: QDragEnterEvent"
           ],
           "docstring": "Handle drag enter events.",
-          "line": 296,
+          "line": 429,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38443,7 +38536,7 @@
             "event"
           ],
           "docstring": "Handle drag leave events.",
-          "line": 307,
+          "line": 440,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38456,7 +38549,7 @@
             "event: QDropEvent"
           ],
           "docstring": "Handle drop events.",
-          "line": 311,
+          "line": 444,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38469,7 +38562,7 @@
             "event"
           ],
           "docstring": "Show context menu.",
-          "line": 328,
+          "line": 461,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38482,7 +38575,7 @@
       "type": "class",
       "name": "VisualCalendarWidget",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/release_calendar/visual_calendar.py",
-      "line": 364,
+      "line": 497,
       "docstring": "Main visual calendar widget.",
       "bases": [
         "QWidget"
@@ -38495,7 +38588,7 @@
             "parent"
           ],
           "docstring": "Initialize the visual calendar widget.",
-          "line": 374,
+          "line": 508,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38507,7 +38600,7 @@
             "self"
           ],
           "docstring": "Set up the calendar UI.",
-          "line": 384,
+          "line": 518,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38519,7 +38612,7 @@
             "self"
           ],
           "docstring": "Create the calendar header with navigation.",
-          "line": 416,
+          "line": 551,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38531,7 +38624,7 @@
             "self"
           ],
           "docstring": "Navigate to previous month.",
-          "line": 447,
+          "line": 580,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38543,7 +38636,7 @@
             "self"
           ],
           "docstring": "Navigate to next month.",
-          "line": 460,
+          "line": 593,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38555,7 +38648,7 @@
             "self"
           ],
           "docstring": "Navigate to current month.",
-          "line": 473,
+          "line": 606,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38567,7 +38660,22 @@
             "self"
           ],
           "docstring": "Update the calendar display.",
-          "line": 479,
+          "line": 612,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "on_artwork_updated",
+          "args": [
+            "self",
+            "artist: str",
+            "title: str",
+            "file_path: str"
+          ],
+          "docstring": "Handle artwork update from day cell.",
+          "line": 660,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38579,7 +38687,7 @@
             "self"
           ],
           "docstring": "Populate the calendar with release data.",
-          "line": 526,
+          "line": 665,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38593,7 +38701,7 @@
             "config: Dict"
           ],
           "docstring": "Set the release data to display.",
-          "line": 560,
+          "line": 700,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38641,7 +38749,7 @@
             "self"
           ],
           "docstring": "Loads configuration from JSON file or creates default.",
-          "line": 117,
+          "line": 133,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38654,7 +38762,7 @@
             "settings_dict"
           ],
           "docstring": "Saves settings to the JSON file.",
-          "line": 180,
+          "line": 196,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38668,7 +38776,7 @@
             "default"
           ],
           "docstring": "Get a specific setting value.",
-          "line": 247,
+          "line": 263,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38682,7 +38790,7 @@
             "value"
           ],
           "docstring": "Set a specific setting value.",
-          "line": 251,
+          "line": 267,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38694,7 +38802,7 @@
             "self"
           ],
           "docstring": "Returns the BPM units dictionary.",
-          "line": 255,
+          "line": 271,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38706,7 +38814,7 @@
             "self"
           ],
           "docstring": "Returns the available aspect ratios list.",
-          "line": 259,
+          "line": 275,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38718,7 +38826,7 @@
             "self"
           ],
           "docstring": "Returns the script directory path.",
-          "line": 263,
+          "line": 279,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38730,7 +38838,7 @@
             "self"
           ],
           "docstring": "Returns the export settings.",
-          "line": 267,
+          "line": 283,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -38743,7 +38851,7 @@
             "settings"
           ],
           "docstring": "Updates and saves export settings.",
-          "line": 271,
+          "line": 287,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39214,7 +39322,7 @@
       "type": "class",
       "name": "VideoRemixerApp",
       "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/snippet_remixer/main_app.py",
-      "line": 31,
+      "line": 32,
       "docstring": "Main application window for the Video Snippet Remixer.",
       "bases": [],
       "methods": [
@@ -39225,7 +39333,19 @@
             "root"
           ],
           "docstring": "",
-          "line": 36,
+          "line": 37,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "apply_bedrot_theme",
+          "args": [
+            "self"
+          ],
+          "docstring": "Apply the BEDROT cyberpunk visual theme to the application.",
+          "line": 121,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39237,7 +39357,7 @@
             "self"
           ],
           "docstring": "Creates and arranges all the GUI elements.",
-          "line": 117,
+          "line": 295,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39250,7 +39370,7 @@
             "parent"
           ],
           "docstring": "Create the input files section.",
-          "line": 137,
+          "line": 315,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39262,7 +39382,7 @@
             "self"
           ],
           "docstring": "Set up drag and drop functionality for the input listbox.",
-          "line": 185,
+          "line": 391,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39274,7 +39394,7 @@
             "self"
           ],
           "docstring": "Add a visual hint that the listbox supports drag and drop.",
-          "line": 211,
+          "line": 417,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39286,7 +39406,7 @@
             "self"
           ],
           "docstring": "Remove the drag and drop hint if present.",
-          "line": 222,
+          "line": 428,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39299,7 +39419,7 @@
             "event"
           ],
           "docstring": "Handle clicks on the listbox to remove placeholder and browse files.",
-          "line": 232,
+          "line": 438,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39312,7 +39432,7 @@
             "event"
           ],
           "docstring": "Handle file drop events on the listbox.",
-          "line": 239,
+          "line": 445,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39325,7 +39445,7 @@
             "event"
           ],
           "docstring": "Visual feedback when files are dragged over the listbox.",
-          "line": 284,
+          "line": 490,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39338,7 +39458,7 @@
             "event"
           ],
           "docstring": "Reset visual feedback when drag leaves the listbox.",
-          "line": 289,
+          "line": 495,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39351,7 +39471,7 @@
             "parent"
           ],
           "docstring": "Create the output settings section.",
-          "line": 294,
+          "line": 500,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39364,7 +39484,7 @@
             "parent"
           ],
           "docstring": "Create the length control section.",
-          "line": 360,
+          "line": 606,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39377,7 +39497,7 @@
             "parent"
           ],
           "docstring": "Create the process button section.",
-          "line": 476,
+          "line": 744,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39390,7 +39510,7 @@
             "parent"
           ],
           "docstring": "Create the status display section.",
-          "line": 525,
+          "line": 796,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39403,7 +39523,7 @@
             "*args"
           ],
           "docstring": "Toggle between seconds and BPM input modes.",
-          "line": 562,
+          "line": 872,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39415,7 +39535,7 @@
             "self"
           ],
           "docstring": "Toggle jitter slider visibility based on checkbox state.",
-          "line": 578,
+          "line": 888,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39428,7 +39548,7 @@
             "*args"
           ],
           "docstring": "Update the jitter intensity value label.",
-          "line": 590,
+          "line": 900,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39441,7 +39561,7 @@
             "*args"
           ],
           "docstring": "Update the duration estimate label when BPM settings change.",
-          "line": 595,
+          "line": 905,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39453,7 +39573,7 @@
             "self"
           ],
           "docstring": "Browse for input video files.",
-          "line": 639,
+          "line": 949,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39466,7 +39586,7 @@
             "filepaths"
           ],
           "docstring": "Add files to the processing queue.",
-          "line": 658,
+          "line": 968,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39478,7 +39598,19 @@
             "self"
           ],
           "docstring": "Browse for output folder.",
-          "line": 681,
+          "line": 991,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "open_output_folder",
+          "args": [
+            "self"
+          ],
+          "docstring": "Open the output folder in File Explorer.",
+          "line": 1008,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39490,7 +39622,7 @@
             "self"
           ],
           "docstring": "Clear selected items from the queue.",
-          "line": 694,
+          "line": 1024,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39502,7 +39634,7 @@
             "self"
           ],
           "docstring": "Clear all items from the queue.",
-          "line": 710,
+          "line": 1040,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39514,7 +39646,7 @@
             "self"
           ],
           "docstring": "Open the export settings dialog.",
-          "line": 721,
+          "line": 1051,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39527,7 +39659,7 @@
             "message"
           ],
           "docstring": "Update the status display with message.",
-          "line": 739,
+          "line": 1069,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39541,7 +39673,7 @@
             "msg_type"
           ],
           "docstring": "Append message to the status text area.",
-          "line": 749,
+          "line": 1079,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39554,7 +39686,7 @@
             "message"
           ],
           "docstring": "Update status with an error message.",
-          "line": 774,
+          "line": 1104,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39567,7 +39699,7 @@
             "message"
           ],
           "docstring": "Update status with a warning message.",
-          "line": 779,
+          "line": 1109,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39580,7 +39712,7 @@
             "message"
           ],
           "docstring": "Update status with a success message.",
-          "line": 784,
+          "line": 1114,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39593,7 +39725,7 @@
             "enable"
           ],
           "docstring": "Enable or disable the generate button.",
-          "line": 789,
+          "line": 1119,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39605,7 +39737,7 @@
             "self"
           ],
           "docstring": "Enhanced processing thread starter with continuous mode support.",
-          "line": 798,
+          "line": 1128,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39617,7 +39749,7 @@
             "self"
           ],
           "docstring": "Validates inputs, generates filename, and launches processing thread.",
-          "line": 811,
+          "line": 1141,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39635,7 +39767,7 @@
             "settings"
           ],
           "docstring": "Helper to start the thread after a short GUI delay.",
-          "line": 889,
+          "line": 1219,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39647,7 +39779,7 @@
             "self"
           ],
           "docstring": "Handles window closing: saves settings, prompts if processing.",
-          "line": 966,
+          "line": 1296,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39659,7 +39791,7 @@
             "self"
           ],
           "docstring": "Toggle continuous mode on/off.",
-          "line": 1010,
+          "line": 1340,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39671,7 +39803,7 @@
             "self"
           ],
           "docstring": "Start the next remix in continuous mode with dynamic settings update.",
-          "line": 1040,
+          "line": 1370,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39683,7 +39815,7 @@
             "self"
           ],
           "docstring": "Get current settings from GUI controls.",
-          "line": 1074,
+          "line": 1404,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39697,7 +39829,7 @@
             "new_settings"
           ],
           "docstring": "Detect and describe changes between settings.",
-          "line": 1088,
+          "line": 1418,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39709,7 +39841,7 @@
             "self"
           ],
           "docstring": "Stop continuous mode.",
-          "line": 1121,
+          "line": 1451,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39721,7 +39853,7 @@
             "self"
           ],
           "docstring": "Abort the current processing operation.",
-          "line": 1130,
+          "line": 1460,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39733,7 +39865,7 @@
             "self"
           ],
           "docstring": "Update the continuous mode counter display with current settings.",
-          "line": 1137,
+          "line": 1467,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39746,7 +39878,7 @@
             "*args"
           ],
           "docstring": "Update the continuous mode counter display when any relevant setting changes.",
-          "line": 1160,
+          "line": 1490,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -39759,7 +39891,7 @@
             "event"
           ],
           "docstring": "Handle immediate updates when user finishes editing input fields (Enter or focus loss).",
-          "line": 1165,
+          "line": 1495,
           "is_async": false,
           "is_property": false,
           "is_staticmethod": false,
@@ -42923,14 +43055,6 @@
   "duplicates": [
     {
       "type": "function",
-      "name": "start_download",
-      "files": [
-        "test_fixed_gui.py",
-        "test_gui_simple.py"
-      ]
-    },
-    {
-      "type": "function",
       "name": "parse_time_to_seconds",
       "files": [
         "src/media_download_app.py",
@@ -43136,7 +43260,7 @@
   ],
   "statistics": {
     "files_by_directory": {
-      ".": 5,
+      ".": 2,
       "src": 6,
       "tests": 7,
       "tools": 4,
@@ -43150,9 +43274,6 @@
     "functions_per_file": {
       "fix_and_test_gui.py": 1,
       "launcher.py": 8,
-      "test_fixed_gui.py": 3,
-      "test_gui_simple.py": 3,
-      "test_mp3_fix.py": 0,
       "src/media_download_app.py": 8,
       "src/reel_tracker_modular.py": 0,
       "src/release_calendar_modular.py": 1,
@@ -43246,9 +43367,6 @@
     "classes_per_file": {
       "fix_and_test_gui.py": 1,
       "launcher.py": 0,
-      "test_fixed_gui.py": 0,
-      "test_gui_simple.py": 1,
-      "test_mp3_fix.py": 0,
       "src/media_download_app.py": 1,
       "src/reel_tracker_modular.py": 0,
       "src/release_calendar_modular.py": 0,
@@ -43311,7 +43429,7 @@
       "src/release_calendar/data_manager.py": 1,
       "src/release_calendar/main_app.py": 1,
       "src/release_calendar/utils.py": 1,
-      "src/release_calendar/visual_calendar.py": 2,
+      "src/release_calendar/visual_calendar.py": 3,
       "src/release_calendar/__init__.py": 0,
       "src/snippet_remixer/config_manager.py": 1,
       "src/snippet_remixer/export_settings_dialog.py": 1,
@@ -43339,6 +43457,6 @@
       "src/video_caption_generator/worker_threads.py": 3,
       "src/video_caption_generator/__init__.py": 0
     },
-    "duplicate_count": 24
+    "duplicate_count": 23
   }
 }

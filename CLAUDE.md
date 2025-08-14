@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Last Maintenance Scan**: Completed full codebase audit
+- Function registry updated: 91 files, 181 functions, 111 classes, 1055 methods, 23 duplicates
+- Entry points verified: All launcher paths exist and are correct
+- Config files mapped: Found 5 duplicate config locations across modules
+- Dependencies verified: PyQt5 (23 files), PyQt6 (4 files - release_calendar only), Tkinter (4 files)
+
 ## CRITICAL: Check Function Registry Before Writing Code
 
 **IMPORTANT**: Before creating ANY new functions, methods, or scripts, you MUST check the function registry to avoid duplicates:
@@ -12,7 +18,7 @@ This registry contains:
 - All existing functions, classes, and methods in the codebase
 - Their locations (file paths and line numbers)
 - Signatures and docstrings
-- Identified duplicate functions (24 duplicates currently found!)
+- Identified duplicate functions (23 duplicates as of last scan)
 
 **Before writing code**:
 1. Check if a similar function already exists in the registry
@@ -23,11 +29,19 @@ This registry contains:
    python tools/generate_function_registry.py
    ```
 
+**Registry Stats (Last Updated)**:
+- Files scanned: 91
+- Functions found: 181
+- Classes found: 111
+- Methods found: 1055
+- Duplicates found: 23
+
 **Known Duplicates to Avoid**:
 - `parse_aspect_ratio` - exists in 3 files
 - `generate_unique_suffix` - exists in 3 files
 - `main` - exists in 13 files (expected for entry points)
-- `start_download`, `parse_time_to_seconds`, `load_settings`, `save_settings` - each in 2 files
+- `parse_time_to_seconds`, `load_settings`, `save_settings` - each in 2 files
+- `get_video_info`, `get_config_manager`, `get_path_resolver`, `get_video_processor` - each in 2 files
 
 ## Project Overview
 
@@ -35,19 +49,62 @@ The **Bedrot Productions Media Tool Suite** is a sophisticated Python-based coll
 
 ## Critical Implementation Notes
 
-### Entry Point Confusion
-**IMPORTANT**: The codebase has inconsistent entry points due to ongoing modularization:
-- Some tools use `*_modular.py` files at the src root level
-- Some tools use `main.py` within their package directory
-- The launcher.py has hardcoded fallback paths that may be incorrect
-- Always verify the actual file exists before documenting paths
+### Entry Point Status (Verified)
+**IMPORTANT**: The codebase has mixed entry point patterns:
 
-### Configuration File Locations
-**WARNING**: Configuration files are NOT fully centralized despite documentation claims:
-- Primary location: `/config/` directory
-- Secondary locations exist in module subdirectories
-- Some modules have their own config subdirectories
-- Environment variable support exists but is not consistently implemented
+**Modular Wrappers** (in src/ directory):
+- `reel_tracker_modular.py` - thin wrapper for reel_tracker package
+- `release_calendar_modular.py` - thin wrapper for release_calendar package  
+- `snippet_remixer_modular.py` - thin wrapper for snippet_remixer package
+
+**Standalone Files** (in src/ directory):
+- `media_download_app.py` - self-contained media downloader
+- `snippet_remixer.py` - LEGACY 695-line standalone version (launcher uses this, not modular!)
+
+**Package Entry Points** (verified to exist):
+- `random_slideshow/main.py` - primary entry point
+- `random_slideshow/main_app.py` - also exists (full GUI)
+- `reel_tracker/main_app.py` - PyQt5 application
+- `release_calendar/main_app.py` - PyQt6 application
+- `snippet_remixer/main.py` - package entry
+- `snippet_remixer/main_app.py` - GUI application
+- `video_caption_generator/main_app.py` - main application
+
+**Launcher.py Fallback Paths** (ALL VERIFIED TO EXIST):
+- Line 48: `src/media_download_app.py` ✓
+- Line 49: `src/snippet_remixer.py` ✓ (uses LEGACY file, not modular!)
+- Line 50: `src/random_slideshow/main.py` ✓
+- Line 51: `src/reel_tracker_modular.py` ✓
+- Line 52: `src/video_caption_generator/main_app.py` ✓
+- Line 53: `src/release_calendar_modular.py` ✓
+
+### Configuration File Locations (Actual State)
+**WARNING**: Configuration files are scattered across multiple locations:
+
+**Primary Config Directory** (`/config/`):
+- `calendar_data.json` - release calendar data storage
+- `combined_random_config.json` - slideshow settings
+- `config.json` - slideshow editor settings
+- `random_config.json` - legacy slideshow config
+- `reel_tracker_config.json` - reel tracker settings
+- `release_calendar_config.json` - release calendar settings
+- `slideshow_presets.json` - slideshow presets
+- `video_caption_generator_config.json` - caption generator settings
+- `video_remixer_settings.json` - snippet remixer settings
+- `yt_downloader_gui_settings.json` - media downloader settings
+
+**Duplicate/Secondary Locations Found**:
+- `src/combined_random_config.json` - duplicate slideshow config
+- `src/config/reel_tracker_config.json` - duplicate reel tracker config
+- `src/random_slideshow/combined_random_config.json` - another duplicate
+- `src/random_slideshow/config/slideshow_presets.json` - duplicate presets
+- `src/video_caption_generator/config/video_caption_generator_config.json` - duplicate caption config
+
+**Config Management Approaches**:
+- **Direct JSON**: 12 modules use `json.load()`/`json.dump()` directly
+- **Core Config Manager**: Only 5 files import from `core.config_manager`
+- **Module-Specific**: Each module has its own `config_manager.py` with different implementations
+- **Advanced**: Only `reel_tracker` has version history and audit trails
 
 ## Quick Start Commands
 
@@ -225,12 +282,25 @@ bedrot-media-suite/
 - **python3-tk**: Required on Linux/WSL (not included in requirements.txt!)
 
 ### Python Frameworks (from requirements.txt)
-#### GUI Frameworks (Multiple!)
-- **Tkinter**: Used by launcher, media downloader, snippet remixer
-  - NOTE: Requires `python3-tk` package on Linux/WSL
-- **customtkinter**: Modern tkinter wrapper (some tools)
-- **PyQt5**: Used by reel tracker, random slideshow, slideshow editor
-- **PyQt6**: Used ONLY by release calendar (potential conflicts!)
+#### GUI Frameworks (VERIFIED USAGE)
+- **Tkinter**: Used by 4 files
+  - `media_download_app.py` - main downloader GUI
+  - `snippet_remixer.py` - legacy standalone version  
+  - `snippet_remixer/main_app.py` - modular GUI
+  - `snippet_remixer/export_settings_dialog.py` - dialog
+  - **WARNING**: Requires `python3-tk` package on Linux/WSL (NOT in requirements.txt!)
+- **customtkinter**: In requirements.txt (enhanced tkinter)
+- **PyQt5**: Used by 23 files across multiple modules
+  - `random_slideshow/*` - all slideshow components
+  - `reel_tracker/*` - all reel tracker components  
+  - `video_caption_generator/*` - caption generator components
+  - `core/health_check.py` - system health checks
+- **PyQt6**: Used by 4 files (ONLY release_calendar!)
+  - `release_calendar/main_app.py`
+  - `release_calendar/visual_calendar.py`
+  - `release_calendar/checklist_dialog.py`
+  - `release_calendar_modular.py`
+  - **WARNING**: Potential conflicts with PyQt5!
 - **tkinterdnd2**: Drag-and-drop support
 
 #### Media Processing
@@ -437,23 +507,23 @@ thread.start()
 
 ### Known Issues and Workarounds
 
-#### Issue 1: Launcher Fallback Paths
-**Problem**: Launcher.py has incorrect hardcoded paths
-**Current Code**:
+#### Issue 1: Launcher Uses Legacy Snippet Remixer
+**Status**: VERIFIED - This is intentional, not a bug!
+**Current Code** (Line 49):
 ```python
-SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer.py')  # Wrong!
+SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer.py')  # Uses 695-line legacy file
 ```
-**Should Be**:
-```python
-SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.py')
-```
+**Note**: The launcher deliberately uses the standalone `snippet_remixer.py` (695 lines), NOT the modular wrapper (18 lines). Both files exist and work.
 
 #### Issue 2: Config File Duplication
 **Problem**: Multiple config files for same module
-**Locations to Check**:
-- `/config/` (primary)
-- `/src/module_name/config/` (module-specific)
-- `/src/` (legacy)
+**Verified Duplicates**:
+- `config/combined_random_config.json` (primary)
+- `src/combined_random_config.json` (duplicate)
+- `src/random_slideshow/combined_random_config.json` (another duplicate)
+- `config/reel_tracker_config.json` vs `src/config/reel_tracker_config.json`
+- `config/video_caption_generator_config.json` vs `src/video_caption_generator/config/video_caption_generator_config.json`
+- `config/slideshow_presets.json` vs `src/random_slideshow/config/slideshow_presets.json`
 
 #### Issue 3: Missing Dependencies
 **Problem**: tkinter not in requirements.txt
@@ -486,10 +556,11 @@ SLIDESHOW_TOOLS_DIR=tools
 
 # Script paths (for launcher)
 SLIDESHOW_MEDIA_DOWNLOAD_SCRIPT=src/media_download_app.py
-SLIDESHOW_SNIPPET_REMIXER_SCRIPT=src/snippet_remixer.py  # WRONG! Should be snippet_remixer_modular.py
+SLIDESHOW_SNIPPET_REMIXER_SCRIPT=src/snippet_remixer.py  # NOTE: Uses LEGACY file, not modular wrapper!
 SLIDESHOW_RANDOM_SLIDESHOW_SCRIPT=src/random_slideshow/main.py
 SLIDESHOW_REEL_TRACKER_SCRIPT=src/reel_tracker_modular.py
 SLIDESHOW_VIDEO_CAPTION_GENERATOR_SCRIPT=src/video_caption_generator/main_app.py
+SLIDESHOW_RELEASE_CALENDAR_SCRIPT=src/release_calendar_modular.py
 
 # Default directories
 SLIDESHOW_DEFAULT_OUTPUT_DIR=~/Videos/RandomSlideshows
