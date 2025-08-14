@@ -97,10 +97,17 @@ class VideoRemixerApp:
         self.duration_seconds_var.trace_add("write", self.update_continuous_counter_on_change)
         self.length_mode_var.trace_add("write", self.update_continuous_counter_on_change)
 
-        # Window Setup
-        self.root.geometry("700x650")
+        # Window Setup - compact size that fits all elements
+        self.root.geometry("700x680")  # Sized to fit all controls
+        self.root.minsize(650, 650)    # Minimum size to prevent UI cutoff
+        
+        # Track window state for status section visibility
+        self.window_maximized = False
+        self.root.bind("<Configure>", self.on_window_configure)
+        
         self.create_widgets()
         self.toggle_length_mode_ui()
+            
         # Initialize duration estimate if in BPM mode
         self.root.after(100, self.update_duration_estimate)
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -294,7 +301,8 @@ class VideoRemixerApp:
 
     def create_widgets(self):
         """Creates and arranges all the GUI elements."""
-        main_frame = ttk.Frame(self.root, padding="10")
+        # Simple main frame that expands with window
+        main_frame = ttk.Frame(self.root, padding="5")  # Reduced padding
         main_frame.pack(fill=tk.BOTH, expand=True)
 
         # Input Files Section
@@ -338,7 +346,7 @@ class VideoRemixerApp:
         self.queue_listbox = tk.Listbox(
             input_list_frame, 
             listvariable=self.input_file_paths, 
-            height=8, 
+            height=5,  # Reduced height for more compact UI
             selectmode=tk.EXTENDED,
             bg='#1a1a1a',
             fg='#e0e0e0',
@@ -743,20 +751,23 @@ class VideoRemixerApp:
 
     def create_process_section(self, parent):
         """Create the process button section."""
-        process_button_frame = ttk.Frame(parent, padding=(0, 10, 0, 0))
+        process_button_frame = ttk.Frame(parent, padding=(0, 5, 0, 0))
         process_button_frame.pack(fill=tk.X)
         
         # Continuous mode toggle
         continuous_frame = ttk.Frame(process_button_frame)
-        continuous_frame.pack(pady=(0, 10))
+        continuous_frame.pack(pady=(0, 5))
         
         self.continuous_check = ttk.Checkbutton(
             continuous_frame,
             text="[Continuous Mode] Keep making videos",
-            variable=self.continuous_mode_var,
-            command=self.toggle_continuous_mode
+            variable=self.continuous_mode_var
+            # Don't bind command yet to prevent triggering on startup
         )
         self.continuous_check.pack()
+        
+        # Bind command AFTER widget creation to prevent startup trigger
+        self.root.after(10, lambda: self.continuous_check.configure(command=self.toggle_continuous_mode))
         
         # Counter display for continuous mode
         self.continuous_label = ttk.Label(
@@ -766,7 +777,7 @@ class VideoRemixerApp:
         )
         self.continuous_label.pack(pady=(5, 0))
         
-        # Generate button
+        # Main Generate/Abort button
         self.generate_button = ttk.Button(
             process_button_frame, 
             text="GENERATE REMIX", 
@@ -774,38 +785,20 @@ class VideoRemixerApp:
             style='Generate.TButton'
         )
         self.generate_button.pack(pady=10)
-        
-        # Abort button (initially hidden)
-        self.abort_button = ttk.Button(
-            process_button_frame,
-            text="ABORT PROCESSING",
-            command=self.abort_processing,
-            style='Stop.TButton'
-        )
-        # Don't pack initially
-        
-        # Stop button (initially hidden)
-        self.stop_button = ttk.Button(
-            process_button_frame,
-            text="[STOP] STOP CONTINUOUS MODE",
-            command=self.stop_continuous_mode,
-            style='Stop.TButton'
-        )
-        # Don't pack initially
 
     def create_status_section(self, parent):
-        """Create the status display section."""
+        """Create the status display section (hidden by default)."""
         # Create custom frame with BEDROT styling
-        status_container = tk.Frame(parent, bg='#121212', bd=0)
-        status_container.pack(fill=tk.BOTH, expand=True, pady=(10,0))
+        self.status_container = tk.Frame(parent, bg='#121212', bd=0)
+        # Don't pack initially - will be shown when window is maximized
         
         # Label for the section
-        status_label = tk.Label(status_container, text=" STATUS ", bg='#121212', fg='#00ffff', 
+        status_label = tk.Label(self.status_container, text=" STATUS ", bg='#121212', fg='#00ffff', 
                                font=('Segoe UI', 10, 'bold'))
         status_label.pack(anchor='w', padx=15)
         
         # Frame with border
-        status_frame_outer = tk.Frame(status_container, bg='#121212', highlightbackground='#00ffff', 
+        status_frame_outer = tk.Frame(self.status_container, bg='#121212', highlightbackground='#00ffff', 
                                       highlightthickness=1, bd=0)
         status_frame_outer.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 5))
         
@@ -1117,22 +1110,36 @@ class VideoRemixerApp:
         self._append_to_status_text(message, "SUCCESS")
 
     def enable_generate_button(self, enable=True):
-        """Enable or disable the generate button."""
+        """Enable or disable the generate button and reset its text."""
         new_state = tk.NORMAL if enable else tk.DISABLED
         try:
             if self.root.winfo_exists():
-                self.root.after(0, self.generate_button.config, {'state': new_state})
+                if enable:
+                    # Reset to Generate button
+                    self.root.after(0, lambda: self.generate_button.config(
+                        text="GENERATE REMIX",
+                        command=self.start_processing_thread,
+                        style='Generate.TButton',
+                        state=new_state
+                    ))
+                else:
+                    # Change to Abort button
+                    self.root.after(0, lambda: self.generate_button.config(
+                        text="ABORT PROCESSING",
+                        command=self.abort_processing,
+                        style='Stop.TButton',
+                        state=tk.NORMAL
+                    ))
         except tk.TclError:
             safe_print("Generate button state change ignored (window closing?).")
 
+    
     def start_processing_thread(self):
         """Enhanced processing thread starter with continuous mode support."""
         # Check if starting continuous mode
         if self.continuous_mode_var.get() and not self.continuous_processing:
             self.continuous_processing = True
             self.continuous_count = 0
-            self.stop_button.pack(pady=(0, 10))
-            self.generate_button.pack_forget()
             self.update_continuous_counter()
         
         # Original processing logic
@@ -1201,11 +1208,7 @@ class VideoRemixerApp:
         )
 
         # Setup UI for processing
-        self.enable_generate_button(False)
-        # Show abort button during processing
-        if not self.continuous_processing:
-            self.abort_button.pack(pady=(0, 10))
-            self.abort_button.config(state=tk.NORMAL)
+        self.enable_generate_button(False)  # This now changes button to ABORT
         output_msg = f"Output: {os.path.basename(final_output_path)}"
         self.update_status(output_msg)
         # Log output file for launcher log area
@@ -1263,7 +1266,6 @@ class VideoRemixerApp:
                     self.root.after(2000, self.start_next_continuous_remix)  # 2 second delay
                 else:
                     self.enable_generate_button(True)
-                    self.abort_button.pack_forget()
                     self.continuous_processing = False
             else:
                 failure_msg = "Processing failed. Check console for details."
@@ -1272,7 +1274,6 @@ class VideoRemixerApp:
                 safe_print(f"[FAILED] {failure_msg}")
                 self.logger.error(failure_msg)
                 self.enable_generate_button(True)
-                self.abort_button.pack_forget()
                 self.continuous_processing = False
 
         # Get export settings from config
@@ -1293,6 +1294,23 @@ class VideoRemixerApp:
             progress_callback, error_callback, completion_callback
         )
 
+    def on_window_configure(self, event):
+        """Handle window resize/state changes to show/hide status section."""
+        if event.widget == self.root:
+            # Check if window is maximized (either by button or by size)
+            is_maximized = (self.root.state() == 'zoomed' or 
+                          self.root.winfo_width() > 1200 or 
+                          self.root.winfo_height() > 800)
+            
+            if is_maximized != self.window_maximized:
+                self.window_maximized = is_maximized
+                if is_maximized:
+                    # Show status section when maximized
+                    self.status_container.pack(fill=tk.BOTH, expand=True, pady=(10,0))
+                else:
+                    # Hide status section when not maximized
+                    self.status_container.pack_forget()
+    
     def on_closing(self):
         """Handles window closing: saves settings, prompts if processing."""
         if self.processing_worker.is_processing():
@@ -1338,9 +1356,10 @@ class VideoRemixerApp:
         self.root.destroy()
     
     def toggle_continuous_mode(self):
-        """Toggle continuous mode on/off."""
+        """Toggle continuous mode on/off - only updates UI, doesn't start processing."""
         if self.continuous_mode_var.get():
-            # Capture initial settings when starting continuous mode
+            # Checkbox is checked - just update status, don't start processing
+            # Actual processing starts when user clicks Generate button
             self._last_continuous_settings = self._get_current_settings()
             
             # Enhanced status message showing current settings
@@ -1353,19 +1372,21 @@ class VideoRemixerApp:
                 duration = self._last_continuous_settings.get("duration_seconds", "N/A")
                 settings_info = f"Duration: {duration}s"
             
-            status_msg = f"Continuous mode enabled ({settings_info}) - will keep generating remixes"
+            status_msg = f"Continuous mode enabled ({settings_info}) - click Generate to start"
             self.update_status(status_msg)
-            safe_print(f"[CONTINUOUS] {status_msg}")
-            self.logger.info(f"Continuous mode started with settings: {settings_info}")
+            # Don't log as [CONTINUOUS] since we're not actually processing yet
+            self.logger.info(f"Continuous mode checkbox checked with settings: {settings_info}")
             
+            # Just update counter display, don't change processing state
             if not self.continuous_processing:
                 self.continuous_count = 0
                 self.update_continuous_counter()
         else:
             self.update_status("Continuous mode disabled")
-            self.continuous_processing = False
-            self.stop_button.pack_forget()
-            self.generate_button.pack(pady=10)
+            # Only stop processing if it was actually running
+            if self.continuous_processing:
+                self.continuous_processing = False
+            # Generate button is always visible
     
     def start_next_continuous_remix(self):
         """Start the next remix in continuous mode with dynamic settings update."""
@@ -1452,17 +1473,19 @@ class VideoRemixerApp:
         """Stop continuous mode."""
         self.continuous_processing = False
         self.continuous_mode_var.set(False)
-        self.stop_button.pack_forget()
-        self.generate_button.pack(pady=10)
         self.enable_generate_button(True)
         self.update_status(f"Continuous mode stopped. Created {self.continuous_count} remixes.")
     
     def abort_processing(self):
         """Abort the current processing operation."""
-        if self.processing_worker.is_processing():
+        if self.continuous_processing:
+            # If in continuous mode, stop continuous mode
+            self.stop_continuous_mode()
+        elif self.processing_worker.is_processing():
+            # Single processing - abort it
             self.update_status("Aborting processing...")
             self.processing_worker.abort_processing()
-            self.abort_button.config(state=tk.DISABLED)
+            self.enable_generate_button(True)
     
     def update_continuous_counter(self):
         """Update the continuous mode counter display with current settings."""

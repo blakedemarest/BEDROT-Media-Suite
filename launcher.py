@@ -46,7 +46,7 @@ def get_script_path(script_key, fallback_path):
 
 # Script paths with environment variable support and fallbacks
 SCRIPT_1_PATH = get_script_path('media_download', 'src/media_download_app.py')
-SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer.py') 
+SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.py') 
 SCRIPT_3_PATH = get_script_path('random_slideshow', 'src/random_slideshow/main.py')
 SCRIPT_4_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
 SCRIPT_5_PATH = get_script_path('video_caption_generator', 'src/video_caption_generator/main_app.py')
