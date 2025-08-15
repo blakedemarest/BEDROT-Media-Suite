@@ -364,11 +364,11 @@ class ReelEntryDialog(QDialog):
                 image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.webp'}
                 
                 if file_ext in video_extensions:
-                    file_type = "🎥 Video"
+                    file_type = "[VIDEO]"
                 elif file_ext in image_extensions:
-                    file_type = "🖼️ Image"
+                    file_type = "[IMAGE]"
                 else:
-                    file_type = "📄 File"
+                    file_type = "[FILE]"
                 
                 info_text = f"{file_type} • {file_ext.upper()} • {size_str}"
                 self.file_info_display.setText(info_text)

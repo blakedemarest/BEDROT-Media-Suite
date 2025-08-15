@@ -8,6 +8,7 @@ import os
 import shutil
 import datetime
 from pathlib import Path
+from .utils import safe_print
 
 class BackupManager:
     """Manages automatic backups of the reel tracker CSV."""
@@ -32,10 +33,10 @@ class BackupManager:
         
         try:
             shutil.copy2(self.csv_path, backup_path)
-            print(f"✅ Backup created: {backup_path}")
+            safe_print(f"[BACKUP] Created: {backup_path}")
             return backup_path
         except Exception as e:
-            print(f"❌ Backup failed: {e}")
+            safe_print(f"[BACKUP ERROR] Failed: {e}")
             return None
     
     def create_pre_save_backup(self):
@@ -56,9 +57,9 @@ class BackupManager:
                 if os.path.getmtime(backup_path) < cutoff_time.timestamp():
                     try:
                         os.remove(backup_path)
-                        print(f"🗑️ Cleaned up old backup: {backup_file}")
+                        safe_print(f"[CLEANUP] Removed old backup: {backup_file}")
                     except Exception as e:
-                        print(f"❌ Failed to clean up {backup_file}: {e}")
+                        safe_print(f"[CLEANUP ERROR] Failed to remove {backup_file}: {e}")
     
     def list_backups(self):
         """List all available backups."""

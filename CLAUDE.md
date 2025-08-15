@@ -419,6 +419,20 @@ bedrot-media-suite/
 - Color wheel for styling
 - Worker threads for processing
 
+## Critical Coding Standards
+
+### ASCII-Only Policy (MANDATORY)
+- **NEVER use emoji characters** (❌, ✅, 🔄, etc.) in any code
+- **ALWAYS use ASCII-only text** for all output, logs, and UI elements
+- **Use bracketed prefixes instead**:
+  - [SUCCESS] instead of ✅
+  - [ERROR] instead of ❌  
+  - [WARNING] instead of ⚠️
+  - [INFO] instead of ℹ️
+  - [BACKUP] instead of 🛡️
+- This prevents Windows encoding errors (`charmap codec can't encode`)
+- All console output MUST be Windows-compatible ASCII
+
 ## Development Guidelines
 
 ### Understanding the Modularization Pattern

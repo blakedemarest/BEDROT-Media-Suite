@@ -61,7 +61,7 @@ class CSVProtectionManager:
         self.csv_path = csv_path
         self.lock = threading.Lock()
         self.last_save_time = 0
-        self.debounce_delay = 0.5  # 500ms debounce
+        self.debounce_delay = 0.1  # 100ms debounce - much faster saves
         self.save_timer = None
         self.pending_save = False
         
@@ -76,7 +76,7 @@ class CSVProtectionManager:
                 return True
             else:
                 # File locking not available, proceed without locking
-                safe_print("⚠️ File locking not available on this system")
+                safe_print("[WARNING] File locking not available on this system")
                 return True
         except (OSError, IOError):
             return False
@@ -125,23 +125,46 @@ class CSVProtectionManager:
     def safe_csv_write(self, data, columns, csv_path, backup_manager=None):
         """
         Safely write CSV with file locking, validation, and backup protection.
+        NEVER destructively overwrites without backup.
         """
         with self.lock:
+            # CRITICAL: Ensure we're using the correct path
+            # The single source of truth is E:\VIDEOS\RELEASE CONTENT\bedrot-reel-tracker.csv
+            expected_path = "E:/VIDEOS/RELEASE CONTENT/bedrot-reel-tracker.csv"
+            if csv_path.replace("\\", "/") != expected_path:
+                safe_print(f"[WARNING] Attempting to save to non-standard path: {csv_path}")
+                safe_print(f"[WARNING] Expected: {expected_path}")
+            
             # Validate data first
             is_valid, validation_msg = self.validate_data(data, columns)
             if not is_valid:
-                safe_print(f"❌ CSV Write Blocked: {validation_msg}")
+                safe_print(f"[ERROR] CSV Write Blocked: {validation_msg}")
                 return False, f"Data validation failed: {validation_msg}"
             
-            # Create backup before writing if backup manager available
-            if backup_manager and os.path.exists(csv_path):
-                try:
-                    backup_path = backup_manager.create_pre_save_backup()
-                    if backup_path:
-                        safe_print(f"🛡️ Backup created before save: {backup_path}")
-                except Exception as e:
-                    safe_print(f"❌ Backup creation failed: {e}")
-                    return False, f"Backup creation failed: {e}"
+            # MANDATORY: Create backup before ANY write operation
+            if os.path.exists(csv_path):
+                if backup_manager:
+                    try:
+                        backup_path = backup_manager.create_pre_save_backup()
+                        if backup_path:
+                            safe_print(f"[BACKUP] Created before save: {backup_path}")
+                        else:
+                            safe_print(f"[ERROR] Backup creation returned None - aborting save")
+                            return False, "Could not create backup - save aborted for safety"
+                    except Exception as e:
+                        safe_print(f"[ERROR] Backup creation failed: {e}")
+                        return False, f"Backup creation failed - save aborted for safety: {e}"
+                else:
+                    safe_print(f"[WARNING] No backup manager available - creating emergency backup")
+                    try:
+                        import shutil
+                        from datetime import datetime
+                        emergency_backup = csv_path + f".emergency_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                        shutil.copy2(csv_path, emergency_backup)
+                        safe_print(f"[BACKUP] Emergency backup created: {emergency_backup}")
+                    except Exception as e:
+                        safe_print(f"[ERROR] Emergency backup failed: {e}")
+                        return False, f"Could not create emergency backup - save aborted: {e}"
             
             # Write CSV with file locking
             temp_path = csv_path + ".tmp"
@@ -150,16 +173,37 @@ class CSVProtectionManager:
                 df = pd.DataFrame(data, columns=columns)
                 
                 # Write to temporary file first
-                with open(temp_path, 'w', newline='', encoding='utf-8') as temp_file:
-                    if not self.lock_file(temp_file):
-                        return False, "Could not acquire file lock"
-                    
+                # Try multiple encoding options for maximum compatibility
+                encoding_options = ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']
+                write_success = False
+                last_error = None
+                
+                for encoding in encoding_options:
                     try:
-                        df.to_csv(temp_file, index=False)
-                        temp_file.flush()
-                        os.fsync(temp_file.fileno())  # Force write to disk
-                    finally:
-                        self.unlock_file(temp_file)
+                        with open(temp_path, 'w', newline='', encoding=encoding) as temp_file:
+                            if not self.lock_file(temp_file):
+                                continue  # Try next encoding
+                            
+                            try:
+                                df.to_csv(temp_file, index=False)
+                                temp_file.flush()
+                                os.fsync(temp_file.fileno())  # Force write to disk
+                                write_success = True
+                                safe_print(f"[SUCCESS] Wrote CSV with {encoding} encoding")
+                                break
+                            finally:
+                                self.unlock_file(temp_file)
+                    except Exception as e:
+                        last_error = e
+                        safe_print(f"[WARNING] Failed with {encoding} encoding: {e}")
+                        continue
+                
+                if not write_success:
+                    raise Exception(f"Could not write CSV with any encoding. Last error: {last_error}")
+                
+                # Verify temp file exists and has content
+                if not os.path.exists(temp_path) or os.path.getsize(temp_path) == 0:
+                    raise Exception("Temp file is missing or empty after write")
                 
                 # Atomic move from temp to final location
                 if os.path.exists(csv_path):
@@ -167,7 +211,7 @@ class CSVProtectionManager:
                 else:
                     os.rename(temp_path, csv_path)
                 
-                safe_print(f"✅ CSV safely written: {len(data)} rows to {csv_path}")
+                safe_print(f"[SUCCESS] CSV safely written: {len(data)} rows to {csv_path}")
                 return True, f"Successfully saved {len(data)} rows"
                 
             except Exception as e:
@@ -177,7 +221,7 @@ class CSVProtectionManager:
                         os.remove(temp_path)
                     except:
                         pass
-                safe_print(f"❌ CSV write failed: {e}")
+                safe_print(f"[ERROR] CSV write failed: {e}")
                 return False, f"Write operation failed: {e}"
     
     def debounced_save(self, data, columns, csv_path, backup_manager=None, callback=None):
@@ -198,6 +242,21 @@ class CSVProtectionManager:
         self.pending_save = True
         self.save_timer = threading.Timer(self.debounce_delay, perform_save)
         self.save_timer.start()
+    
+    def immediate_save(self, data, columns, csv_path, backup_manager=None):
+        """
+        Perform an immediate synchronous save without debouncing.
+        Used for critical operations like app exit or file organization.
+        """
+        # Cancel any pending debounced save first
+        if self.save_timer:
+            self.save_timer.cancel()
+            self.save_timer = None
+        self.pending_save = False
+        
+        # Perform immediate save
+        success, message = self.safe_csv_write(data, columns, csv_path, backup_manager)
+        return success, message
 
 
 class DropdownDelegate(QItemDelegate):
@@ -606,11 +665,11 @@ class ReelTrackerApp(QMainWindow):
         button_layout = QHBoxLayout()
         
         # File operations
-        self.load_button = QPushButton("📂 Load CSV")
+        self.load_button = QPushButton("Load CSV")
         self.load_button.clicked.connect(self.load_csv)
         button_layout.addWidget(self.load_button)
         
-        self.save_button = QPushButton("💾 Save CSV")
+        self.save_button = QPushButton("Save CSV")
         self.save_button.clicked.connect(self.save_csv)
         button_layout.addWidget(self.save_button)
         
@@ -669,7 +728,7 @@ class ReelTrackerApp(QMainWindow):
         """)
         button_layout.addWidget(self.randomize_reel_button)
         
-        self.manage_release_button = QPushButton("📋 Manage Release Values")
+        self.manage_release_button = QPushButton("Manage Release Values")
         self.manage_release_button.clicked.connect(self.manage_release_values)
         self.manage_release_button.setStyleSheet("""
             QPushButton {
@@ -693,7 +752,7 @@ class ReelTrackerApp(QMainWindow):
         """)
         button_layout.addWidget(self.manage_release_button)
         
-        self.default_metadata_button = QPushButton("🏷️ Default Metadata")
+        self.default_metadata_button = QPushButton("Default Metadata")
         self.default_metadata_button.clicked.connect(self.open_default_metadata)
         self.default_metadata_button.setStyleSheet("""
             QPushButton {
@@ -717,7 +776,7 @@ class ReelTrackerApp(QMainWindow):
         """)
         button_layout.addWidget(self.default_metadata_button)
         
-        self.file_organization_button = QPushButton("📁 Organize Files")
+        self.file_organization_button = QPushButton("Organize Files")
         self.file_organization_button.clicked.connect(self.open_file_organization)
         self.file_organization_button.setStyleSheet("""
             QPushButton {
@@ -741,7 +800,7 @@ class ReelTrackerApp(QMainWindow):
         """)
         button_layout.addWidget(self.file_organization_button)
         
-        self.edit_row_button = QPushButton("✏️ Edit Selected")
+        self.edit_row_button = QPushButton("Edit Selected")
         self.edit_row_button.clicked.connect(self.edit_selected_reel)
         self.edit_row_button.setStyleSheet("""
             QPushButton {
@@ -789,7 +848,7 @@ class ReelTrackerApp(QMainWindow):
         """)
         button_layout.addWidget(self.duplicate_row_button)
         
-        self.delete_row_button = QPushButton("🗑️ Delete")
+        self.delete_row_button = QPushButton("Delete")
         self.delete_row_button.clicked.connect(self.delete_selected_reel)
         self.delete_row_button.setStyleSheet("""
             QPushButton {
@@ -1109,7 +1168,7 @@ class ReelTrackerApp(QMainWindow):
         
         stats_text = f"Rows: {count}"
         if video_count > 0 or image_count > 0:
-            stats_text += f" (🎥{video_count} 🖼️{image_count})"
+            stats_text += f" (Video:{video_count} Image:{image_count})"
             
         self.row_count_label.setText(stats_text)
         
@@ -1131,7 +1190,7 @@ class ReelTrackerApp(QMainWindow):
         # Only apply goal achievement styling for individual releases, not global count
         if self.current_release_filter and reel_count >= goal:
             # Goal achieved for specific release - change styling and add achievement badge
-            self.release_counter_button.setText(f"🎉 {counter_text} - GOAL ACHIEVED! 🎉")
+            self.release_counter_button.setText(f"*** {counter_text} - GOAL ACHIEVED! ***")
             self.release_counter_button.setStyleSheet("""
                 QPushButton {
                     font-weight: bold;
@@ -1268,27 +1327,31 @@ class ReelTrackerApp(QMainWindow):
         dialog = ReleaseBreakdownDialog(self, release_counts)
         dialog.exec_()
     
-    def auto_save_csv(self):
+    def auto_save_csv(self, immediate=False, allow_empty=False):
         """
         Automatically save CSV with enhanced protection against corruption.
-        Uses file locking, data validation, and debouncing to prevent issues.
+        Uses file locking, data validation, and optionally debouncing to prevent issues.
+        
+        Args:
+            immediate (bool): If True, saves immediately without debouncing (for critical operations)
+            allow_empty (bool): If True, allows saving empty CSV with just headers (for clear operations)
         """
         if not self.config_manager:
-            safe_print("❌ Auto-save skipped: No config manager")
+            safe_print("[ERROR] Auto-save skipped: No config manager")
             return False
             
         last_csv_path = self.config_manager.get_last_csv_path()
         if not last_csv_path:
-            safe_print("❌ Auto-save skipped: No CSV path configured")
+            safe_print("[ERROR] Auto-save skipped: No CSV path configured")
             return False
         
         # Enhanced validation: Check table state
-        if self.table.rowCount() == 0:
-            safe_print("❌ Auto-save skipped: Table is empty")
+        if self.table.rowCount() == 0 and not allow_empty:
+            safe_print("[ERROR] Auto-save skipped: Table is empty")
             return False
         
-        # Prevent spam logging when a save is already pending
-        if hasattr(self.csv_protection, 'pending_save') and self.csv_protection.pending_save:
+        # For non-immediate saves, prevent spam logging when a save is already pending
+        if not immediate and hasattr(self.csv_protection, 'pending_save') and self.csv_protection.pending_save:
             return True  # Save already pending, don't log again
         
         try:
@@ -1302,36 +1365,52 @@ class ReelTrackerApp(QMainWindow):
                         cell_value = item.text() if item and item.text() is not None else ""
                         row_data.append(str(cell_value))
                     except Exception as e:
-                        safe_print(f"❌ Error reading cell [{row},{col}]: {e}")
+                        safe_print(f"[ERROR] Reading cell [{row},{col}]: {e}")
                         row_data.append("")  # Use empty string as fallback
                 data.append(row_data)
             
             # Additional validation before saving
             if not data:
-                safe_print("❌ Auto-save skipped: No data extracted from table")
+                safe_print("[ERROR] Auto-save skipped: No data extracted from table")
                 return False
             
-            # Use debounced protected save
-            def save_callback(success, message):
+            if immediate:
+                # Perform immediate synchronous save for critical operations
+                success, message = self.csv_protection.immediate_save(
+                    data=data,
+                    columns=self.columns,
+                    csv_path=last_csv_path,
+                    backup_manager=self.backup_manager
+                )
                 if success:
-                    self.statusBar().showMessage(f"Auto-saved: {message}", 2000)
+                    self.statusBar().showMessage(f"Saved: {message}", 2000)
+                    safe_print(f"[SUCCESS] Immediate save complete: {len(data)} rows")
                 else:
-                    self.statusBar().showMessage(f"Auto-save failed: {message}", 3000)
-                    safe_print(f"❌ Auto-save failed: {message}")
-            
-            self.csv_protection.debounced_save(
-                data=data,
-                columns=self.columns,
-                csv_path=last_csv_path,
-                backup_manager=self.backup_manager,
-                callback=save_callback
-            )
-            
-            safe_print(f"🔄 Auto-save queued: {len(data)} rows")
-            return True
+                    self.statusBar().showMessage(f"Save failed: {message}", 3000)
+                    safe_print(f"[ERROR] Immediate save failed: {message}")
+                return success
+            else:
+                # Use debounced protected save for normal operations
+                def save_callback(success, message):
+                    if success:
+                        self.statusBar().showMessage(f"Auto-saved: {message}", 2000)
+                    else:
+                        self.statusBar().showMessage(f"Auto-save failed: {message}", 3000)
+                        safe_print(f"[ERROR] Auto-save failed: {message}")
+                
+                self.csv_protection.debounced_save(
+                    data=data,
+                    columns=self.columns,
+                    csv_path=last_csv_path,
+                    backup_manager=self.backup_manager,
+                    callback=save_callback
+                )
+                
+                safe_print(f"[INFO] Auto-save queued: {len(data)} rows")
+                return True
             
         except Exception as e:
-            safe_print(f"❌ Auto-save failed with exception: {e}")
+            safe_print(f"[ERROR] Auto-save failed with exception: {e}")
             self.statusBar().showMessage(f"Auto-save error: {str(e)}", 3000)
             return False
         
@@ -1459,8 +1538,8 @@ class ReelTrackerApp(QMainWindow):
                     safe_print(f"[CSV_UPDATE] Updated row for reel {reel_id}: {new_filename} at {new_filepath}")
             
             if updated_rows > 0:
-                # Immediately save CSV after updates
-                self.auto_save_csv()
+                # Immediately save CSV after updates (use immediate=True for file organization)
+                self.auto_save_csv(immediate=True)
                 safe_print(f"[CSV_UPDATE] Successfully updated {updated_rows} row(s) for reel {reel_id}")
             else:
                 safe_print(f"[CSV_UPDATE] Warning: No rows found for reel ID: {reel_id}")
@@ -1681,20 +1760,20 @@ class ReelTrackerApp(QMainWindow):
                 backup_path = self.backup_manager.create_pre_clear_backup()
                 if backup_path:
                     backup_created = True
-                    safe_print(f"🛡️ CRITICAL BACKUP created before clear: {backup_path}")
+                    safe_print(f"[CRITICAL BACKUP] Created before clear: {backup_path}")
             except Exception as e:
-                safe_print(f"❌ Failed to create backup: {e}")
+                safe_print(f"[ERROR] Failed to create backup: {e}")
         
         # Enhanced warning message
-        warning_msg = "⚠️ DANGER: This will permanently delete ALL reel data!\n\n"
+        warning_msg = "DANGER: This will permanently delete ALL reel data!\n\n"
         if backup_created:
-            warning_msg += "✅ Backup created successfully.\n"
+            warning_msg += "[OK] Backup created successfully.\n"
         else:
-            warning_msg += "❌ Could not create backup! This is VERY DANGEROUS!\n"
+            warning_msg += "[ERROR] Could not create backup! This is VERY DANGEROUS!\n"
         warning_msg += "\nAre you absolutely sure you want to clear all data?"
         
         reply = QMessageBox.question(
-            self, "⚠️ CONFIRM CLEAR ALL DATA", 
+            self, "CONFIRM CLEAR ALL DATA", 
             warning_msg,
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
@@ -1703,9 +1782,16 @@ class ReelTrackerApp(QMainWindow):
         if reply == QMessageBox.Yes:
             self.table.setRowCount(0)
             self.update_row_count()
-            # NEVER auto-save after clearing data - this would overwrite the CSV with empty data!
-            # This was the bug that caused the original data loss
-            self.statusBar().showMessage("All data cleared - CSV NOT auto-saved to prevent data loss")
+            
+            # Save the empty CSV (with headers only) to reflect the cleared state
+            # The backup was already created above, so this is safe
+            if backup_created and self.config_manager:
+                # Only save if backup was successful to prevent accidental data loss
+                safe_print("[INFO] Saving empty CSV with headers after successful backup...")
+                self.auto_save_csv(immediate=True, allow_empty=True)
+                self.statusBar().showMessage("All data cleared and CSV updated (backup created)")
+            else:
+                self.statusBar().showMessage("All data cleared - CSV NOT saved (no backup)")
     
     def update_autofill_memory(self, row_index):
         """Remember last used Persona/Release/Reel Type values from a given row"""
@@ -1752,8 +1838,23 @@ class ReelTrackerApp(QMainWindow):
         
         if file_path:
             try:
-                # Read CSV using pandas
-                df = pd.read_csv(file_path)
+                # Read CSV using pandas with multiple encoding attempts
+                df = None
+                encoding_options = ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']
+                last_error = None
+                
+                for encoding in encoding_options:
+                    try:
+                        df = pd.read_csv(file_path, encoding=encoding)
+                        safe_print(f"[SUCCESS] Read CSV with {encoding} encoding")
+                        break
+                    except Exception as e:
+                        last_error = e
+                        safe_print(f"[WARNING] Failed to read with {encoding}: {e}")
+                        continue
+                
+                if df is None:
+                    raise Exception(f"Could not read CSV with any encoding. Last error: {last_error}")
                 
                 # Filter to only include defined columns, add missing ones as empty
                 filtered_df = pd.DataFrame()
@@ -1777,7 +1878,7 @@ class ReelTrackerApp(QMainWindow):
                     self.backup_manager = BackupManager(file_path)
                     safe_print(f"🛡️ Backup protection activated for: {file_path}")
                 except Exception as e:
-                    safe_print(f"❌ Could not initialize backup manager: {e}")
+                    safe_print(f"[ERROR] Could not initialize backup manager: {e}")
                     self.backup_manager = None
                 
                 # Initialize CSV protection manager for this file
@@ -1813,7 +1914,7 @@ class ReelTrackerApp(QMainWindow):
                             cell_value = item.text() if item and item.text() is not None else ""
                             row_data.append(str(cell_value))
                         except Exception as e:
-                            safe_print(f"❌ Error reading cell [{row},{col}]: {e}")
+                            safe_print(f"[ERROR] Reading cell [{row},{col}]: {e}")
                             row_data.append("")  # Use empty string as fallback
                     data.append(row_data)
                 
@@ -1830,9 +1931,9 @@ class ReelTrackerApp(QMainWindow):
                     self.csv_path = file_path
                     try:
                         self.backup_manager = BackupManager(file_path)
-                        safe_print(f"🛡️ Backup protection activated for: {file_path}")
+                        safe_print(f"[BACKUP] Protection activated for: {file_path}")
                     except Exception as e:
-                        safe_print(f"❌ Could not initialize backup manager: {e}")
+                        safe_print(f"[ERROR] Could not initialize backup manager: {e}")
                         self.backup_manager = None
                     
                     # Update CSV protection manager path
@@ -1876,6 +1977,49 @@ class ReelTrackerApp(QMainWindow):
             # Always restore signals even if an exception occurs
             self.table.blockSignals(False)
     
+    def closeEvent(self, event):
+        """
+        Handle application close event to ensure data is saved.
+        This prevents data loss when the app is closed.
+        """
+        try:
+            # Check if there's data to save
+            if self.table.rowCount() > 0 and self.config_manager:
+                last_csv_path = self.config_manager.get_last_csv_path()
+                if last_csv_path:
+                    safe_print("[INFO] Saving data before exit...")
+                    # Perform immediate save on exit
+                    success = self.auto_save_csv(immediate=True)
+                    if success:
+                        safe_print("[SUCCESS] Data saved successfully before exit")
+                    else:
+                        # Ask user if they want to exit without saving
+                        reply = QMessageBox.warning(
+                            self, "Save Failed",
+                            "Failed to save data. Do you still want to exit?\n\n"
+                            "Click 'No' to stay and try saving manually.",
+                            QMessageBox.Yes | QMessageBox.No,
+                            QMessageBox.No
+                        )
+                        if reply == QMessageBox.No:
+                            event.ignore()
+                            return
+            
+            # Save window geometry if config manager is available
+            if self.config_manager:
+                try:
+                    self.config_manager.save_window_geometry(self.saveGeometry())
+                except:
+                    pass  # Don't block exit if geometry save fails
+            
+            # Accept the close event
+            event.accept()
+            
+        except Exception as e:
+            safe_print(f"[ERROR] During close event: {e}")
+            # Still allow exit even if there's an error
+            event.accept()
+    
     def auto_load_last_csv(self):
         """Auto-load the last CSV file if enabled and file exists."""
         if not self.config_manager or not self.config_manager.should_auto_load_csv():
@@ -1884,8 +2028,23 @@ class ReelTrackerApp(QMainWindow):
         last_csv_path = self.config_manager.get_last_csv_path()
         if last_csv_path and os.path.exists(last_csv_path):
             try:
-                # Read CSV using pandas
-                df = pd.read_csv(last_csv_path)
+                # Read CSV using pandas with multiple encoding attempts
+                df = None
+                encoding_options = ['utf-8-sig', 'utf-8', 'latin-1', 'cp1252']
+                last_error = None
+                
+                for encoding in encoding_options:
+                    try:
+                        df = pd.read_csv(last_csv_path, encoding=encoding)
+                        safe_print(f"[SUCCESS] Read CSV with {encoding} encoding")
+                        break
+                    except Exception as e:
+                        last_error = e
+                        safe_print(f"[WARNING] Failed to read with {encoding}: {e}")
+                        continue
+                
+                if df is None:
+                    raise Exception(f"Could not read CSV with any encoding. Last error: {last_error}")
                 
                 # Filter to only include defined columns, add missing ones as empty
                 filtered_df = pd.DataFrame()
@@ -1903,9 +2062,9 @@ class ReelTrackerApp(QMainWindow):
                 self.csv_path = last_csv_path
                 try:
                     self.backup_manager = BackupManager(last_csv_path)
-                    safe_print(f"🛡️ Backup protection activated for: {last_csv_path}")
+                    safe_print(f"[BACKUP] Protection activated for: {last_csv_path}")
                 except Exception as e:
-                    safe_print(f"❌ Could not initialize backup manager: {e}")
+                    safe_print(f"[ERROR] Could not initialize backup manager: {e}")
                     self.backup_manager = None
                 
                 # Initialize CSV protection manager for this file

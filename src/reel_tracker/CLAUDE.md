@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code when working with the reel tracker module.
 
+## CRITICAL CODING STANDARDS
+
+### ASCII-Only Policy
+- **NEVER use emoji characters** in any code, comments, or strings
+- **NEVER use Unicode symbols** like ✅, ❌, ⚠️, 🔄, etc.
+- **ALWAYS use ASCII-only alternatives**:
+  - Instead of ✅ use [SUCCESS] or [OK]
+  - Instead of ❌ use [ERROR] or [FAILED]
+  - Instead of ⚠️ use [WARNING]
+  - Instead of 🔄 use [INFO] or [PROCESSING]
+  - Instead of 💾 use [SAVE]
+  - Instead of 📂 use [LOAD]
+  - Instead of 🛡️ use [BACKUP]
+- This prevents encoding errors on Windows systems
+- All console output must be Windows-compatible ASCII
+
 ## Module Overview
 
 The Reel Tracker is a PyQt5-based application for managing content production with CSV-based data storage. It features advanced configuration management with version history, dynamic dropdown values, and sophisticated file organization capabilities.
