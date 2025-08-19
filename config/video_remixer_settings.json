@@ -3,9 +3,9 @@
     "output_folder": "E:/VIDEOS/A03_SNIPPET_REMIXER_OUTPUTS",
     "length_mode": "BPM",
     "duration_seconds": 132.0,
-    "bpm": 191.0,
-    "bpm_unit": "1/2 Beat",
-    "num_units": 100,
+    "bpm": 172.0,
+    "bpm_unit": "1/4 Beat",
+    "num_units": 200,
     "aspect_ratio": "1920x1080 (16:9 Landscape)",
     "export_settings": {
         "custom_width": null,

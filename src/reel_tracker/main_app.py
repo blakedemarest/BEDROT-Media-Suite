@@ -359,23 +359,25 @@ class ReelTrackerApp(QMainWindow):
         # Define exact column order as required (Visual Template removed)
         self.columns = [
             "Reel ID", "Persona", "Release", "Reel Type", 
-            "Clip Filename", "Caption", "FilePath"
+            "Clip Filename", "Caption", "Aspect Ratio", "FilePath"
         ]
         
         # Column indices for dropdowns
         self.dropdown_columns = {
             "Persona": 1,
             "Release": 2,
-            "Reel Type": 3
+            "Reel Type": 3,
+            "Aspect Ratio": 6  # New dropdown for aspect ratio
         }
         
         # Store dropdown delegates for refreshing
         self.persona_delegate = None
         self.release_delegate = None
         self.reel_type_delegate = None
+        self.aspect_ratio_delegate = None
         
         # Store last-used values for autofill
-        self.last_autofill = {"Persona": "", "Release": "RENEGADE PIPELINE", "Reel Type": ""}
+        self.last_autofill = {"Persona": "", "Release": "RENEGADE PIPELINE", "Reel Type": "", "Aspect Ratio": "9:16"}
 
         self.init_ui()
         
@@ -800,6 +802,31 @@ class ReelTrackerApp(QMainWindow):
         """)
         button_layout.addWidget(self.file_organization_button)
         
+        # Add Scan Aspect Ratios button
+        self.scan_aspect_button = QPushButton("[SCAN] Aspect Ratios")
+        self.scan_aspect_button.clicked.connect(self.scan_aspect_ratios)
+        self.scan_aspect_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 0, 255, 0.8);
+                color: #000000;
+                font-weight: bold;
+                padding: 6px 10px;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                text-transform: uppercase;
+                min-width: 140px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 0, 255, 0.9);
+                box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
+            }
+            QPushButton:pressed {
+                background-color: #cc00cc;
+            }
+        """)
+        button_layout.addWidget(self.scan_aspect_button)
+        
         self.edit_row_button = QPushButton("Edit Selected")
         self.edit_row_button.clicked.connect(self.edit_selected_reel)
         self.edit_row_button.setStyleSheet("""
@@ -973,6 +1000,19 @@ class ReelTrackerApp(QMainWindow):
         # File organization settings
         file_org_action = config_menu.addAction('File Organization Settings')
         file_org_action.triggered.connect(self.open_file_organization)
+        
+        # Tools menu
+        tools_menu = menubar.addMenu('Tools')
+        
+        # Scan aspect ratios action
+        scan_aspect_action = tools_menu.addAction('Scan Video Aspect Ratios')
+        scan_aspect_action.setStatusTip('Scan video files to auto-detect aspect ratios')
+        scan_aspect_action.triggered.connect(self.scan_aspect_ratios)
+        
+        # Refresh selected aspect ratios
+        refresh_selected_action = tools_menu.addAction('Refresh Selected Aspect Ratios')
+        refresh_selected_action.setStatusTip('Scan aspect ratios for selected rows only')
+        refresh_selected_action.triggered.connect(self.scan_selected_aspect_ratios)
     
     def show_dropdown_config(self):
         """Show current dropdown configuration."""
@@ -1124,11 +1164,13 @@ class ReelTrackerApp(QMainWindow):
                 self.persona_delegate = DropdownDelegate(self.table, "persona", self.config_manager)
                 self.release_delegate = DropdownDelegate(self.table, "release", self.config_manager)
                 self.reel_type_delegate = DropdownDelegate(self.table, "reel_type", self.config_manager)
+                self.aspect_ratio_delegate = DropdownDelegate(self.table, "aspect_ratio", self.config_manager)
                 
                 # Apply delegates to specific columns
                 self.table.setItemDelegateForColumn(self.dropdown_columns["Persona"], self.persona_delegate)
                 self.table.setItemDelegateForColumn(self.dropdown_columns["Release"], self.release_delegate)
                 self.table.setItemDelegateForColumn(self.dropdown_columns["Reel Type"], self.reel_type_delegate)
+                self.table.setItemDelegateForColumn(self.dropdown_columns["Aspect Ratio"], self.aspect_ratio_delegate)
                 
                 safe_print("[OK] Dropdown delegates setup successfully")
             else:
@@ -1484,6 +1526,9 @@ class ReelTrackerApp(QMainWindow):
     
     def open_file_organization(self):
         """Open the file organization dialog."""
+        # Get the FilePath column index dynamically
+        filepath_col = self.columns.index("FilePath")
+        
         # Get current table data
         reel_data_list = []
         for row in range(self.table.rowCount()):
@@ -1493,7 +1538,7 @@ class ReelTrackerApp(QMainWindow):
                 row_data.append(item.text() if item else "")
             
             # Only include rows with valid file paths
-            if len(row_data) >= 7 and row_data[6].strip():  # FilePath column
+            if len(row_data) > filepath_col and row_data[filepath_col].strip():  # FilePath column
                 reel_data_list.append(row_data)
         
         if not reel_data_list:
@@ -1554,6 +1599,403 @@ class ReelTrackerApp(QMainWindow):
             # Refresh the table delegates to show updated dropdown values
             self.setup_dropdown_delegates()
             self.statusBar().showMessage("Release values updated successfully")
+    
+    def scan_aspect_ratios(self):
+        """Scan video files to auto-detect aspect ratios for all rows."""
+        try:
+            row_count = self.table.rowCount()
+            if row_count == 0:
+                QMessageBox.information(self, "No Data", "No rows to scan. Please load a CSV file first.")
+                return
+            
+            # Confirm with user
+            reply = QMessageBox.question(
+                self, "Scan Video Aspect Ratios",
+                f"This will scan {row_count} video files to detect their actual aspect ratios.\n\n"
+                f"This may take a few minutes for large datasets.\n\n"
+                f"Continue?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+            
+            if reply != QMessageBox.Yes:
+                return
+            
+            # Create progress dialog
+            progress = QProgressBar(self)
+            progress.setWindowTitle("Scanning Video Files")
+            progress.setMinimum(0)
+            progress.setMaximum(row_count)
+            
+            self.statusBar().addWidget(progress)
+            self.statusBar().showMessage("Scanning video files...")
+            
+            # Try MoviePy first (much faster than FFprobe)
+            use_moviepy = False
+            try:
+                from moviepy.editor import VideoFileClip
+                use_moviepy = True
+                safe_print("[INFO] Using MoviePy for fast video scanning")
+            except ImportError:
+                safe_print("[WARNING] MoviePy not available, using pattern matching only")
+            
+            def get_video_dimensions_fast(filepath):
+                """Get video dimensions quickly using MoviePy or filename patterns."""
+                import os
+                # First try MoviePy (very fast - just reads metadata)
+                if use_moviepy:
+                    try:
+                        # MoviePy is much faster as it only reads metadata, not frames
+                        clip = VideoFileClip(filepath)
+                        width = clip.w
+                        height = clip.h
+                        clip.close()  # Important to release resources
+                        return width, height
+                    except Exception as e:
+                        safe_print(f"[WARNING] MoviePy failed for {os.path.basename(filepath)}: {e}")
+                
+                # Fallback: Check filename patterns for common resolutions
+                filename = os.path.basename(filepath).lower()
+                
+                # Common resolution patterns in filenames
+                resolution_hints = [
+                    ("1080x1920", 1080, 1920),  # Portrait Full HD
+                    ("1920x1080", 1920, 1080),  # Landscape Full HD
+                    ("720x1280", 720, 1280),    # Portrait HD
+                    ("1280x720", 1280, 720),    # Landscape HD
+                    ("1080x1080", 1080, 1080),  # Square
+                    ("1080x1350", 1080, 1350),  # Instagram portrait
+                    ("4k", 3840, 2160),          # 4K
+                    ("uhd", 3840, 2160),         # UHD
+                    ("fhd", 1920, 1080),         # Full HD
+                    ("hd", 1280, 720),           # HD
+                ]
+                
+                for pattern, w, h in resolution_hints:
+                    if pattern in filename:
+                        return w, h
+                
+                # If filename contains "reel", "short", "story" - assume 9:16
+                if any(x in filename for x in ["reel", "short", "story", "tiktok", "vertical"]):
+                    return 1080, 1920  # Standard vertical
+                
+                # If filename contains "youtube", "landscape", "horizontal" - assume 16:9
+                if any(x in filename for x in ["youtube", "landscape", "horizontal", "wide"]):
+                    return 1920, 1080  # Standard landscape
+                
+                # If filename contains "square", "post" - assume 1:1
+                if any(x in filename for x in ["square", "post", "instagram"]):
+                    return 1080, 1080  # Square
+                
+                return None, None
+            
+            def get_canonical_ratio(width, height):
+                """Convert dimensions to canonical aspect ratio."""
+                if not width or not height:
+                    return "unknown"
+                
+                ratio = width / height
+                
+                # Check common ratios with tolerance
+                ratios = [
+                    (9/16, "9:16"),    # Portrait
+                    (16/9, "16:9"),    # Landscape
+                    (1.0, "1:1"),      # Square
+                    (4/5, "4:5"),      # Instagram portrait
+                    (5/4, "5:4"),      # Alternative landscape
+                    (4/3, "4:3"),      # Traditional
+                    (3/4, "3:4"),      # Alternative portrait
+                    (21/9, "21:9"),    # Ultrawide
+                    (2/3, "2:3"),      # Portrait
+                ]
+                
+                for target_ratio, label in ratios:
+                    if abs(ratio - target_ratio) / target_ratio < 0.05:  # 5% tolerance
+                        return label
+                
+                # Return simplified ratio if no match
+                from fractions import Fraction
+                try:
+                    frac = Fraction(int(width), int(height)).limit_denominator(100)
+                    return f"{frac.numerator}:{frac.denominator}"
+                except:
+                    return "unknown"
+            
+            # Get column indices
+            filepath_col = self.columns.index("FilePath") if "FilePath" in self.columns else -1
+            aspect_col = self.columns.index("Aspect Ratio") if "Aspect Ratio" in self.columns else -1
+            
+            if filepath_col == -1:
+                QMessageBox.warning(self, "Error", "FilePath column not found.")
+                self.statusBar().removeWidget(progress)
+                return
+            
+            if aspect_col == -1:
+                QMessageBox.warning(self, "Error", "Aspect Ratio column not found.")
+                self.statusBar().removeWidget(progress)
+                return
+            
+            scanned = 0
+            updated = 0
+            failed = 0
+            
+            for row in range(row_count):
+                progress.setValue(row + 1)
+                QApplication.processEvents()  # Keep UI responsive
+                
+                # Get filepath
+                filepath_item = self.table.item(row, filepath_col)
+                if not filepath_item:
+                    continue
+                
+                filepath = filepath_item.text()
+                if not filepath:
+                    continue
+                
+                scanned += 1
+                
+                # Use fast scanning method
+                width, height = get_video_dimensions_fast(filepath)
+                if width and height:
+                    aspect_ratio = get_canonical_ratio(width, height)
+                else:
+                    # Default based on filename if can't determine
+                    filename_lower = os.path.basename(filepath).lower()
+                    if "reel" in filename_lower:
+                        aspect_ratio = "9:16"
+                    else:
+                        aspect_ratio = "unknown"
+                        failed += 1
+                
+                # Update table
+                aspect_item = self.table.item(row, aspect_col)
+                if aspect_item:
+                    if aspect_item.text() != aspect_ratio:
+                        aspect_item.setText(aspect_ratio)
+                        updated += 1
+                else:
+                    aspect_item = QTableWidgetItem(aspect_ratio)
+                    self.table.setItem(row, aspect_col, aspect_item)
+                    updated += 1
+            
+            # Remove progress bar
+            self.statusBar().removeWidget(progress)
+            
+            # Auto-save if changes were made
+            if updated > 0:
+                self.auto_save_csv()
+            
+            # Show results
+            success_rate = ((scanned - failed) / scanned * 100) if scanned > 0 else 0
+            QMessageBox.information(
+                self, "Scan Complete",
+                f"Aspect Ratio Scan Results:\n\n"
+                f"Files scanned: {scanned}\n"
+                f"Successful: {scanned - failed}\n"
+                f"Failed: {failed}\n"
+                f"Rows updated: {updated}\n"
+                f"Success rate: {success_rate:.1f}%"
+            )
+            
+            self.statusBar().showMessage(f"Scan complete: {updated} aspect ratios updated")
+            
+        except Exception as e:
+            safe_print(f"[ERROR] Failed to scan aspect ratios: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to scan aspect ratios:\n{str(e)}")
+            self.statusBar().showMessage("Aspect ratio scan failed")
+    
+    def detect_aspect_ratio_for_row(self, row, filepath, aspect_col):
+        """Detect and set aspect ratio for a single row using fast methods."""
+        try:
+            import os
+            
+            # Try MoviePy first (much faster than FFprobe)
+            try:
+                from moviepy.editor import VideoFileClip
+                clip = VideoFileClip(filepath)
+                width = clip.w
+                height = clip.h
+                clip.close()
+            except:
+                # Fallback to filename-based detection
+                filename = os.path.basename(filepath).lower()
+                if "reel" in filename or "vertical" in filename or "9x16" in filename:
+                    width, height = 1080, 1920
+                elif "landscape" in filename or "16x9" in filename:
+                    width, height = 1920, 1080
+                elif "square" in filename or "1x1" in filename:
+                    width, height = 1080, 1080
+                else:
+                    width, height = None, None
+            
+            if width and height:
+                    
+                    # Calculate aspect ratio
+                    ratio = width / height
+                    
+                    # Map to canonical aspect ratio
+                    aspect_ratio = "unknown"
+                    ratios = [
+                        (9/16, "9:16"),    # Portrait
+                        (16/9, "16:9"),    # Landscape
+                        (1.0, "1:1"),      # Square
+                        (4/5, "4:5"),      # Instagram portrait
+                        (5/4, "5:4"),      # Alternative landscape
+                        (4/3, "4:3"),      # Traditional
+                        (3/4, "3:4"),      # Alternative portrait
+                        (21/9, "21:9"),    # Ultrawide
+                        (2/3, "2:3"),      # Portrait
+                    ]
+                    
+                    for target_ratio, label in ratios:
+                        if abs(ratio - target_ratio) / target_ratio < 0.05:  # 5% tolerance
+                            aspect_ratio = label
+                            break
+                    
+                    if aspect_ratio == "unknown":
+                        # Return simplified ratio
+                        from fractions import Fraction
+                        try:
+                            frac = Fraction(int(width), int(height)).limit_denominator(100)
+                            aspect_ratio = f"{frac.numerator}:{frac.denominator}"
+                        except:
+                            aspect_ratio = "unknown"
+                    
+                    # Set the aspect ratio in the table
+                    self.table.item(row, aspect_col).setText(aspect_ratio)
+                    safe_print(f"[OK] Detected aspect ratio {aspect_ratio} for {os.path.basename(filepath)}")
+                    return
+                    
+        except Exception as e:
+            safe_print(f"[WARNING] Could not detect aspect ratio: {e}")
+        
+        # Default to 9:16 for reels if detection fails
+        self.table.item(row, aspect_col).setText("9:16")
+        safe_print(f"[INFO] Defaulted to 9:16 aspect ratio for {os.path.basename(filepath)}")
+    
+    def scan_selected_aspect_ratios(self):
+        """Scan video files to auto-detect aspect ratios for selected rows only."""
+        try:
+            selected_rows = set()
+            for item in self.table.selectedItems():
+                selected_rows.add(item.row())
+            
+            if not selected_rows:
+                QMessageBox.information(self, "No Selection", "Please select rows to scan.")
+                return
+            
+            # Confirm with user
+            reply = QMessageBox.question(
+                self, "Scan Selected Video Aspect Ratios",
+                f"This will scan {len(selected_rows)} selected video files.\n\nContinue?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+            
+            if reply != QMessageBox.Yes:
+                return
+            
+            # Try to use MoviePy for fast scanning
+            use_moviepy = False
+            try:
+                from moviepy.editor import VideoFileClip
+                use_moviepy = True
+            except ImportError:
+                pass
+            
+            # Helper function for fast video dimension detection
+            def get_dimensions_fast(filepath):
+                import os
+                if use_moviepy:
+                    try:
+                        clip = VideoFileClip(filepath)
+                        width = clip.w
+                        height = clip.h
+                        clip.close()
+                        return width, height
+                    except:
+                        pass
+                
+                # Fallback to filename patterns
+                filename = os.path.basename(filepath).lower()
+                if "reel" in filename or "vertical" in filename:
+                    return 1080, 1920
+                elif "landscape" in filename or "horizontal" in filename:
+                    return 1920, 1080
+                elif "square" in filename:
+                    return 1080, 1080
+                return None, None
+            
+            # Helper function for aspect ratio calculation
+            def calc_aspect_ratio(width, height):
+                if not width or not height:
+                    return "unknown"
+                ratio = width / height
+                ratios = [
+                    (9/16, "9:16"),
+                    (16/9, "16:9"),
+                    (1.0, "1:1"),
+                    (4/5, "4:5"),
+                ]
+                for target, label in ratios:
+                    if abs(ratio - target) / target < 0.05:
+                        return label
+                return f"{width}:{height}"
+            
+            # Get column indices
+            filepath_col = self.columns.index("FilePath") if "FilePath" in self.columns else -1
+            aspect_col = self.columns.index("Aspect Ratio") if "Aspect Ratio" in self.columns else -1
+            
+            if filepath_col == -1 or aspect_col == -1:
+                QMessageBox.warning(self, "Error", "Required columns not found.")
+                return
+            
+            updated = 0
+            failed = 0
+            
+            for row in selected_rows:
+                # Get filepath
+                filepath_item = self.table.item(row, filepath_col)
+                if not filepath_item:
+                    continue
+                
+                filepath = filepath_item.text()
+                if not filepath:
+                    continue
+                
+                # Get dimensions using fast method
+                width, height = get_dimensions_fast(filepath)
+                if width and height:
+                    aspect_ratio = calc_aspect_ratio(width, height)
+                else:
+                    # Default based on filename
+                    if "reel" in os.path.basename(filepath).lower():
+                        aspect_ratio = "9:16"
+                    else:
+                        aspect_ratio = "unknown"
+                        failed += 1
+                
+                # Update table
+                aspect_item = self.table.item(row, aspect_col)
+                if aspect_item:
+                    aspect_item.setText(aspect_ratio)
+                else:
+                    self.table.setItem(row, aspect_col, QTableWidgetItem(aspect_ratio))
+                updated += 1
+            
+            # Auto-save
+            if updated > 0:
+                self.auto_save_csv()
+            
+            QMessageBox.information(
+                self, "Scan Complete",
+                f"Updated {updated} aspect ratios.\n"
+                f"Failed: {failed}"
+            )
+            
+        except Exception as e:
+            safe_print(f"[ERROR] Failed to scan selected: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to scan:\n{str(e)}")
     
     def add_file_row(self, file_path):
         """Add a new row to the table with file information and default metadata."""
@@ -1630,6 +2072,11 @@ class ReelTrackerApp(QMainWindow):
                 safe_print(f"[DEBUG] Applied caption: '{caption}'")
             
             safe_print(f"[OK] Applied default metadata to drag-dropped file: {filename}")
+        
+        # Auto-detect aspect ratio for video files
+        if "Aspect Ratio" in self.columns:
+            aspect_col = self.columns.index("Aspect Ratio")
+            self.detect_aspect_ratio_for_row(row_count, file_path, aspect_col)
         
         # Update autofill memory
         self.update_autofill_memory(row_count)

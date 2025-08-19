@@ -21,6 +21,7 @@
       "Bash(./venv/Scripts/yt-dlp.exe --version)",
       "Bash(echo:*)",
       "Bash(cd:*)",
+      "Bash(cd:*)",
       "Bash(cd:*)"
     ],
     "deny": []

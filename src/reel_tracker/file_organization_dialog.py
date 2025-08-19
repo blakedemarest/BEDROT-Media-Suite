@@ -43,7 +43,9 @@ class FileOrganizationThread(QThread):
     
     def progress_callback(self, current, total, reel_data):
         """Callback for progress updates."""
-        message = f"Processing: {reel_data[0]} - {os.path.basename(reel_data[6])}"
+        # Get filepath index based on data length (7 for old format, 8 for new with Aspect Ratio)
+        filepath_index = 6 if len(reel_data) == 7 else 7
+        message = f"Processing: {reel_data[0]} - {os.path.basename(reel_data[filepath_index])}"
         self.progress_updated.emit(current, total, message)
     
     def csv_update_callback(self, reel_id, new_filepath, new_filename):

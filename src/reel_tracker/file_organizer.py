@@ -226,10 +226,17 @@ class FileOrganizer:
             tuple: (success: bool, message: str, new_filepath: str or None)
         """
         try:
+            # Handle both old format (7 columns) and new format (8 columns with Aspect Ratio)
             if len(reel_data) < 7:
                 return False, "Invalid reel data format", None
             
-            reel_id, persona, release, reel_type, filename, caption, source_filepath = reel_data
+            # Extract data based on column count
+            if len(reel_data) == 7:
+                # Old format without Aspect Ratio
+                reel_id, persona, release, reel_type, filename, caption, source_filepath = reel_data
+            else:
+                # New format with Aspect Ratio at index 6, FilePath at index 7
+                reel_id, persona, release, reel_type, filename, caption, aspect_ratio, source_filepath = reel_data[:8]
             
             # Get export folder from config
             if not self.config_manager:
@@ -347,10 +354,13 @@ class FileOrganizer:
                         reel_data, safe_mode, overwrite_protection
                     )
                     
+                    # Get filepath index based on data length (7 for old format, 8 for new with Aspect Ratio)
+                    filepath_index = 6 if len(reel_data) == 7 else 7
+                    
                     if result == True:  # Success
                         successful.append({
                             "reel_id": reel_data[0],
-                            "original_path": reel_data[6],
+                            "original_path": reel_data[filepath_index],
                             "new_path": filepath,
                             "message": message
                         })
@@ -362,21 +372,22 @@ class FileOrganizer:
                     elif result == "skipped":  # Skipped due to duplicate
                         skipped.append({
                             "reel_id": reel_data[0],
-                            "original_path": reel_data[6],
+                            "original_path": reel_data[filepath_index],
                             "existing_path": filepath,
                             "reason": message
                         })
                     else:  # Failed
                         failed.append({
                             "reel_id": reel_data[0],
-                            "original_path": reel_data[6],
+                            "original_path": reel_data[filepath_index],
                             "error": message
                         })
                         
                 except Exception as e:
+                    filepath_index = 6 if len(reel_data) == 7 else 7
                     failed.append({
                         "reel_id": reel_data[0] if len(reel_data) > 0 else "Unknown",
-                        "original_path": reel_data[6] if len(reel_data) > 6 else "Unknown",
+                        "original_path": reel_data[filepath_index] if len(reel_data) > filepath_index else "Unknown",
                         "error": f"Unexpected error: {e}"
                     })
             
@@ -429,7 +440,13 @@ class FileOrganizer:
                 if len(reel_data) < 7:
                     continue
                 
-                reel_id, persona, release, reel_type, filename, caption, source_filepath = reel_data
+                # Extract data based on column count
+                if len(reel_data) == 7:
+                    # Old format without Aspect Ratio
+                    reel_id, persona, release, reel_type, filename, caption, source_filepath = reel_data
+                else:
+                    # New format with Aspect Ratio at index 6, FilePath at index 7
+                    reel_id, persona, release, reel_type, filename, caption, aspect_ratio, source_filepath = reel_data[:8]
                 
                 # Generate new filename and folder
                 new_filename = self.generate_new_filename(persona, release, reel_id, source_filepath)

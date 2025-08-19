@@ -74,6 +74,9 @@ class ConfigManager:
                     "Transformation", "Day in Life", "Tips & Tricks", "Unboxing",
                     "Comparison", "Story Time", "Challenge", "Trend", "Educational"
                 ],
+                "aspect_ratio": [
+                    "", "9:16", "16:9", "1:1", "4:5", "5:4", "3:4", "4:3", "21:9", "2:3", "unknown"
+                ],
                 # visual_template removed from schema
             },
             "last_csv_path": "",
@@ -85,8 +88,8 @@ class ConfigManager:
                     "Release": 100,
                     "Reel Type": 130,
                     "Clip Filename": 180,
-                    "Visual Template": 140,
-                    "Caption": 220,
+                    "Caption": 200,
+                    "Aspect Ratio": 90,
                     "FilePath": 350
                 }
             },
