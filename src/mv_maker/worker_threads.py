@@ -1,4 +1,4 @@
-"""Background worker threads for Video Caption Generator."""
+"""Background worker threads for MV Maker."""
 
 import os
 import sys
@@ -24,13 +24,13 @@ try:
     from .utils import safe_print, cleanup_temp_directory, estimate_processing_time
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.audio_extractor import AudioExtractor
-    from video_caption_generator.transcriber import Transcriber
-    from video_caption_generator.caption_generator import CaptionGenerator
-    from video_caption_generator.caption_exporter import CaptionExporter
-    from video_caption_generator.video_processor import VideoProcessor
-    from video_caption_generator.audio_to_video_generator import AudioToVideoGenerator
-    from video_caption_generator.utils import safe_print, cleanup_temp_directory, estimate_processing_time
+    from mv_maker.audio_extractor import AudioExtractor
+    from mv_maker.transcriber import Transcriber
+    from mv_maker.caption_generator import CaptionGenerator
+    from mv_maker.caption_exporter import CaptionExporter
+    from mv_maker.video_processor import VideoProcessor
+    from mv_maker.audio_to_video_generator import AudioToVideoGenerator
+    from mv_maker.utils import safe_print, cleanup_temp_directory, estimate_processing_time
 
 class TranscriptionWorker(QThread):
     """Worker thread for video transcription and caption generation."""

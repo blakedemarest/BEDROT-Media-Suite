@@ -28,7 +28,7 @@ Automates the entire media production pipeline from raw footage to platform-opti
 - **Media Downloader**: YouTube/platform downloader with format conversion
 - **Snippet Remixer**: BPM-synced video remixing from random snippets
 - **Random Slideshow Generator**: Automated slideshow creation (16:9, 9:16)
-- **Video Caption Generator**: AI-powered captions with live preview
+- **MV Maker**: AI-powered captions with live preview
 - **Reel Tracker**: Advanced CSV-based content management system
 
 #### Visual Production Features

@@ -48,7 +48,7 @@ This report documents discrepancies found between the actual codebase implementa
   - `src/config/reel_tracker_config.json`
   - `src/random_slideshow/combined_random_config.json`
   - `src/random_slideshow/config/slideshow_presets.json`
-  - `src/video_caption_generator/config/video_caption_generator_config.json`
+  - `src/mv_maker/config/mv_maker_config.json`
 
 **Impact**: Configuration files scattered across multiple locations, not centralized as documented.
 

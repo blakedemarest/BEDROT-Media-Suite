@@ -18,11 +18,11 @@ if str(parent_dir) not in sys.path:
 # Import from absolute path to handle direct script execution
 try:
     from .utils import safe_print
-    from .config_manager import get_video_caption_config
+    from .config_manager import get_mv_maker_config
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import safe_print
-    from video_caption_generator.config_manager import get_video_caption_config
+    from mv_maker.utils import safe_print
+    from mv_maker.config_manager import get_mv_maker_config
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -33,7 +33,7 @@ class WhisperTranscriber:
     
     def __init__(self):
         """Initialize the fallback transcriber."""
-        self.config = get_video_caption_config()
+        self.config = get_mv_maker_config()
         self.recognizer = sr.Recognizer()
         
         # Configuration

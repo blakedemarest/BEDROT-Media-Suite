@@ -12,18 +12,18 @@ if str(parent_dir) not in sys.path:
 # Import from absolute path to handle direct script execution
 try:
     from .utils import split_text_for_captions, safe_print
-    from .config_manager import get_video_caption_config
+    from .config_manager import get_mv_maker_config
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import split_text_for_captions, safe_print
-    from video_caption_generator.config_manager import get_video_caption_config
+    from mv_maker.utils import split_text_for_captions, safe_print
+    from mv_maker.config_manager import get_mv_maker_config
 
 class CaptionGenerator:
     """Generates properly timed captions from transcription segments."""
     
     def __init__(self):
         """Initialize caption generator."""
-        self.config = get_video_caption_config()
+        self.config = get_mv_maker_config()
         self.max_caption_length = self.config.get('caption_max_length', 42)
         self.max_caption_duration = self.config.get('caption_max_duration', 7.0)
     

@@ -49,7 +49,7 @@ SCRIPT_1_PATH = get_script_path('media_download', 'src/media_download_app.py')
 SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.py') 
 SCRIPT_3_PATH = get_script_path('random_slideshow', 'src/random_slideshow/main.py')
 SCRIPT_4_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
-SCRIPT_5_PATH = get_script_path('video_caption_generator', 'src/video_caption_generator/main_app.py')
+SCRIPT_5_PATH = get_script_path('mv_maker', 'src/mv_maker/main_app.py')
 SCRIPT_6_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
@@ -625,9 +625,9 @@ stop_button4 = ttk.Button(
 stop_button4.pack(side=tk.LEFT, padx=5)
 # --- END OF REEL TRACKER TAB ---
 
-# --- Tab 5: Video Caption Generator ---
+# --- Tab 5: MV Maker ---
 tab5 = ttk.Frame(notebook, padding="10")
-notebook.add(tab5, text='Caption Generator')
+notebook.add(tab5, text='MV Maker')
 label5 = ttk.Label(tab5, text="Generate time-synchronized captions for videos using AI speech recognition.")
 label5.pack(pady=10)
 status_label5 = ttk.Label(tab5, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
@@ -656,7 +656,7 @@ stop_button5 = ttk.Button(
     width=15
 )
 stop_button5.pack(side=tk.LEFT, padx=5)
-# --- END OF VIDEO CAPTION GENERATOR TAB ---
+# --- END OF MV MAKER TAB ---
 
 # --- Tab 6: Release Calendar ---
 tab6 = ttk.Frame(notebook, padding="10")

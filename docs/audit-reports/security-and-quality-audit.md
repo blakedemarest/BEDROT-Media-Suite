@@ -109,7 +109,7 @@ Key findings include:
 - **References**: [12-Factor App Config](https://12factor.net/config)
 
 ### 3. Insufficient Input Validation
-- **Location**: `/src/video_caption_generator/video_processor.py`, lines 246-256
+- **Location**: `/src/mv_maker/video_processor.py`, lines 246-256
 - **Description**: FFmpeg time parsing without proper validation
 - **Impact**: Command injection if malicious time strings are provided
 - **Remediation Checklist**:

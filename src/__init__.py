@@ -10,7 +10,7 @@ Modules:
 - reel_tracker: CSV-based content tracking and management
 - snippet_remixer: Video remixing and snippet generation
 - random_slideshow: Automated slideshow creation
-- video_caption_generator: AI-powered caption generation
+- mv_maker: AI-powered caption generation and MV creation
 - release_calendar: Music release scheduling and management
 """
 
@@ -64,25 +64,25 @@ def get_slideshow_generator():
     from .random_slideshow import get_slideshow_generator
     return get_slideshow_generator()
 
-# Video Caption Generator Module
-def get_video_caption_generator():
-    """Get video caption generator main app (PyQt5)."""
-    from .video_caption_generator import get_main_app
+# MV Maker Module
+def get_mv_maker():
+    """Get MV Maker main app (PyQt5)."""
+    from .mv_maker import get_main_app
     return get_main_app()
 
 def get_transcriber():
     """Get caption transcriber (ElevenLabs/Whisper)."""
-    from .video_caption_generator import get_transcriber
+    from .mv_maker import get_transcriber
     return get_transcriber()
 
 def get_caption_exporter():
     """Get caption exporter for multiple formats."""
-    from .video_caption_generator import get_caption_exporter
+    from .mv_maker import get_caption_exporter
     return get_caption_exporter()
 
 def get_live_preview_widget():
     """Get live preview widget for captions."""
-    from .video_caption_generator import get_live_preview_widget
+    from .mv_maker import get_live_preview_widget
     return get_live_preview_widget()
 
 # Release Calendar Module (NEW)
@@ -136,8 +136,8 @@ __all__ = [
     'get_random_slideshow',
     'get_slideshow_generator',
     
-    # Video Caption Generator
-    'get_video_caption_generator',
+    # MV Maker
+    'get_mv_maker',
     'get_transcriber',
     'get_caption_exporter',
     'get_live_preview_widget',

@@ -1,4 +1,4 @@
-"""Utility functions for Video Caption Generator."""
+"""Utility functions for MV Maker."""
 
 import os
 import sys

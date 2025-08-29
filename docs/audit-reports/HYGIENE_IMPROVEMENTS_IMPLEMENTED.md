@@ -25,7 +25,7 @@ This document summarizes all the hygiene improvements implemented during the com
   - Cross-file references
 
 ### 3. Hardcoded Path Remediation
-- **FIXED:** Hardcoded Windows paths in `src/video_caption_generator/utils.py`
+- **FIXED:** Hardcoded Windows paths in `src/mv_maker/utils.py`
 - **IMPLEMENTED:** Environment-based path resolution using:
   - `SLIDESHOW_FFMPEG_PATH` for direct path specification
   - `SLIDESHOW_FFMPEG_SEARCH_PATHS` for custom search locations
@@ -127,7 +127,7 @@ SLIDESHOW_FFMPEG_PATH=
 SLIDESHOW_FFPROBE_PATH=  
 SLIDESHOW_FFMPEG_SEARCH_PATHS=
 
-# Video Caption Generator
+# MV Maker
 CAPTION_TRANSCRIPTION_SERVICE=whisper
 CAPTION_WHISPER_MODEL=base
 CAPTION_OUTPUT_DIR=output/captions

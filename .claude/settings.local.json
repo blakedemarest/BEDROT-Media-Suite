@@ -22,7 +22,14 @@
       "Bash(echo:*)",
       "Bash(cd:*)",
       "Bash(cd:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(for dir in */)",
+      "Bash(do if [ -f \"$dir/main.py\" ])",
+      "Bash(then echo \"$dir: main.py exists\")",
+      "Bash(fi)",
+      "Bash(if [ -f \"$dir/main_app.py\" ])",
+      "Bash(then echo \"$dir: main_app.py exists\")",
+      "Bash(done)"
     ],
     "deny": []
   }

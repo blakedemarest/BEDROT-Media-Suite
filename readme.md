@@ -42,7 +42,7 @@ bedrot-media-suite/
 │   ├── combined_random_config.json         # Random Slideshow settings
 │   ├── config.json                         # Slideshow Editor settings
 │   ├── reel_tracker_config.json            # Reel Tracker settings
-│   ├── video_caption_generator_config.json # Caption Generator settings
+│   ├── mv_maker_config.json # MV Maker settings
 │   ├── release_calendar_config.json        # Release Calendar settings
 │   ├── calendar_data.json                  # Release Calendar data
 │   └── slideshow_presets.json             # Slideshow presets
@@ -57,7 +57,7 @@ bedrot-media-suite/
 │   ├── random_slideshow/                   # Random slideshow package
 │   ├── reel_tracker/                       # Reel tracker package
 │   ├── release_calendar/                   # Release calendar package
-│   └── video_caption_generator/            # Caption generator package
+│   └── mv_maker/            # MV Maker package
 │
 └── tools/                     # Standalone utilities
     ├── slideshow_editor.py   # PyQt5 slideshow editor
@@ -73,7 +73,7 @@ bedrot-media-suite/
 3. **Snippet Remixer** - Creates remixed videos from random snippets
 4. **Random Slideshow Generator** - Automated slideshow creation from images
 5. **Reel Tracker** - Advanced content tracking with CSV backend
-6. **Video Caption Generator** - AI-powered caption generation
+6. **MV Maker** - AI-powered caption generation and music video creation
 7. **Release Calendar** - Music release scheduling (requires PyQt6)
 
 ## Installation & Setup
@@ -185,8 +185,8 @@ python src/reel_tracker_modular.py
 # Release Calendar (requires PyQt6)
 python src/release_calendar_modular.py
 
-# Video Caption Generator
-python -m src.video_caption_generator.main_app
+# MV Maker
+python -m src.mv_maker.main_app
 
 # Tools
 python tools/slideshow_editor.py
@@ -258,10 +258,10 @@ python tools/xyimagescaler.py
 - Automatic conflict detection
 - Friday release day highlighting
 
-### 6. Video Caption Generator
+### 6. MV Maker
 
-**Entry:** `python -m src.video_caption_generator.main_app`  
-**Config:** `config/video_caption_generator_config.json`
+**Entry:** `python -m src.mv_maker.main_app`  
+**Config:** `config/mv_maker_config.json`
 
 **Features:**
 - AI-powered caption generation

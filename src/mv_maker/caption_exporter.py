@@ -15,7 +15,7 @@ try:
     from .utils import format_timestamp, safe_print
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import format_timestamp, safe_print
+    from mv_maker.utils import format_timestamp, safe_print
 
 class CaptionExporter:
     """Exports captions to various subtitle formats."""
@@ -255,7 +255,7 @@ class CaptionExporter:
         try:
             # Prepare data for JSON serialization
             json_data = {
-                'format': 'video-caption-generator',
+                'format': 'mv-maker',
                 'version': '1.0',
                 'captions': []
             }

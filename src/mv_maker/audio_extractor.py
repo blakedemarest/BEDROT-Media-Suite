@@ -1,4 +1,4 @@
-"""Audio extraction module for Video Caption Generator."""
+"""Audio extraction module for MV Maker."""
 
 import os
 import sys
@@ -19,7 +19,7 @@ try:
     )
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import (
+    from mv_maker.utils import (
         safe_print, get_ffmpeg_path, run_ffmpeg_command,
         get_video_info, get_audio_duration
     )

@@ -4,9 +4,9 @@
     "length_mode": "BPM",
     "duration_seconds": 132.0,
     "bpm": 172.0,
-    "bpm_unit": "1/4 Beat",
-    "num_units": 200,
-    "aspect_ratio": "1920x1080 (16:9 Landscape)",
+    "bpm_unit": "Beat",
+    "num_units": 35,
+    "aspect_ratio": "1080x1920 (9:16 Portrait)",
     "export_settings": {
         "custom_width": null,
         "custom_height": null,
@@ -19,11 +19,11 @@
         "trim_start": "",
         "trim_end": "",
         "jitter_enabled": true,
-        "jitter_intensity": 100,
+        "jitter_intensity": 34,
         "aspect_ratio_mode": "Crop to Fill"
     },
-    "continuous_mode": false,
+    "continuous_mode": true,
     "jitter_enabled": true,
-    "jitter_intensity": 100,
+    "jitter_intensity": 34,
     "aspect_ratio_mode": "Crop to Fill"
 }

@@ -176,7 +176,7 @@ class PathResolver:
                 'SLIDESHOW_RANDOM_SLIDESHOW_SCRIPT': 'src/random_slideshow/main.py',
                 'SLIDESHOW_REEL_TRACKER_SCRIPT': 'src/reel_tracker_modular.py',
                 'SLIDESHOW_EDITOR_SCRIPT': 'tools/slideshow_editor.py',
-                'SLIDESHOW_VIDEO_CAPTION_GENERATOR_SCRIPT': 'src/video_caption_generator/main_app.py',
+                'SLIDESHOW_MV_MAKER_SCRIPT': 'src/mv_maker/main_app.py',
                 'SLIDESHOW_RELEASE_CALENDAR_SCRIPT': 'src/release_calendar_modular.py'
             }
             

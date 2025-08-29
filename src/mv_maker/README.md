@@ -105,7 +105,7 @@ pip install pysrt webvtt-py PyQt5 pandas numpy python-dotenv
 
 ### Standalone
 ```bash
-python src/video_caption_generator/main_app.py
+python src/mv_maker/main_app.py
 ```
 
 ### Basic Workflow
@@ -141,7 +141,7 @@ If ElevenLabs is unavailable, the tool can fall back to local Whisper:
 
 ## Configuration
 
-Settings are stored in `config/video_caption_generator_config.json`
+Settings are stored in `config/mv_maker_config.json`
 
 ### Key Settings:
 - `transcription_service`: Choose between 'elevenlabs' or 'whisper'
@@ -280,9 +280,9 @@ For integration with other tools:
 
 ```python
 import os
-from video_caption_generator import get_transcriber, get_audio_extractor
-from video_caption_generator.caption_generator import CaptionGenerator
-from video_caption_generator.caption_exporter import CaptionExporter
+from mv_maker import get_transcriber, get_audio_extractor
+from mv_maker.caption_generator import CaptionGenerator
+from mv_maker.caption_exporter import CaptionExporter
 
 # Set API key
 os.environ['ELEVENLABS_API_KEY'] = 'your_key_here'

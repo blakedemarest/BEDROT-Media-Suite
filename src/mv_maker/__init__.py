@@ -1,5 +1,5 @@
 """
-Video Caption Generator Package
+MV Maker Package
 
 A sophisticated tool for extracting audio from videos and audio files, transcribing speech,
 and generating time-synchronized caption files with advanced styling and real-time preview.
@@ -18,8 +18,8 @@ Features:
 
 def get_main_app():
     """Get main application class with enhanced UI and real-time preview."""
-    from .main_app import VideoCaptionGenerator
-    return VideoCaptionGenerator
+    from .main_app import MVMaker
+    return MVMaker
 
 def get_transcriber():
     """Get transcriber instance (ElevenLabs or Whisper)."""

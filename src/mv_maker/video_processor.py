@@ -18,8 +18,8 @@ try:
     from .font_manager import get_font_manager
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import safe_print, sanitize_filename
-    from video_caption_generator.font_manager import get_font_manager
+    from mv_maker.utils import safe_print, sanitize_filename
+    from mv_maker.font_manager import get_font_manager
 
 class VideoProcessor:
     """Handles video processing operations including caption overlays."""

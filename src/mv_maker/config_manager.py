@@ -1,4 +1,4 @@
-"""Configuration management for Video Caption Generator."""
+"""Configuration management for MV Maker."""
 
 import os
 import json
@@ -15,8 +15,8 @@ except ImportError:
     def resolve_config_path(filename):
         return os.path.join("config", filename)
 
-class VideoCaptionConfig:
-    """Manages configuration for the video caption generator."""
+class MVMakerConfig:
+    """Manages configuration for MV Maker."""
     
     DEFAULT_CONFIG = {
         # Transcription service settings
@@ -78,7 +78,7 @@ class VideoCaptionConfig:
         "last_output_path": ""
     }
     
-    def __init__(self, config_file="video_caption_generator_config.json"):
+    def __init__(self, config_file="mv_maker_config.json"):
         """Initialize configuration manager."""
         self.config_file = resolve_config_path(config_file)
         self.config_dir = os.path.dirname(self.config_file)
@@ -222,9 +222,9 @@ class VideoCaptionConfig:
 # Global config instance
 _config_instance = None
 
-def get_video_caption_config():
+def get_mv_maker_config():
     """Get or create the global config instance."""
     global _config_instance
     if _config_instance is None:
-        _config_instance = VideoCaptionConfig()
+        _config_instance = MVMakerConfig()
     return _config_instance

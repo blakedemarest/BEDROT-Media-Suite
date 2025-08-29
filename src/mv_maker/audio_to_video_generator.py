@@ -16,7 +16,7 @@ if str(parent_dir) not in sys.path:
 try:
     from .utils import safe_print, get_ffmpeg_path, run_ffmpeg_command
 except ImportError:
-    from video_caption_generator.utils import safe_print, get_ffmpeg_path, run_ffmpeg_command
+    from mv_maker.utils import safe_print, get_ffmpeg_path, run_ffmpeg_command
 
 
 class AudioToVideoGenerator:

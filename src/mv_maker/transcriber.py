@@ -17,11 +17,11 @@ if str(parent_dir) not in sys.path:
 # Import from absolute path to handle direct script execution
 try:
     from .utils import safe_print, get_optimal_device, check_cuda_available
-    from .config_manager import get_video_caption_config
+    from .config_manager import get_mv_maker_config
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import safe_print, get_optimal_device, check_cuda_available
-    from video_caption_generator.config_manager import get_video_caption_config
+    from mv_maker.utils import safe_print, get_optimal_device, check_cuda_available
+    from mv_maker.config_manager import get_mv_maker_config
 
 # Suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -38,7 +38,7 @@ class Transcriber:
             api_key: ElevenLabs API key (if not provided, reads from env/config)
             use_fallback: Force use of fallback transcriber
         """
-        self.config = get_video_caption_config()
+        self.config = get_mv_maker_config()
         
         # Get API key from various sources
         self.api_key = (
@@ -56,7 +56,7 @@ class Transcriber:
             try:
                 from .whisper_transcriber import WhisperTranscriber
             except ImportError:
-                from video_caption_generator.whisper_transcriber import WhisperTranscriber
+                from mv_maker.whisper_transcriber import WhisperTranscriber
             self.fallback_transcriber = WhisperTranscriber()
         elif not self.api_key:
             raise ValueError(
@@ -309,7 +309,7 @@ class Transcriber:
                 try:
                     from .whisper_transcriber import WhisperTranscriber
                 except ImportError:
-                    from video_caption_generator.whisper_transcriber import WhisperTranscriber
+                    from mv_maker.whisper_transcriber import WhisperTranscriber
                 
                 fallback_transcriber = WhisperTranscriber()
                 

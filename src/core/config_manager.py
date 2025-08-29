@@ -118,7 +118,7 @@ class ConfigManager:
                 'transition_duration': 0.5,
                 'recent_folders': []
             },
-            'video_caption_generator': {
+            'mv_maker': {
                 'output_directory': str(self.path_resolver.resolve_output_path()),
                 'model_size': 'base',
                 'language': 'en',
@@ -251,7 +251,7 @@ class ConfigManager:
                 'output_directory': 'SLIDESHOW_DEFAULT_OUTPUT_DIR',
                 'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO'
             },
-            'video_caption_generator': {
+            'mv_maker': {
                 'output_directory': 'SLIDESHOW_DEFAULT_EXPORTS_DIR',
                 'audio_temp_directory': 'SLIDESHOW_TEMP_DIR',
                 'api_key': 'ELEVENLABS_API_KEY'

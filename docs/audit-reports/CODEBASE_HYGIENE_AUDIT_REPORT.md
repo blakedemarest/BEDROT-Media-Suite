@@ -43,7 +43,7 @@ This comprehensive audit analyzed 91 Python files across the bedrot-media-suite 
 ## 3. Hardcoded Path Violations
 
 ### HIGH PRIORITY: Windows Path Hardcoding
-- **File:** `src/video_caption_generator/utils.py`
+- **File:** `src/mv_maker/utils.py`
 - **Lines:** 35-37
 - **Issue:** Hardcoded Windows paths for FFmpeg
 ```python
@@ -118,7 +118,7 @@ The following files should be relocated:
 - Worker threads properly isolated in:
   - `src/snippet_remixer/processing_worker.py`
   - `src/random_slideshow/slideshow_worker.py`
-  - `src/video_caption_generator/worker_threads.py`
+  - `src/mv_maker/worker_threads.py`
 
 #### Resource Management
 - MoviePy clips properly released in `src/core/moviepy_utils.py`
@@ -175,7 +175,7 @@ ELEVENLABS_API_KEY (commented out)
 ### Immediate Actions (Critical/High Priority)
 
 1. **✅ COMPLETED:** Remove exposed API key from `.env`
-2. **REQUIRED:** Fix hardcoded Windows paths in `src/video_caption_generator/utils.py`
+2. **REQUIRED:** Fix hardcoded Windows paths in `src/mv_maker/utils.py`
 3. **REQUIRED:** Consolidate duplicate utility functions into `src/core/`
 4. **REQUIRED:** Remove outdated function registry file
 5. **REQUIRED:** Organize root directory files into appropriate subdirectories

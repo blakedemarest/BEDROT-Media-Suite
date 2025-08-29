@@ -2,11 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Last Maintenance Scan**: Completed full codebase audit
-- Function registry updated: 91 files, 181 functions, 111 classes, 1055 methods, 23 duplicates
+**Last Maintenance Scan**: December 19, 2024
+- Function registry updated: 102 files, 212 functions, 118 classes, 1088 methods, 21 duplicates
 - Entry points verified: All launcher paths exist and are correct
-- Config files mapped: Found 5 duplicate config locations across modules
-- Dependencies verified: PyQt5 (23 files), PyQt6 (4 files - release_calendar only), Tkinter (4 files)
+- Config files mapped: 11 config files in /config/, 1 duplicate in src/random_slideshow/config/
+- Dependencies verified: PyQt5 (22 files), PyQt6 (4 files - release_calendar only), Tkinter (3 files)
 
 ## CRITICAL: Check Function Registry Before Writing Code
 
@@ -29,19 +29,20 @@ This registry contains:
    python tools/generate_function_registry.py
    ```
 
-**Registry Stats (Last Updated)**:
-- Files scanned: 91
-- Functions found: 181
-- Classes found: 111
-- Methods found: 1055
-- Duplicates found: 23
+**Registry Stats (Last Updated: December 19, 2024)**:
+- Files scanned: 102
+- Functions found: 212
+- Classes found: 118
+- Methods found: 1088
+- Duplicates found: 21
 
 **Known Duplicates to Avoid**:
-- `parse_aspect_ratio` - exists in 3 files
-- `generate_unique_suffix` - exists in 3 files
-- `main` - exists in 13 files (expected for entry points)
-- `parse_time_to_seconds`, `load_settings`, `save_settings` - each in 2 files
-- `get_video_info`, `get_config_manager`, `get_path_resolver`, `get_video_processor` - each in 2 files
+- `parse_aspect_ratio` - exists in 2 files
+- `generate_unique_suffix` - exists in 2 files
+- `main` - exists in 23 files (expected for entry points)
+- `parse_time_to_seconds` - exists in 2 files
+- `get_config_manager`, `get_path_resolver`, `get_video_processor` - each in 2 files
+- `get_transcriber`, `get_caption_exporter`, `get_live_preview_widget` - each in 2 files
 
 ## Project Overview
 
@@ -59,7 +60,6 @@ The **Bedrot Productions Media Tool Suite** is a sophisticated Python-based coll
 
 **Standalone Files** (in src/ directory):
 - `media_download_app.py` - self-contained media downloader
-- `snippet_remixer.py` - LEGACY 695-line standalone version (launcher uses this, not modular!)
 
 **Package Entry Points** (verified to exist):
 - `random_slideshow/main.py` - primary entry point
@@ -70,9 +70,9 @@ The **Bedrot Productions Media Tool Suite** is a sophisticated Python-based coll
 - `snippet_remixer/main_app.py` - GUI application
 - `video_caption_generator/main_app.py` - main application
 
-**Launcher.py Fallback Paths** (ALL VERIFIED TO EXIST):
+**Launcher.py Fallback Paths** (ALL VERIFIED TO EXIST - December 19, 2024):
 - Line 48: `src/media_download_app.py` ✓
-- Line 49: `src/snippet_remixer.py` ✓ (uses LEGACY file, not modular!)
+- Line 49: `src/snippet_remixer_modular.py` ✓ (now uses modular wrapper)
 - Line 50: `src/random_slideshow/main.py` ✓
 - Line 51: `src/reel_tracker_modular.py` ✓
 - Line 52: `src/video_caption_generator/main_app.py` ✓
@@ -94,15 +94,12 @@ The **Bedrot Productions Media Tool Suite** is a sophisticated Python-based coll
 - `yt_downloader_gui_settings.json` - media downloader settings
 
 **Duplicate/Secondary Locations Found**:
-- `src/combined_random_config.json` - duplicate slideshow config
-- `src/config/reel_tracker_config.json` - duplicate reel tracker config
-- `src/random_slideshow/combined_random_config.json` - another duplicate
-- `src/random_slideshow/config/slideshow_presets.json` - duplicate presets
+- `src/random_slideshow/config/slideshow_presets.json` - duplicate of /config/slideshow_presets.json
 - `src/video_caption_generator/config/video_caption_generator_config.json` - duplicate caption config
 
 **Config Management Approaches**:
-- **Direct JSON**: 12 modules use `json.load()`/`json.dump()` directly
-- **Core Config Manager**: Only 5 files import from `core.config_manager`
+- **Direct JSON**: 17 files use `json.load()`/`json.dump()` directly
+- **Core Config Manager**: Only 5 files import from `core.config_manager` or `core` config functions
 - **Module-Specific**: Each module has its own `config_manager.py` with different implementations
 - **Advanced**: Only `reel_tracker` has version history and audit trails
 
@@ -282,15 +279,14 @@ bedrot-media-suite/
 - **python3-tk**: Required on Linux/WSL (not included in requirements.txt!)
 
 ### Python Frameworks (from requirements.txt)
-#### GUI Frameworks (VERIFIED USAGE)
-- **Tkinter**: Used by 4 files
+#### GUI Frameworks (VERIFIED USAGE - December 19, 2024)
+- **Tkinter**: Used by 3 files
   - `media_download_app.py` - main downloader GUI
-  - `snippet_remixer.py` - legacy standalone version  
   - `snippet_remixer/main_app.py` - modular GUI
   - `snippet_remixer/export_settings_dialog.py` - dialog
   - **WARNING**: Requires `python3-tk` package on Linux/WSL (NOT in requirements.txt!)
 - **customtkinter**: In requirements.txt (enhanced tkinter)
-- **PyQt5**: Used by 23 files across multiple modules
+- **PyQt5**: Used by 22 files across multiple modules
   - `random_slideshow/*` - all slideshow components
   - `reel_tracker/*` - all reel tracker components  
   - `video_caption_generator/*` - caption generator components

@@ -1,4 +1,4 @@
-"""Dialog windows for Video Caption Generator."""
+"""Dialog windows for MV Maker."""
 
 import sys
 from pathlib import Path
@@ -21,11 +21,11 @@ from PyQt5.QtGui import QColor, QPalette
 # Import from absolute path to handle direct script execution
 try:
     from .utils import get_available_languages
-    from .config_manager import get_video_caption_config
+    from .config_manager import get_mv_maker_config
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.utils import get_available_languages
-    from video_caption_generator.config_manager import get_video_caption_config
+    from mv_maker.utils import get_available_languages
+    from mv_maker.config_manager import get_mv_maker_config
 
 class SettingsDialog(QDialog):
     """Settings dialog for caption generator configuration."""
@@ -33,7 +33,7 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         """Initialize settings dialog."""
         super().__init__(parent)
-        self.config = get_video_caption_config()
+        self.config = get_mv_maker_config()
         self.setWindowTitle("Caption Generator Settings")
         self.setModal(True)
         self.setMinimumWidth(500)

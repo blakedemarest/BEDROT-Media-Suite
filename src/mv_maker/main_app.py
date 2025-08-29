@@ -1,4 +1,4 @@
-"""Main application GUI for Video Caption Generator."""
+"""Main application GUI for MV Maker."""
 
 import os
 import sys
@@ -22,7 +22,7 @@ from PyQt5.QtGui import QIcon, QFont, QPixmap, QDragEnterEvent, QDropEvent
 
 # Import from absolute path to handle direct script execution
 try:
-    from .config_manager import get_video_caption_config
+    from .config_manager import get_mv_maker_config
     from .worker_threads import TranscriptionWorker, BatchProcessingWorker
     from .dialogs import SettingsDialog, ProgressDialog, BatchSelectionDialog
     from .utils import safe_print, get_available_languages, sanitize_filename
@@ -32,26 +32,26 @@ try:
     from .font_manager import get_font_manager
 except ImportError:
     # Fallback for direct script execution
-    from video_caption_generator.config_manager import get_video_caption_config
-    from video_caption_generator.worker_threads import TranscriptionWorker, BatchProcessingWorker
-    from video_caption_generator.dialogs import SettingsDialog, ProgressDialog, BatchSelectionDialog
-    from video_caption_generator.utils import safe_print, get_available_languages, sanitize_filename
-    from video_caption_generator.audio_extractor import AudioExtractor
-    from video_caption_generator.live_preview_widget import LivePreviewWidget
-    from video_caption_generator.color_wheel_widget import ColorWheelWidget
-    from video_caption_generator.font_manager import get_font_manager
+    from mv_maker.config_manager import get_mv_maker_config
+    from mv_maker.worker_threads import TranscriptionWorker, BatchProcessingWorker
+    from mv_maker.dialogs import SettingsDialog, ProgressDialog, BatchSelectionDialog
+    from mv_maker.utils import safe_print, get_available_languages, sanitize_filename
+    from mv_maker.audio_extractor import AudioExtractor
+    from mv_maker.live_preview_widget import LivePreviewWidget
+    from mv_maker.color_wheel_widget import ColorWheelWidget
+    from mv_maker.font_manager import get_font_manager
 
-class VideoCaptionGenerator(QMainWindow):
-    """Main application window for Video Caption Generator."""
+class MVMaker(QMainWindow):
+    """Main application window for MV Maker."""
     
     def __init__(self):
         """Initialize main application."""
         super().__init__()
-        self.config = get_video_caption_config()
+        self.config = get_mv_maker_config()
         self.current_video = None
         self.worker = None
         
-        self.setWindowTitle("Video & Audio Caption Generator - Bedrot Productions")
+        self.setWindowTitle("MV Maker - Bedrot Productions")
         self.setMinimumSize(1200, 800)
         
         # Initialize font manager
@@ -581,7 +581,7 @@ class VideoCaptionGenerator(QMainWindow):
         dialog = SettingsDialog(self)
         if dialog.exec_():
             # Reload config
-            self.config = get_video_caption_config()
+            self.config = get_mv_maker_config()
             # Update UI with new settings
             self.model_combo.setCurrentText(self.config.get('whisper_model', 'base'))
             
@@ -972,7 +972,7 @@ class VideoCaptionGenerator(QMainWindow):
                     try:
                         from .audio_extractor import AudioExtractor
                     except ImportError:
-                        from video_caption_generator.audio_extractor import AudioExtractor
+                        from mv_maker.audio_extractor import AudioExtractor
                     
                     extractor = AudioExtractor()
                     if extractor.is_supported_format(file_path):
@@ -1014,7 +1014,7 @@ class VideoCaptionGenerator(QMainWindow):
             try:
                 from .audio_extractor import AudioExtractor
             except ImportError:
-                from video_caption_generator.audio_extractor import AudioExtractor
+                from mv_maker.audio_extractor import AudioExtractor
             
             extractor = AudioExtractor()
             
@@ -1058,10 +1058,10 @@ class VideoCaptionGenerator(QMainWindow):
 def main():
     """Main entry point for standalone execution."""
     app = QApplication(sys.argv)
-    app.setApplicationName("Video Caption Generator")
+    app.setApplicationName("MV Maker")
     app.setOrganizationName("Bedrot Productions")
     
-    window = VideoCaptionGenerator()
+    window = MVMaker()
     window.show()
     
     sys.exit(app.exec_())

@@ -21,8 +21,8 @@ try:
     from .utils import safe_print
     from .font_manager import get_font_manager
 except ImportError:
-    from video_caption_generator.utils import safe_print
-    from video_caption_generator.font_manager import get_font_manager
+    from mv_maker.utils import safe_print
+    from mv_maker.font_manager import get_font_manager
 
 
 class CaptionOverlay(QWidget):

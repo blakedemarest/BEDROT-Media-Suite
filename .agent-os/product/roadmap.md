@@ -42,7 +42,7 @@
 - [x] Export to multiple formats
 - [x] Backup and restore functionality
 
-### Video Caption Generator
+### MV Maker
 - [x] AI-powered speech recognition
 - [x] WebVTT and SRT format support
 - [x] Live preview with editing

@@ -22,7 +22,7 @@ tkinterdnd2
 python-dotenv
 numpy
 
-# Video Caption Generator dependencies
+# MV Maker dependencies
 # ElevenLabs API (primary)
 requests  # Already listed above
 
