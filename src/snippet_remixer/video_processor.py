@@ -379,6 +379,11 @@ class VideoProcessor:
                 bitrate = export_settings.get("bitrate", "5M")
                 quality_params = ["-b:v", bitrate]
         
+        remove_audio = export_settings.get("remove_audio", False) if export_settings else False
+        if remove_audio:
+            self.logger.info("Audio muting enabled for snippet generation.")
+            safe_print("Audio muting enabled for snippet generation.")
+
         for i, (filepath, start, duration) in enumerate(snippet_definitions):
             if progress_callback:
                 progress_callback(f"Cutting snippet {i+1}/{len(snippet_definitions)}...")
@@ -413,6 +418,8 @@ class VideoProcessor:
                 if trim_start is not None:
                     start += trim_start  # Adjust start time by trim
             
+            audio_params = ["-an"] if remove_audio else ["-c:a", "aac", "-b:a", "128k"]
+
             cut_command = [
                 self.ffmpeg_path or "ffmpeg", 
                 "-hide_banner", "-loglevel", "error", 
@@ -420,8 +427,7 @@ class VideoProcessor:
                 "-ss", str(start), 
                 "-t", str(duration), 
                 "-vf", vf_filter,
-                "-c:v", "libx264"] + quality_params + [
-                "-c:a", "aac", "-b:a", "128k", 
+                "-c:v", "libx264"] + quality_params + audio_params + [
                 "-avoid_negative_ts", "make_zero",
                 "-y", temp_snippet_path
             ]
@@ -580,15 +586,53 @@ class VideoProcessor:
         Returns:
             bool: True if successful, False otherwise
         """
+        remove_audio = export_settings.get("remove_audio", False) if export_settings else False
+        if remove_audio:
+            self.logger.info("Audio muting enabled for final output.")
+            safe_print("Audio muting enabled for final export.")
+
         if aspect_ratio_selection == "Original":
             if progress_callback:
-                progress_callback("Finalizing (Original Aspect Ratio)...")
-            try:
-                shutil.move(temp_concat_path, final_output_path)
-                return True
-            except (IOError, OSError) as e:
-                safe_print(f"Error moving temp concat file: {e}")
-                return False
+                suffix = " (audio muted)" if remove_audio else ""
+                progress_callback(f"Finalizing (Original Aspect Ratio){suffix}...")
+            if remove_audio:
+                command = [
+                    self.ffmpeg_path or "ffmpeg",
+                    "-hide_banner", "-loglevel", "error",
+                    "-i", temp_concat_path,
+                    "-c:v", "copy",
+                    "-an",
+                    "-y", final_output_path
+                ]
+                try:
+                    creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                    subprocess.run(
+                        command,
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                        encoding='utf-8',
+                        errors='ignore',
+                        creationflags=creationflags
+                    )
+                    try:
+                        os.remove(temp_concat_path)
+                    except OSError as e:
+                        safe_print(f"Warning: Could not remove temp concat file after muting audio: {e}")
+                    return True
+                except subprocess.CalledProcessError as e:
+                    safe_print(f"Error muting audio:\nCMD: {' '.join(e.cmd)}\nStderr:\n{e.stderr}")
+                    return False
+                except Exception as e:
+                    safe_print(f"Unexpected error while muting audio: {e}")
+                    return False
+            else:
+                try:
+                    shutil.move(temp_concat_path, final_output_path)
+                    return True
+                except (IOError, OSError) as e:
+                    safe_print(f"Error moving temp concat file: {e}")
+                    return False
         else:
             if progress_callback:
                 progress_callback(f"Adjusting Aspect Ratio to {aspect_ratio_selection}...")
@@ -630,13 +674,14 @@ class VideoProcessor:
                         bitrate = export_settings.get("bitrate", "5M")
                         quality_params = ["-b:v", bitrate]
                 
+                audio_params = ["-an"] if remove_audio else ["-c:a", "copy"]
+
                 ar_command = [
                     self.ffmpeg_path or "ffmpeg", 
                     "-hide_banner", "-loglevel", "error", 
                     "-i", temp_concat_path,
                     "-vf", ar_filter_vf, 
-                    "-c:v", "libx264"] + quality_params + [
-                    "-c:a", "copy",
+                    "-c:v", "libx264"] + quality_params + audio_params + [
                     "-y", final_output_path
                 ]
                 

@@ -76,6 +76,7 @@ class VideoRemixerApp:
         self.aspect_ratio_mode_var = tk.StringVar(value=self.settings.get("aspect_ratio_mode", "Crop to Fill"))
         self.status_var = tk.StringVar(value="Ready")
         self.continuous_mode_var = tk.BooleanVar(value=self.settings.get("continuous_mode", False))
+        self.mute_audio_var = tk.BooleanVar(value=self.settings.get("mute_audio", False))
 
         # Internal state
         self.last_input_folder = self.settings["last_input_folder"]
@@ -810,6 +811,14 @@ class VideoRemixerApp:
         )
         self.queue_details_label.pack(pady=(2, 0))
         
+        # Audio options
+        self.mute_audio_check = ttk.Checkbutton(
+            process_button_frame,
+            text="Mute audio in final export",
+            variable=self.mute_audio_var
+        )
+        self.mute_audio_check.pack(pady=(0, 8))
+        
         # Main Generate/Abort button
         self.generate_button = ttk.Button(
             process_button_frame, 
@@ -1317,15 +1326,16 @@ class VideoRemixerApp:
                 self.continuous_processing = False
 
         # Get export settings from config
-        export_settings = self.config_manager.get_export_settings()
-        
+        export_settings = self.config_manager.get_export_settings().copy()
+
         # Add jitter settings to export settings
         export_settings["jitter_enabled"] = settings.get("jitter_enabled", False)
         export_settings["jitter_intensity"] = settings.get("jitter_intensity", 50)
-        
-        # Add aspect ratio mode to export settings
+
+        # Add aspect ratio mode and audio preference
         export_settings["aspect_ratio_mode"] = self.aspect_ratio_mode_var.get()
-        
+        export_settings["remove_audio"] = self.mute_audio_var.get()
+
         # Start processing
         self.processing_worker.start_processing_thread(
             input_files, final_output_path, target_total_duration_sec,
@@ -1386,6 +1396,7 @@ class VideoRemixerApp:
             
         # Save continuous mode setting
         self.settings["continuous_mode"] = self.continuous_mode_var.get()
+        self.settings["mute_audio"] = self.mute_audio_var.get()
         
         # Save jitter settings
         self.settings["jitter_enabled"] = self.jitter_enabled_var.get()
@@ -1476,7 +1487,8 @@ class VideoRemixerApp:
             "jitter_intensity": self.jitter_intensity_var.get(),
             "length_mode": self.length_mode_var.get(),
             "aspect_ratio": self.aspect_ratio_var.get(),
-            "aspect_ratio_mode": self.aspect_ratio_mode_var.get()
+            "aspect_ratio_mode": self.aspect_ratio_mode_var.get(),
+            "mute_audio": self.mute_audio_var.get()
         }
     
     def _detect_setting_changes(self, old_settings, new_settings):
@@ -1506,6 +1518,10 @@ class VideoRemixerApp:
         
         if old_settings.get("aspect_ratio") != new_settings.get("aspect_ratio"):
             changes.append(f"Aspect ratio {old_settings.get('aspect_ratio')} → {new_settings.get('aspect_ratio')}")
+        
+        if old_settings.get("mute_audio") != new_settings.get("mute_audio"):
+            audio_state = "muted" if new_settings.get("mute_audio") else "enabled"
+            changes.append(f"Audio {audio_state}")
         
         if old_settings.get("length_mode") != new_settings.get("length_mode"):
             changes.append(f"Mode {old_settings.get('length_mode')} → {new_settings.get('length_mode')}")
@@ -1641,10 +1657,11 @@ class VideoRemixerApp:
             )
             
             # Get export settings
-            export_settings = self.config_manager.get_export_settings()
+            export_settings = self.config_manager.get_export_settings().copy()
             export_settings["jitter_enabled"] = settings.get("jitter_enabled", False)
             export_settings["jitter_intensity"] = settings.get("jitter_intensity", 50)
             export_settings["aspect_ratio_mode"] = self.aspect_ratio_mode_var.get()
+            export_settings["remove_audio"] = self.mute_audio_var.get()
             
             # Create job
             job = ProcessingJob(

@@ -72,6 +72,7 @@ class ConfigManager:
             "num_units": 16,
             "aspect_ratio": get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', DEFAULT_ASPECT_RATIO),
             "continuous_mode": False,
+            "mute_audio": False,
             "jitter_enabled": False,
             "jitter_intensity": 50,
             "aspect_ratio_mode": "Crop to Fill",
@@ -204,6 +205,8 @@ class ConfigManager:
                 settings_dict["bpm"] = 120.0
             if settings_dict["num_units"] <= 0:
                 settings_dict["num_units"] = 16
+
+            settings_dict["mute_audio"] = bool(settings_dict.get("mute_audio", False))
 
             # Ensure the directory exists before writing
             os.makedirs(os.path.dirname(settings_path), exist_ok=True)
