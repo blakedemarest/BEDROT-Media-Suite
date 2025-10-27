@@ -13,7 +13,10 @@ Before adding code, inspect `bedrot_media_suite_function_registry.json` to reuse
 On Windows prefer `start_launcher.bat`; it provisions the venv, installs `requirements.txt`, and opens the GUI. Manual flow: `python -m venv venv`, activate (`.\\venv\\Scripts\\activate` or `source venv/bin/activate`), then `pip install -r requirements.txt`. Launch individual tools with `python launcher.py`, `python src/reel_tracker_modular.py`, or `python tools/slideshow_editor.py` while iterating.
 
 ## Coding Standards & Output Rules
-Follow PEP 8 with 4-space indent, `snake_case` modules/functions, and `PascalCase` Qt/Tk widgets. Centralize path handling through `src/core/path_utils.py` when practical instead of hardcoding separators. All console/UI text must be ASCII—replace emojis with tags like `[INFO]`, `[ERROR]`, etc.—to stay Windows-safe.
+Follow PEP 8 with 4-space indent, `snake_case` modules/functions, and `PascalCase` Qt/Tk widgets. Centralize path handling through `src/core/path_utils.py` when practical instead of hardcoding separators. All console/UI text must be ASCIIreplace emojis with tags like `[INFO]`, `[ERROR]`, etc.to stay Windows-safe.
+
+## No Fallback Policy
+All new work must assume required dependencies are present and correctly configured. Do not ship automatic downgrades, alternate execution paths, or silent fallbacks for missing GPU support, third-party APIs, or optional packages. Instead, implement explicit preflight checks that fail fast with actionable setup instructions so Windows installations stay deterministic.
 
 ## Testing & Diagnostics
 Tests are executable scripts in `tests/` that print explicit PASS/FAIL summaries; run individually (`python tests/test_config_system.py`, `python tests/test_video_logging.py`) or batch via `for %f in (tests\test_*.py) do python %f`. New features should ship with a sibling `test_<feature>.py` covering config paths, FFmpeg interactions, and thread safety; document OS-specific assumptions at the top.
@@ -22,4 +25,4 @@ Tests are executable scripts in `tests/` that print explicit PASS/FAIL summaries
 History favors concise, present-tense subjects ("aspect ratio detection support"); keep them under 60 characters and expand in the body when needed. PRs should outline affected tools, list the exact test scripts run, attach before/after screenshots for UI work, flag config or `.env` changes, and request review from the module owner with at least one QA sign-off.
 
 ## Environment & Configuration Notes
-Keep secrets out of `.env.example`; store credentials only in local `.env`. Verify FFmpeg (`ffmpeg -version`) and install `python3-tk` on Linux/WSL before launching Tkinter tools. Track duplicate configs (e.g., slideshow presets under both `config/` and `src/random_slideshow/config/`) and update all copies during changes. PyQt5 and PyQt6 coexist—activate the intended venv before running `src/release_calendar_modular.py`.
+Keep secrets out of `.env.example`; store credentials only in local `.env`. Verify FFmpeg (`ffmpeg -version`) and install `python3-tk` on Linux/WSL before launching Tkinter tools. Track duplicate configs (e.g., slideshow presets under both `config/` and `src/random_slideshow/config/`) and update all copies during changes. PyQt5 and PyQt6 coexistactivate the intended venv before running `src/release_calendar_modular.py`.
