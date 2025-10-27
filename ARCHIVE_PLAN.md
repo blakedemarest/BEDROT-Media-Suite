@@ -4,6 +4,7 @@ The following steps outline how to archive the obsolete MV Maker and Random Slid
 
 ## 1. Archive the MV Maker module
 :::task-stub{title="Archive mv_maker package"}
+
 1. From `src/mv_maker/`, move all Python modules, assets, and configs into a new `archive/mv_maker/` directory (create `archive/` at repo root if it doesn’t exist). Preserve the relative structure so the package can be restored, but remove any virtual-environment or cache artifacts while moving.
 2. Remove or rename any `__init__.py` left in `src/mv_maker/` to prevent accidental imports, and add a short `README.md` in the archive folder clarifying that the package is frozen and not to be executed.
 3. Update `.gitignore` if necessary so archived files remain tracked but isolated from active packages, ensuring Windows line endings are respected (`.gitattributes` already enforces this repo-wide).
@@ -25,6 +26,7 @@ The following steps outline how to archive the obsolete MV Maker and Random Slid
 1. Relocate the entire `src/random_slideshow/` directory (including nested configs) into `archive/random_slideshow/`, removing cached `.pyc` folders while preserving original relative paths.
 2. Delete or rename any remaining wrappers or entry points under `src/` that import `random_slideshow` so imports fail immediately if someone attempts to use it, and place an `ARCHIVED.md` file alongside the moved package describing its deprecated status.
 3. Execute `rg "random_slideshow"` to identify additional references that must be addressed, and append the resulting checklist (path + action) directly below this task stub to guide documentation cleanup.
+
 :::
 
 ## 3. Remove launcher integration points
