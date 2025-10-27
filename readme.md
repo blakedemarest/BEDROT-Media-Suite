@@ -1,30 +1,17 @@
 # Bedrot Productions - Media Tool Suite
 
-A comprehensive Python-based multimedia processing suite for content creation, video downloading, editing, and automated slideshow generation. All tools are managed through a central GUI launcher with real-time process monitoring.
+> **Important:** This repository is maintained for internal workflows at Bedrot Productions and is provided publicly for educational and referential purposes only. The suite targets Windows environments exclusively and is not supported on macOS or Linux.
 
-## Quick Start (Windows)
+A comprehensive Python-based multimedia processing suite for content creation, video downloading, editing, and automated slideshow generation. All tools are managed through a central GUI launcher with real-time process monitoring, and every workflow assumes a Windows host.
+
+## Quick Start (Windows Only)
 
 ```batch
 # Recommended method for Windows users
 start_launcher.bat
 ```
 
-## Quick Start (Linux/macOS)
-
-```bash
-# Install system dependencies (Linux/WSL)
-sudo apt-get install python3-tk ffmpeg
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Run the launcher
-python launcher.py
-```
+> **Note:** Non-Windows operating systems are unsupported. The commands and tooling documented below assume Windows PowerShell or Command Prompt.
 
 ## Directory Structure
 
@@ -78,19 +65,16 @@ bedrot-media-suite/
 
 ## Installation & Setup
 
-### Prerequisites
+### Prerequisites (Windows)
 
-1. **Python 3.8+** - Download from [python.org](https://www.python.org/)
-2. **FFmpeg/FFprobe** - Required for video processing
-3. **System Dependencies:**
-   - **Linux/WSL:** `sudo apt-get install python3-tk ffmpeg`
-   - **Windows:** FFmpeg must be in PATH
-   - **macOS:** `brew install ffmpeg`
+1. **Windows 10 or later** with permission to install software
+2. **Python 3.8+** - Download from [python.org](https://www.python.org/)
+3. **FFmpeg/FFprobe** - Install and add to PATH (e.g., via [FFmpeg for Windows builds](https://www.gyan.dev/ffmpeg/builds/))
 
 ### Windows Installation (Recommended)
 
 1. **Clone the repository:**
-   ```bash
+   ```powershell
    git clone https://github.com/yourusername/bedrot-media-suite.git
    cd bedrot-media-suite
    ```
@@ -104,43 +88,45 @@ bedrot-media-suite/
    - Install all dependencies
    - Launch the application
 
-### Manual Installation (All Platforms)
+### Manual Installation (Windows)
 
 1. **Clone the repository:**
-   ```bash
+   ```powershell
    git clone https://github.com/yourusername/bedrot-media-suite.git
    cd bedrot-media-suite
    ```
 
 2. **Create virtual environment:**
-   ```bash
+   ```powershell
    python -m venv venv
    ```
 
 3. **Activate virtual environment:**
-   - Windows: `.\venv\Scripts\activate`
-   - Linux/macOS: `source venv/bin/activate`
+   ```powershell
+   .\venv\Scripts\Activate.ps1
+   ```
 
 4. **Install dependencies:**
-   ```bash
+   ```powershell
    pip install -r requirements.txt
    ```
 
-5. **Linux/WSL only - Install tkinter:**
-   ```bash
-   sudo apt-get install python3-tk
-   ```
-
-6. **Configure environment (optional):**
-   ```bash
-   cp .env.example .env
+5. **Configure environment (optional):**
+   ```powershell
+   Copy-Item .env.example .env
    # Edit .env with your preferred settings
    ```
 
-7. **Run the launcher:**
-   ```bash
+6. **Run the launcher:**
+   ```powershell
    python launcher.py
    ```
+
+## Usage Policy
+
+- Intended for internal use by Bedrot Productions staff.
+- Provided publicly for educational and referential review only.
+- External users should not expect official support, warranties, or non-Windows compatibility.
 
 ## Usage Guide
 
@@ -151,8 +137,8 @@ bedrot-media-suite/
 start_launcher.bat
 ```
 
-**All Platforms:**
-```bash
+**Windows (Manual command):**
+```powershell
 python launcher.py
 ```
 
@@ -169,7 +155,7 @@ python launcher.py
 
 You can also run tools directly without the launcher:
 
-```bash
+```powershell
 # Media Downloader
 python src/media_download_app.py
 

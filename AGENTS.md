@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+**Windows-Only / Internal Use Notice**
+
+This codebase targets Windows environments exclusively and is maintained for internal workflows at Bedrot Productions. The repository is publicly visible strictly for educational and referential purposes; external users should not expect cross-platform support or production readiness.
+
 ## Mandatory Briefing
 Before writing any code, open `CLAUDE.md` and follow its directives. That file contains the authoritative checklist for entry points, config locations, duplicate functions, and tooling expectations; treating it as the first stop prevents regressions and aligns new work with current audits.
 
