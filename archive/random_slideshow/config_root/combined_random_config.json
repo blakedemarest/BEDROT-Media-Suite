@@ -1,0 +1,9 @@
+{
+    "aspect_ratio": "9:16",
+    "image_folder": "",
+    "output_folder": "",
+    "batch_settings": {
+        "max_workers": 2,
+        "auto_start": true
+    }
+}

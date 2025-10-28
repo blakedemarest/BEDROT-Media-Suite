@@ -66,9 +66,10 @@ SLIDESHOW_LOG_DIR=logs                            # Log files
 ```bash
 SLIDESHOW_MEDIA_DOWNLOAD_SCRIPT=src/media_download_app.py
 SLIDESHOW_SNIPPET_REMIXER_SCRIPT=src/snippet_remixer.py
-SLIDESHOW_RANDOM_SLIDESHOW_SCRIPT=src/random_slideshow/main.py
 SLIDESHOW_REEL_TRACKER_SCRIPT=src/reel_tracker_modular.py
 SLIDESHOW_EDITOR_SCRIPT=tools/slideshow_editor.py
+# Legacy (archived):
+# SLIDESHOW_RANDOM_SLIDESHOW_SCRIPT previously pointed to src/random_slideshow/main.py (see archive/random_slideshow/).
 ```
 
 ### Default Output Directories

@@ -46,7 +46,8 @@ class ScaleAndCropApp:
         if not filepath:
             return
         try:
-            self.original_image = Image.open(filepath)
+            with Image.open(filepath) as opened_image:
+                self.original_image = opened_image.copy()
             self.display_preview(self.original_image)
         except Exception as e:
             messagebox.showerror("Error", f"Failed to open image:\n{e}")

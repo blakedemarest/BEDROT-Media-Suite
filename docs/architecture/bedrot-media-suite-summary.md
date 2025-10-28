@@ -15,6 +15,8 @@ This document provides a comprehensive analysis of the **Bedrot Productions Medi
 - **Batch Processing Capabilities**: Advanced job queue system with concurrent processing
 - **Real-Time Dynamic Updates**: Live configuration changes without system restart
 
+> Update (2025-10-28): The `random_slideshow` and `mv_maker` packages were archived and moved under `archive/` for historical reference. Architectural diagrams retain them for lineage context but they are no longer active launcher targets.
+
 ## Table of Contents
 
 1. [System Overview](#system-overview)

@@ -4,6 +4,8 @@
 
 This document provides comprehensive guidelines for LLM agents to transform monolithic Python scripts into clean, reusable, modular packages within the slideshow_editor repository. The guidelines are based on successful modularization patterns observed in the `reel_tracker` and `random_slideshow` modules.
 
+> Note: The `random_slideshow` package was archived on 2025-10-28; examples remain for historical reference.
+
 ## 🎯 Core Principles
 
 ### 1. **Single Responsibility Principle**

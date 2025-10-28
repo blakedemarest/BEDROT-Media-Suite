@@ -552,7 +552,8 @@ class VideoProcessor:
             creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
             subprocess.run(
                 concat_command, 
-                capture_output=True, 
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
                 text=True, 
                 check=True, 
                 encoding='utf-8', 
@@ -608,7 +609,8 @@ class VideoProcessor:
                     creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
                     subprocess.run(
                         command,
-                        capture_output=True,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.PIPE,
                         text=True,
                         check=True,
                         encoding='utf-8',
@@ -689,12 +691,13 @@ class VideoProcessor:
                     safe_print(f"Running FFmpeg AR Adjust: {' '.join(ar_command)}")
                     creationflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
                     subprocess.run(
-                        ar_command, 
-                        capture_output=True, 
-                        text=True, 
-                        check=True, 
-                        encoding='utf-8', 
-                        errors='ignore', 
+                        ar_command,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                        check=True,
+                        encoding='utf-8',
+                        errors='ignore',
                         creationflags=creationflags
                     )
                     

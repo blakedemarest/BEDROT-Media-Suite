@@ -1,0 +1,43 @@
+{
+    "presets": {
+        "Quick Portrait": {
+            "description": "Quick generation for portrait videos (9:16)",
+            "image_folder": "",
+            "output_folder": "",
+            "aspect_ratio": "9:16",
+            "batch_settings": {
+                "max_workers": 2,
+                "auto_start": true
+            },
+            "is_default": true,
+            "created_at": "2025-08-14T03:35:18.367881"
+        },
+        "Quick Landscape": {
+            "description": "Quick generation for landscape videos (16:9)",
+            "image_folder": "",
+            "output_folder": "",
+            "aspect_ratio": "16:9",
+            "batch_settings": {
+                "max_workers": 2,
+                "auto_start": true
+            },
+            "is_default": true,
+            "created_at": "2025-08-14T03:35:18.367895"
+        },
+        "High Performance": {
+            "description": "Maximum performance with all CPU cores",
+            "image_folder": "",
+            "output_folder": "",
+            "aspect_ratio": "16:9",
+            "batch_settings": {
+                "max_workers": 32,
+                "max_memory_mb": 4096,
+                "cache_size": 200,
+                "auto_start": false
+            },
+            "is_default": true,
+            "created_at": "2025-08-14T03:35:18.368046"
+        }
+    },
+    "last_used": "Quick Portrait"
+}

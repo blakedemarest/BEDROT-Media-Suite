@@ -1241,38 +1241,53 @@ class MediaDownloaderApp:
                 processing_error = True
                 self.update_status(f"{progress_prefix} Aborted")
             elif needs_audio_removal_post_dl and not processing_error:
-                 self.update_status(f"{progress_prefix} Removing audio track...")
-                 output_noaudio_path = os.path.join(path, f"{unique_base_title}_TEMP_NOAUDIO{final_extension}")
-                 ffmpeg_an_command = [ ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "error",
-                                       "-i", current_file_path, "-c:v", "copy", "-an", "-map", "0:v:0?", output_noaudio_path ]
-                 try:
-                     print(f"Running FFmpeg Remove Audio: {' '.join(ffmpeg_an_command)}")
-                     an_proc = subprocess.run(ffmpeg_an_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-                     print(f"FFmpeg Remove Audio Output:\n{an_proc.stderr}")
-                     self.update_status(f"{progress_prefix} Audio removal successful.")
-                     try:
-                         print(f"DEBUG: Removing '{current_file_path}' after audio removal."); os.remove(current_file_path)
-                     except OSError as e: print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
-                     current_file_path = output_noaudio_path
-                     print(f"DEBUG: current_file_path is now '{current_file_path}'")
-                 except subprocess.CalledProcessError as e:
-                     print(f"Error during FFmpeg Audio Removal:\nStderr:\n{e.stderr}"); self.update_status(f"{progress_prefix} Error removing audio."); processing_error = True
-                     # *** CORRECTED CLEANUP ***
-                     if os.path.exists(output_noaudio_path):
-                         try:
-                             os.remove(output_noaudio_path)
-                             print(f"Cleaned up intermediate file: {output_noaudio_path}")
-                         except OSError as clean_e:
-                             print(f"Warning: Could not remove intermediate file '{output_noaudio_path}' during audio removal error cleanup: {clean_e}")
-                 except Exception as e:
-                     print(f"Unexpected error during FFmpeg audio removal: {e}"); self.update_status(f"{progress_prefix} Error removing audio."); processing_error = True
-                     # *** CORRECTED CLEANUP ***
-                     if os.path.exists(output_noaudio_path):
-                         try:
-                             os.remove(output_noaudio_path)
-                             print(f"Cleaned up intermediate file: {output_noaudio_path}")
-                         except OSError as clean_e:
-                             print(f"Warning: Could not remove intermediate file '{output_noaudio_path}' during audio removal error cleanup: {clean_e}")
+                self.update_status(f"{progress_prefix} Removing audio track...")
+                output_noaudio_path = os.path.join(path, f"{unique_base_title}_TEMP_NOAUDIO{final_extension}")
+                ffmpeg_an_command = [
+                    ffmpeg_path if ffmpeg_path else "ffmpeg",
+                    "-hide_banner", "-loglevel", "error",
+                    "-i", current_file_path, "-c:v", "copy", "-an", "-map", "0:v:0?",
+                    output_noaudio_path
+                ]
+                try:
+                    print(f"Running FFmpeg Remove Audio: {' '.join(ffmpeg_an_command)}")
+                    an_proc = subprocess.run(
+                        ffmpeg_an_command,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                        check=True,
+                        creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                    )
+                    print(f"FFmpeg Remove Audio Output:\n{an_proc.stderr}")
+                    self.update_status(f"{progress_prefix} Audio removal successful.")
+                    try:
+                        print(f"DEBUG: Removing '{current_file_path}' after audio removal.")
+                        os.remove(current_file_path)
+                    except OSError as e:
+                        print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
+                    current_file_path = output_noaudio_path
+                    print(f"DEBUG: current_file_path is now '{current_file_path}'")
+                except subprocess.CalledProcessError as e:
+                    print(f"Error during FFmpeg Audio Removal:\nStderr:\n{e.stderr}")
+                    self.update_status(f"{progress_prefix} Error removing audio.")
+                    processing_error = True
+                    if os.path.exists(output_noaudio_path):
+                        try:
+                            os.remove(output_noaudio_path)
+                            print(f"Cleaned up intermediate file: {output_noaudio_path}")
+                        except OSError as clean_e:
+                            print(f"Warning: Could not remove intermediate file '{output_noaudio_path}' during audio removal error cleanup: {clean_e}")
+                except Exception as e:
+                    print(f"Unexpected error during FFmpeg audio removal: {e}")
+                    self.update_status(f"{progress_prefix} Error removing audio.")
+                    processing_error = True
+                    if os.path.exists(output_noaudio_path):
+                        try:
+                            os.remove(output_noaudio_path)
+                            print(f"Cleaned up intermediate file: {output_noaudio_path}")
+                        except OSError as clean_e:
+                            print(f"Warning: Could not remove intermediate file '{output_noaudio_path}' during audio removal error cleanup: {clean_e}")
 
 
             # --- Stage 2: Aspect Ratio Adjustment ---
@@ -1280,61 +1295,79 @@ class MediaDownloaderApp:
                 processing_error = True
                 self.update_status(f"{progress_prefix} Aborted")
             elif is_adjusting_ar and not processing_error:
-                 self.update_status(f"{progress_prefix} Adjusting Aspect Ratio to {aspect_ratio_selection}...")
-                 width, height = get_video_dimensions(current_file_path)
-                 output_ar_path = os.path.join(path, f"{unique_base_title}_TEMP_AR{final_extension}") # Define path outside try/except
-                 if width and height:
-                     target_ar_val = parse_aspect_ratio(aspect_ratio_selection)
-                     source_ar_val = width / height
-                     tolerance = 0.01
-                     ffmpeg_ar_command = None
-                     needs_ar_processing = True
+                self.update_status(f"{progress_prefix} Adjusting Aspect Ratio to {aspect_ratio_selection}...")
+                width, height = get_video_dimensions(current_file_path)
+                output_ar_path = os.path.join(path, f"{unique_base_title}_TEMP_AR{final_extension}")  # Define path outside try/except
+                if width and height:
+                    target_ar_val = parse_aspect_ratio(aspect_ratio_selection)
+                    source_ar_val = width / height
+                    tolerance = 0.01
+                    ffmpeg_ar_command = None
+                    needs_ar_processing = True
 
-                     if abs(source_ar_val - target_ar_val) < tolerance:
-                         self.update_status(f"{progress_prefix} Source AR matches target. Skipping."); needs_ar_processing = False
-                     else:
-                         common_opts = [ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "error", "-i", current_file_path]
-                         filter_vf = ""
-                         if source_ar_val > target_ar_val: # Crop
-                             filter_vf = f"crop=w=ih*{target_ar_val:.4f}:h=ih,scale=trunc(iw/2)*2:trunc(ih/2)*2"
-                         else: # Pad
-                             filter_vf = f"pad=w=ih*{target_ar_val:.4f}:h=ih:x=(ow-iw)/2:y=0:color=black,scale=trunc(iw/2)*2:trunc(ih/2)*2"
-                         ffmpeg_ar_command = common_opts + ["-vf", filter_vf]
-                         if not needs_audio_removal_post_dl: ffmpeg_ar_command.extend(["-c:a", "copy"])
-                         ffmpeg_ar_command.extend(["-map", "0", "-preset", "fast", output_ar_path])
+                    if abs(source_ar_val - target_ar_val) < tolerance:
+                        self.update_status(f"{progress_prefix} Source AR matches target. Skipping.")
+                        needs_ar_processing = False
+                    else:
+                        common_opts = [
+                            ffmpeg_path if ffmpeg_path else "ffmpeg",
+                            "-hide_banner", "-loglevel", "error",
+                            "-i", current_file_path
+                        ]
+                        if source_ar_val > target_ar_val:
+                            # Crop to target aspect ratio
+                            filter_vf = f"crop=w=ih*{target_ar_val:.4f}:h=ih,scale=trunc(iw/2)*2:trunc(ih/2)*2"
+                        else:
+                            # Pad with black bars to target ratio
+                            filter_vf = f"pad=w=ih*{target_ar_val:.4f}:h=ih:x=(ow-iw)/2:y=0:color=black,scale=trunc(iw/2)*2:trunc(ih/2)*2"
+                        ffmpeg_ar_command = common_opts + ["-vf", filter_vf]
+                        if not needs_audio_removal_post_dl:
+                            ffmpeg_ar_command.extend(["-c:a", "copy"])
+                        ffmpeg_ar_command.extend(["-map", "0", "-preset", "fast", output_ar_path])
 
-                     if ffmpeg_ar_command and needs_ar_processing:
-                         try:
-                             print(f"Running FFmpeg AR: {' '.join(ffmpeg_ar_command)}")
-                             ar_proc = subprocess.run(ffmpeg_ar_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-                             print(f"FFmpeg AR Output:\n{ar_proc.stderr}")
-                             self.update_status(f"{progress_prefix} Aspect Ratio adjusted.")
-                             re_encoding_occurred = True
-                             try:
-                                 print(f"DEBUG: Removing '{current_file_path}' after AR adjust."); os.remove(current_file_path)
-                             except OSError as e: print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
-                             current_file_path = output_ar_path
-                             print(f"DEBUG: current_file_path is now '{current_file_path}'")
-                         except subprocess.CalledProcessError as e:
-                             print(f"Error during FFmpeg AR adjustment:\nStderr:\n{e.stderr}"); self.update_status(f"{progress_prefix} Error adjusting AR."); processing_error = True
-                             # *** CORRECTED CLEANUP ***
-                             if os.path.exists(output_ar_path):
-                                 try:
-                                     os.remove(output_ar_path)
-                                     print(f"Cleaned up intermediate file: {output_ar_path}")
-                                 except OSError as clean_e:
-                                      print(f"Warning: Could not remove intermediate file '{output_ar_path}' during AR error cleanup: {clean_e}")
-                         except Exception as e:
-                             print(f"Unexpected error during FFmpeg AR adjustment: {e}"); self.update_status(f"{progress_prefix} Error adjusting AR."); processing_error = True
-                             # *** CORRECTED CLEANUP ***
-                             if os.path.exists(output_ar_path):
-                                 try:
-                                     os.remove(output_ar_path)
-                                     print(f"Cleaned up intermediate file: {output_ar_path}")
-                                 except OSError as clean_e:
-                                     print(f"Warning: Could not remove intermediate file '{output_ar_path}' during AR error cleanup: {clean_e}")
-                 else:
-                     self.update_status(f"{progress_prefix} Warning: Could not get dimensions. Skipping AR adjustment.")
+                    if ffmpeg_ar_command and needs_ar_processing:
+                        try:
+                            print(f"Running FFmpeg AR: {' '.join(ffmpeg_ar_command)}")
+                            ar_proc = subprocess.run(
+                                ffmpeg_ar_command,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.PIPE,
+                                text=True,
+                                check=True,
+                                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                            )
+                            print(f"FFmpeg AR Output:\n{ar_proc.stderr}")
+                            self.update_status(f"{progress_prefix} Aspect Ratio adjusted.")
+                            re_encoding_occurred = True
+                            try:
+                                print(f"DEBUG: Removing '{current_file_path}' after AR adjust.")
+                                os.remove(current_file_path)
+                            except OSError as e:
+                                print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
+                            current_file_path = output_ar_path
+                            print(f"DEBUG: current_file_path is now '{current_file_path}'")
+                        except subprocess.CalledProcessError as e:
+                            print(f"Error during FFmpeg AR adjustment:\nStderr:\n{e.stderr}")
+                            self.update_status(f"{progress_prefix} Error adjusting AR.")
+                            processing_error = True
+                            if os.path.exists(output_ar_path):
+                                try:
+                                    os.remove(output_ar_path)
+                                    print(f"Cleaned up intermediate file: {output_ar_path}")
+                                except OSError as clean_e:
+                                    print(f"Warning: Could not remove intermediate file '{output_ar_path}' during AR error cleanup: {clean_e}")
+                        except Exception as e:
+                            print(f"Unexpected error during FFmpeg AR adjustment: {e}")
+                            self.update_status(f"{progress_prefix} Error adjusting AR.")
+                            processing_error = True
+                            if os.path.exists(output_ar_path):
+                                try:
+                                    os.remove(output_ar_path)
+                                    print(f"Cleaned up intermediate file: {output_ar_path}")
+                                except OSError as clean_e:
+                                    print(f"Warning: Could not remove intermediate file '{output_ar_path}' during AR error cleanup: {clean_e}")
+                else:
+                    self.update_status(f"{progress_prefix} Warning: Could not get dimensions. Skipping AR adjustment.")
 
 
             # --- Stage 3: Time Cutting ---
@@ -1342,49 +1375,61 @@ class MediaDownloaderApp:
                 processing_error = True
                 self.update_status(f"{progress_prefix} Aborted")
             elif is_cutting and not processing_error:
-                 self.update_status(f"{progress_prefix} Cutting time range...")
-                 start_sec, end_sec = time_range
-                 output_cut_path = os.path.join(path, f"{unique_base_title}_TEMP_CUT{final_extension}") # Define path outside try/except
-                 ffmpeg_cut_command = [
-                       ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "warning",
-                       "-i", current_file_path,
-                       "-ss", str(start_sec),
-                       "-to", str(end_sec),
-                       "-map", "0",
-                       "-avoid_negative_ts", "make_zero",
-                       "-preset", "fast",
-                       *(["-c", "copy"] if not re_encoding_occurred else []),
-                       output_cut_path
-                 ]
-                 try:
-                     print(f"Running FFmpeg Cut: {' '.join(ffmpeg_cut_command)}")
-                     cut_proc = subprocess.run(ffmpeg_cut_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-                     print(f"FFmpeg Cut Output:\n{cut_proc.stderr}")
-                     self.update_status(f"{progress_prefix} Time cutting successful.")
-                     if "-c" not in ffmpeg_cut_command: re_encoding_occurred = True
-                     try:
-                         print(f"DEBUG: Removing '{current_file_path}' after cut."); os.remove(current_file_path)
-                     except OSError as e: print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
-                     current_file_path = output_cut_path
-                     print(f"DEBUG: current_file_path is now '{current_file_path}'")
-                 except subprocess.CalledProcessError as e:
-                     print(f"Error during FFmpeg time cutting:\nStderr:\n{e.stderr}"); self.update_status(f"{progress_prefix} Error cutting time."); processing_error = True
-                     # *** CORRECTED CLEANUP ***
-                     if os.path.exists(output_cut_path):
-                         try:
-                             os.remove(output_cut_path)
-                             print(f"Cleaned up intermediate file: {output_cut_path}")
-                         except OSError as clean_e:
-                             print(f"Warning: Could not remove intermediate file '{output_cut_path}' during cut error cleanup: {clean_e}")
-                 except Exception as e:
-                     print(f"Unexpected error during FFmpeg time cutting: {e}"); self.update_status(f"{progress_prefix} Error cutting time."); processing_error = True
-                     # *** CORRECTED CLEANUP ***
-                     if os.path.exists(output_cut_path):
-                          try:
-                             os.remove(output_cut_path)
-                             print(f"Cleaned up intermediate file: {output_cut_path}")
-                          except OSError as clean_e:
-                             print(f"Warning: Could not remove intermediate file '{output_cut_path}' during cut error cleanup: {clean_e}")
+                self.update_status(f"{progress_prefix} Cutting time range...")
+                start_sec, end_sec = time_range
+                output_cut_path = os.path.join(path, f"{unique_base_title}_TEMP_CUT{final_extension}")  # Define path outside try/except
+                ffmpeg_cut_command = [
+                    ffmpeg_path if ffmpeg_path else "ffmpeg", "-hide_banner", "-loglevel", "warning",
+                    "-i", current_file_path,
+                    "-ss", str(start_sec),
+                    "-to", str(end_sec),
+                    "-map", "0",
+                    "-avoid_negative_ts", "make_zero",
+                    "-preset", "fast",
+                    *(["-c", "copy"] if not re_encoding_occurred else []),
+                    output_cut_path
+                ]
+                try:
+                    print(f"Running FFmpeg Cut: {' '.join(ffmpeg_cut_command)}")
+                    cut_proc = subprocess.run(
+                        ffmpeg_cut_command,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.PIPE,
+                        text=True,
+                        check=True,
+                        creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                    )
+                    print(f"FFmpeg Cut Output:\n{cut_proc.stderr}")
+                    self.update_status(f"{progress_prefix} Time cutting successful.")
+                    if "-c" not in ffmpeg_cut_command:
+                        re_encoding_occurred = True
+                    try:
+                        print(f"DEBUG: Removing '{current_file_path}' after cut.")
+                        os.remove(current_file_path)
+                    except OSError as e:
+                        print(f"Warning: Failed to remove temp file '{current_file_path}': {e}")
+                    current_file_path = output_cut_path
+                    print(f"DEBUG: current_file_path is now '{current_file_path}'")
+                except subprocess.CalledProcessError as e:
+                    print(f"Error during FFmpeg time cutting:\nStderr:\n{e.stderr}")
+                    self.update_status(f"{progress_prefix} Error cutting time.")
+                    processing_error = True
+                    if os.path.exists(output_cut_path):
+                        try:
+                            os.remove(output_cut_path)
+                            print(f"Cleaned up intermediate file: {output_cut_path}")
+                        except OSError as clean_e:
+                            print(f"Warning: Could not remove intermediate file '{output_cut_path}' during cut error cleanup: {clean_e}")
+                except Exception as e:
+                    print(f"Unexpected error during FFmpeg time cutting: {e}")
+                    self.update_status(f"{progress_prefix} Error cutting time.")
+                    processing_error = True
+                    if os.path.exists(output_cut_path):
+                        try:
+                            os.remove(output_cut_path)
+                            print(f"Cleaned up intermediate file: {output_cut_path}")
+                        except OSError as clean_e:
+                            print(f"Warning: Could not remove intermediate file '{output_cut_path}' during cut error cleanup: {clean_e}")
 
 
             # --- Stage 4: Chopping into Intervals ---
@@ -1397,10 +1442,10 @@ class MediaDownloaderApp:
 
                 if source_duration is None:
                     self.update_status(f"{progress_prefix} Error: Could not get duration for chopping. Skipping chop.")
-                    processing_error = True # Mark as error for this URL if duration fails
+                    processing_error = True
                 elif source_duration <= 0:
-                     self.update_status(f"{progress_prefix} Error: Source duration is zero or negative. Skipping chop.")
-                     processing_error = True # Mark as error
+                    self.update_status(f"{progress_prefix} Error: Source duration is zero or negative. Skipping chop.")
+                    processing_error = True
                 else:
                     num_segments = math.ceil(source_duration / chop_interval_seconds)
                     print(f"DEBUG: Chopping '{current_file_path}' (Duration: {source_duration:.2f}s) into {num_segments} segments of ~{chop_interval_seconds}s")
@@ -1410,7 +1455,8 @@ class MediaDownloaderApp:
                     for i in range(num_segments):
                         segment_start_time = i * chop_interval_seconds
                         segment_duration = min(chop_interval_seconds, source_duration - segment_start_time)
-                        if segment_duration < 0.01: break
+                        if segment_duration < 0.01:
+                            break
 
                         processed_segments += 1
                         segment_num = i + 1
@@ -1431,49 +1477,58 @@ class MediaDownloaderApp:
 
                         try:
                             print(f"Running FFmpeg Chop (Segment {segment_num}): {' '.join(ffmpeg_chop_command)}")
-                            chop_proc = subprocess.run(ffmpeg_chop_command, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-                            if chop_proc.stderr and chop_proc.stderr.strip(): print(f"FFmpeg Chop Output (Segment {segment_num}):\n{chop_proc.stderr}")
+                            chop_proc = subprocess.run(
+                                ffmpeg_chop_command,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.PIPE,
+                                text=True,
+                                check=True,
+                                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                            )
+                            if chop_proc.stderr and chop_proc.stderr.strip():
+                                print(f"FFmpeg Chop Output (Segment {segment_num}):\n{chop_proc.stderr}")
                         except subprocess.CalledProcessError as e:
-                            print(f"Error chopping segment {segment_num} for '{os.path.basename(current_file_path)}':"); print(f"Command: {' '.join(e.cmd)}"); print(f"Stderr:\n{e.stderr}")
-                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}."); segment_success = False
-                            # *** CORRECTED CLEANUP ***
+                            print(f"Error chopping segment {segment_num} for '{os.path.basename(current_file_path)}':")
+                            print(f"Command: {' '.join(e.cmd)}")
+                            print(f"Stderr:\n{e.stderr}")
+                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}.")
+                            segment_success = False
                             if os.path.exists(segment_output_path):
                                 try:
                                     os.remove(segment_output_path)
                                     print(f"Cleaned up failed segment file: {segment_output_path}")
                                 except OSError as clean_e:
                                     print(f"Warning: Could not remove failed segment file '{segment_output_path}' during chop error cleanup: {clean_e}")
-                            break # Exit loop on error
+                            break
                         except Exception as e:
                             print(f"Unexpected error chopping segment {segment_num}: {e}")
-                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}."); segment_success = False
-                            # *** CORRECTED CLEANUP ***
+                            self.update_status(f"{progress_prefix} Error chopping segment {segment_num}.")
+                            segment_success = False
                             if os.path.exists(segment_output_path):
                                 try:
                                     os.remove(segment_output_path)
                                     print(f"Cleaned up failed segment file: {segment_output_path}")
                                 except OSError as clean_e:
                                     print(f"Warning: Could not remove failed segment file '{segment_output_path}' during chop error cleanup: {clean_e}")
-                            break # Exit loop on error
+                            break
 
-                    # --- After Chopping Loop ---
                     if segment_success and processed_segments > 0:
                         self.update_status(f"{progress_prefix} Successfully chopped into {processed_segments} segments.")
                         try:
-                             print(f"DEBUG: Removing '{current_file_path}' after successful chopping.")
-                             os.remove(current_file_path)
-                             current_file_path = None # Indicate the original is gone
-                        except OSError as e: print(f"Warning: Failed to remove source file '{current_file_path}' after chopping: {e}")
-                        processing_error = False # Ensure it's false if chopping succeeded
+                            print(f"DEBUG: Removing '{current_file_path}' after successful chopping.")
+                            os.remove(current_file_path)
+                            current_file_path = None
+                        except OSError as e:
+                            print(f"Warning: Failed to remove source file '{current_file_path}' after chopping: {e}")
+                        processing_error = False
                         self.root.after(0, self.remove_url_from_gui_and_internal, url)
-                        continue # Go to the next URL (chopping is the final step)
+                        continue  # Go to the next URL (chopping is the final step)
                     else:
                         if processed_segments == 0 and segment_success:
-                             self.update_status(f"{progress_prefix} No segments generated (source too short?). Keeping original.")
-                             # Keep processing_error as it was (could have been False if source was short)
-                        else: # Actual error occurred during chopping
+                            self.update_status(f"{progress_prefix} No segments generated (source too short?). Keeping original.")
+                        else:
                             self.update_status(f"{progress_prefix} Chopping failed. Keeping intermediate file.")
-                            processing_error = True # Mark as error
+                            processing_error = True
 
 
             # --- Stage 5: Finalization (Only if NOT chopping, or if chopping failed/skipped) ---

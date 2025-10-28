@@ -9,6 +9,19 @@ The following steps outline how to archive the obsolete MV Maker and Random Slid
 2. Remove or rename any `__init__.py` left in `src/mv_maker/` to prevent accidental imports, and add a short `README.md` in the archive folder clarifying that the package is frozen and not to be executed.
 3. Update `.gitignore` if necessary so archived files remain tracked but isolated from active packages, ensuring Windows line endings are respected (`.gitattributes` already enforces this repo-wide).
 4. Run `rg "mv_maker"` across the repository and document each reference (file path + context) directly beneath this task stub so follow-up cleanup has an explicit checklist.
+
+Reference checklist (2025-10-28):
+- [x] launcher.py — MV Maker tab and script constants removed.
+- [x] src/__init__.py — MV Maker helper exports dropped.
+- [x] readme.md — MV Maker moved to archived section with updated guidance.
+- [x] src/core/config_manager.py — removed `mv_maker` defaults and env mappings.
+- [x] src/core/path_utils.py — removed `SLIDESHOW_MV_MAKER_SCRIPT` fallback.
+- [x] LYRIC_VIDEO_UPLOADER_PLAN.md — note now references archived defaults.
+- [x] docs/architecture/bedrot-media-suite-summary.md — added archival note for MV Maker.
+- [ ] docs/audit-reports/security-and-quality-audit.md — historical reference retained for context.
+- [ ] docs/audit-reports/CODEBASE_HYGIENE_AUDIT_REPORT.md — historical reference retained for context.
+- [ ] docs/audit-reports/HYGIENE_IMPROVEMENTS_IMPLEMENTED.md — historical reference retained for context.
+- [x] docs/DOCUMENTATION_DISCREPANCIES_REPORT.md — updated with archival disclaimer.
 :::
 
 ## Plan Quality Review
@@ -27,6 +40,18 @@ The following steps outline how to archive the obsolete MV Maker and Random Slid
 2. Delete or rename any remaining wrappers or entry points under `src/` that import `random_slideshow` so imports fail immediately if someone attempts to use it, and place an `ARCHIVED.md` file alongside the moved package describing its deprecated status.
 3. Execute `rg "random_slideshow"` to identify additional references that must be addressed, and append the resulting checklist (path + action) directly below this task stub to guide documentation cleanup.
 
+Reference checklist (2025-10-28):
+- [x] launcher.py — Random Slideshow tab and script constants removed.
+- [x] readme.md — Random Slideshow relocated to archived section with updated notes.
+- [x] src/__init__.py — Random Slideshow helper exports removed.
+- [x] tests/test_threading_fixes.py — moved to `archive/random_slideshow/tests/`.
+- [x] tests/diagnose_random_slideshow.py — moved to `archive/random_slideshow/tests/`.
+- [x] src/MODULARIZATION_GUIDELINES.md — added archival note.
+- [x] docs/architecture/bedrot-media-suite-summary.md — archival banner added.
+- [x] docs/ARCHITECTURE_DOCUMENTATION_tmp.html — archival note inserted.
+- [x] docs/CONFIGURATION_MIGRATION_SUMMARY.md — Random Slideshow script now marked as legacy.
+- [x] docs/DOCUMENTATION_DISCREPANCIES_REPORT.md — updated with archival disclaimer.
+- [ ] docs/audit-reports/* — historical references retained for archival context.
 :::
 
 ## 3. Remove launcher integration points

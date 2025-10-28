@@ -9,8 +9,6 @@ Modules:
 - media_download_app: YouTube/media downloader with format conversion
 - reel_tracker: CSV-based content tracking and management
 - snippet_remixer: Video remixing and snippet generation
-- random_slideshow: Automated slideshow creation
-- mv_maker: AI-powered caption generation and MV creation
 - release_calendar: Music release scheduling and management
 """
 
@@ -52,38 +50,6 @@ def get_video_processor():
     """Get snippet remixer video processor."""
     from .snippet_remixer import VideoProcessor
     return VideoProcessor
-
-# Random Slideshow Module
-def get_random_slideshow():
-    """Get random slideshow main window (PyQt5)."""
-    from .random_slideshow import get_main_window
-    return get_main_window()
-
-def get_slideshow_generator():
-    """Get slideshow generator class."""
-    from .random_slideshow import get_slideshow_generator
-    return get_slideshow_generator()
-
-# MV Maker Module
-def get_mv_maker():
-    """Get MV Maker main app (PyQt5)."""
-    from .mv_maker import get_main_app
-    return get_main_app()
-
-def get_transcriber():
-    """Get caption transcriber (ElevenLabs/Whisper)."""
-    from .mv_maker import get_transcriber
-    return get_transcriber()
-
-def get_caption_exporter():
-    """Get caption exporter for multiple formats."""
-    from .mv_maker import get_caption_exporter
-    return get_caption_exporter()
-
-def get_live_preview_widget():
-    """Get live preview widget for captions."""
-    from .mv_maker import get_live_preview_widget
-    return get_live_preview_widget()
 
 # Release Calendar Module (NEW)
 def get_release_calendar():
@@ -131,16 +97,6 @@ __all__ = [
     # Snippet Remixer
     'get_snippet_remixer',
     'get_video_processor',
-    
-    # Random Slideshow
-    'get_random_slideshow',
-    'get_slideshow_generator',
-    
-    # MV Maker
-    'get_mv_maker',
-    'get_transcriber',
-    'get_caption_exporter',
-    'get_live_preview_widget',
     
     # Release Calendar
     'get_release_calendar',

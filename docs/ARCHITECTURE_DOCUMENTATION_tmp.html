@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <title>ARCHITECTURE_DOCUMENTATION.md</title>
@@ -368,6 +368,7 @@ code {
 <h1 id="bedrot-productions-media-tool-suite---comprehensive-architecture-documentation">Bedrot Productions Media Tool Suite - Comprehensive Architecture Documentation</h1>
 <h2 id="executive-summary">Executive Summary</h2>
 <p>This document provides a comprehensive analysis of the <strong>Bedrot Productions Media Tool Suite</strong>, a sophisticated Python-based collection of multimedia processing tools designed for content creation, video downloading, editing, and automated slideshow generation. The suite demonstrates an evolution from monolithic scripts to a modern modular architecture with centralized process orchestration, sophisticated configuration management, and comprehensive error handling.</p>
+<p><em>Update (2025-10-28): The random_slideshow and mv_maker packages have been archived under <code>archive/</code>; diagrams and examples below reference them for lineage only.</em></p>
 <p><strong>Key Architectural Achievements:</strong></p>
 <ul>
 <li><strong>Modular Package Architecture</strong>: Successfully modularized <code>reel_tracker</code>, <code>snippet_remixer</code>, and <code>random_slideshow</code> from monolithic scripts</li>
@@ -1000,7 +1001,7 @@ Future API development should follow:</p>
 </ul>
 <p><strong>3. Job Management</strong></p>
 <ul>
-<li><strong>Job States</strong>: Pending → Processing → Completed/Failed/Cancelled</li>
+<li><strong>Job States</strong>: Pending â†’ Processing â†’ Completed/Failed/Cancelled</li>
 <li><strong>Job Presets</strong>: Save and reuse common configurations</li>
 <li><strong>Job History</strong>: Track completed jobs with statistics</li>
 <li><strong>Queue Recovery</strong>: Resume processing after application restart</li>
@@ -1745,14 +1746,14 @@ ffmpeg_found, ffprobe_found = self.processing_worker.get_video_processor().are_t
 <h3 id="code-quality-standards">Code Quality Standards</h3>
 <p><strong>Module Structure Pattern:</strong></p>
 <pre class="hljs"><code><div>package_name/
-├── __init__.py              # Package exports and lazy imports
-├── main_app.py              # Main application/GUI class
-├── config_manager.py        # Configuration handling
-├── core_logic.py            # Core business logic
-├── worker_threads.py        # Background processing
-├── dialogs.py               # UI dialogs and forms
-├── utils.py                 # Utility functions
-└── README.md                # Module documentation
+â”œâ”€â”€ __init__.py              # Package exports and lazy imports
+â”œâ”€â”€ main_app.py              # Main application/GUI class
+â”œâ”€â”€ config_manager.py        # Configuration handling
+â”œâ”€â”€ core_logic.py            # Core business logic
+â”œâ”€â”€ worker_threads.py        # Background processing
+â”œâ”€â”€ dialogs.py               # UI dialogs and forms
+â”œâ”€â”€ utils.py                 # Utility functions
+â””â”€â”€ README.md                # Module documentation
 </div></code></pre>
 <p><strong>Configuration Management Pattern:</strong></p>
 <pre class="hljs"><code><div><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ConfigManager</span>:</span>
@@ -1883,3 +1884,4 @@ ffmpeg_found, ffprobe_found = self.processing_worker.get_video_processor().are_t
 
 </body>
 </html>
+

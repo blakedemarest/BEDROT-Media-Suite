@@ -18,7 +18,7 @@ This document captures the repository-aware plan for delivering the new `lyric_v
 :::task-stub{title="Create lyric_video_uploader package skeleton"}
 1. Add `src/lyric_video_uploader/` with subpackages mirroring the spec (`ingest`, `stems`, `stt`, `timing`, `tempo`, `render`, `export`, `bridge_snippets`, `ui`, `cli`, `schemas`, `tests` if colocated) and populate `__init__.py` with lazy imports following `snippet_remixer` conventions.【F:src/snippet_remixer/__init__.py†L1-L40】
 2. Leverage `core.path_utils.get_path_resolver()` for project-relative directories (stems, timing, renders, exports) and `core.logger` for module-wide loggers.
-3. Update `core.config_manager.ConfigManager` to register `'lyric_video'` defaults, including stems/STT/render options and ElevenLabs key placeholders, mirroring existing entries for `'mv_maker'`.【F:src/core/config_manager.py†L69-L125】
+3. Update `core.config_manager.ConfigManager` to register `'lyric_video'` defaults, including stems/STT/render options and ElevenLabs key placeholders, mirroring the archived `'mv_maker'` defaults (see `archive/mv_maker/config_root/`).【F:src/core/config_manager.py†L69-L125】
 4. Extend `.env.example` and `core.config_manager.get_script_path` mapping so Windows overrides can set `SLIDESHOW_LYRIC_VIDEO_SCRIPT` and `SLIDESHOW_LYRIC_VIDEO_CONFIG` analogues.【F:.env.example†L45-L94】
 :::
 

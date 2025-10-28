@@ -1,4 +1,4 @@
-# Bedrot Productions - Media Tool Suite
+﻿# Bedrot Productions - Media Tool Suite
 
 > **Important:** This repository is maintained for internal workflows at Bedrot Productions and is provided publicly for educational and referential purposes only. The suite targets Windows environments exclusively and is not supported on macOS or Linux.
 
@@ -17,40 +17,34 @@ start_launcher.bat
 
 ```
 bedrot-media-suite/
-├── launcher.py                   # Main GUI launcher (Tkinter-based)
-├── start_launcher.bat           # Windows batch launcher (recommended for Windows)
-├── requirements.txt             # Python dependencies
-├── .env                        # Environment configuration (create from .env.example)
-├── .env.example               # Template for environment variables
-│
-├── config/                    # Primary configuration directory
-│   ├── yt_downloader_gui_settings.json     # Media Downloader settings
-│   ├── video_remixer_settings.json         # Snippet Remixer settings
-│   ├── combined_random_config.json         # Random Slideshow settings
-│   ├── config.json                         # Slideshow Editor settings
-│   ├── reel_tracker_config.json            # Reel Tracker settings
-│   ├── mv_maker_config.json # MV Maker settings
-│   ├── release_calendar_config.json        # Release Calendar settings
-│   ├── calendar_data.json                  # Release Calendar data
-│   └── slideshow_presets.json             # Slideshow presets
-│
-├── src/                       # Source code directory
-│   ├── core/                 # Centralized utilities (partially implemented)
-│   ├── media_download_app.py               # Standalone media downloader
-│   ├── snippet_remixer_modular.py          # Snippet remixer entry point
-│   ├── reel_tracker_modular.py             # Reel tracker entry point
-│   ├── release_calendar_modular.py         # Release calendar entry point
-│   ├── snippet_remixer/                    # Snippet remixer package
-│   ├── random_slideshow/                   # Random slideshow package
-│   ├── reel_tracker/                       # Reel tracker package
-│   ├── release_calendar/                   # Release calendar package
-│   └── mv_maker/            # MV Maker package
-│
-└── tools/                     # Standalone utilities
-    ├── slideshow_editor.py   # PyQt5 slideshow editor
-    ├── xyimagescaler.py     # Image scaling utility
-    └── generate_function_registry.py # Code analysis tool
-
+|-- launcher.py                    # Main GUI launcher (Tkinter-based)
+|-- start_launcher.bat             # Windows batch launcher (recommended for Windows)
+|-- requirements.txt               # Python dependencies
+|-- .env                           # Environment configuration (create from .env.example)
+|-- .env.example                   # Template for environment variables
+|-- config/                        # Primary configuration directory
+|   |-- yt_downloader_gui_settings.json     # Media Downloader settings
+|   |-- video_remixer_settings.json         # Snippet Remixer settings
+|   |-- config.json                        # Slideshow Editor settings
+|   |-- reel_tracker_config.json           # Reel Tracker settings
+|   |-- release_calendar_config.json       # Release Calendar settings
+|   `-- calendar_data.json                 # Release Calendar data
+|-- src/                           # Source code directory
+|   |-- core/                      # Centralized utilities (shared)
+|   |-- media_download_app.py      # Standalone media downloader
+|   |-- snippet_remixer_modular.py # Snippet Remixer entry point
+|   |-- reel_tracker_modular.py    # Reel Tracker entry point
+|   |-- release_calendar_modular.py# Release Calendar entry point
+|   |-- snippet_remixer/           # Snippet Remixer package
+|   |-- reel_tracker/              # Reel Tracker package
+|   `-- release_calendar/          # Release Calendar package
+|-- archive/                       # Archived modules retained for reference
+|   |-- mv_maker/                  # Legacy MV Maker package and configs
+|   `-- random_slideshow/          # Legacy Random Slideshow package and configs
+`-- tools/                         # Standalone utilities
+    |-- slideshow_editor.py        # PyQt5 slideshow editor
+    |-- xyimagescaler.py           # Image scaling utility
+    `-- generate_function_registry.py # Code analysis tool
 ```
 
 ## Core Components
@@ -58,10 +52,10 @@ bedrot-media-suite/
 1. **Launcher (`launcher.py`)** - Central control hub with tabbed interface for all tools
 2. **Media Downloader** - YouTube/media downloader with format conversion
 3. **Snippet Remixer** - Creates remixed videos from random snippets
-4. **Random Slideshow Generator** - Automated slideshow creation from images
-5. **Reel Tracker** - Advanced content tracking with CSV backend
-6. **MV Maker** - AI-powered caption generation and music video creation
-7. **Release Calendar** - Music release scheduling (requires PyQt6)
+4. **Reel Tracker** - Advanced content tracking with CSV backend
+5. **Release Calendar** - Music release scheduling (requires PyQt6)
+
+> Archived modules: MV Maker and Random Slideshow now live under `archive/` for historical access only.
 
 ## Installation & Setup
 
@@ -162,21 +156,18 @@ python src/media_download_app.py
 # Snippet Remixer (use modular version)
 python src/snippet_remixer_modular.py
 
-# Random Slideshow
-python src/random_slideshow/main.py
-
 # Reel Tracker
 python src/reel_tracker_modular.py
 
 # Release Calendar (requires PyQt6)
 python src/release_calendar_modular.py
 
-# MV Maker
-python -m src.mv_maker.main_app
-
 # Tools
 python tools/slideshow_editor.py
 python tools/xyimagescaler.py
+
+# Archived modules (reference only)
+# See archive/mv_maker/ and archive/random_slideshow/ for legacy entry points.
 ```
 
 ## Tool Descriptions
@@ -205,19 +196,7 @@ python tools/xyimagescaler.py
 - Automatic temp file cleanup
 - Output naming with unique suffixes
 
-### 3. Random Slideshow Generator (`src/random_slideshow/main.py`)
-
-**GUI Framework:** PyQt5  
-**Config:** `config/combined_random_config.json`
-
-**Features:**
-- Continuous automated slideshow generation
-- 16:9 and 9:16 aspect ratio support
-- Batch processing capabilities
-- Preset management system
-- Resource-efficient processing
-
-### 4. Reel Tracker (`src/reel_tracker_modular.py`)
+### 3. Reel Tracker (`src/reel_tracker_modular.py`)
 
 **GUI Framework:** PyQt5  
 **Config:** `config/reel_tracker_config.json`
@@ -230,7 +209,7 @@ python tools/xyimagescaler.py
 - Media randomization tools
 - Custom metadata fields
 
-### 5. Release Calendar (`src/release_calendar_modular.py`)
+### 4. Release Calendar (`src/release_calendar_modular.py`)
 
 **GUI Framework:** PyQt6 (Note: Different from other tools!)  
 **Config:** `config/release_calendar_config.json`, `config/calendar_data.json`
@@ -244,17 +223,10 @@ python tools/xyimagescaler.py
 - Automatic conflict detection
 - Friday release day highlighting
 
-### 6. MV Maker
+### Archived Modules (reference only)
 
-**Entry:** `python -m src.mv_maker.main_app`  
-**Config:** `config/mv_maker_config.json`
-
-**Features:**
-- AI-powered caption generation
-- Live preview widget
-- Font management system
-- Multiple export formats
-- Audio transcription support
+- Random Slideshow (`archive/random_slideshow/`) — legacy PyQt5 generator and original configs now stored under `config_root/`.
+- MV Maker (`archive/mv_maker/`) — legacy captioning suite with archived configs under `config_root/`.
 
 ## Additional Tools
 
@@ -331,4 +303,7 @@ This project is actively maintained. When contributing:
 ## License
 
 [Add your license information here]
+
+
+
 

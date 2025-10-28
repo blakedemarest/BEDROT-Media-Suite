@@ -173,10 +173,8 @@ class PathResolver:
             script_defaults = {
                 'SLIDESHOW_MEDIA_DOWNLOAD_SCRIPT': 'src/media_download_app.py',
                 'SLIDESHOW_SNIPPET_REMIXER_SCRIPT': 'src/snippet_remixer.py',
-                'SLIDESHOW_RANDOM_SLIDESHOW_SCRIPT': 'src/random_slideshow/main.py',
                 'SLIDESHOW_REEL_TRACKER_SCRIPT': 'src/reel_tracker_modular.py',
                 'SLIDESHOW_EDITOR_SCRIPT': 'tools/slideshow_editor.py',
-                'SLIDESHOW_MV_MAKER_SCRIPT': 'src/mv_maker/main_app.py',
                 'SLIDESHOW_RELEASE_CALENDAR_SCRIPT': 'src/release_calendar_modular.py'
             }
             

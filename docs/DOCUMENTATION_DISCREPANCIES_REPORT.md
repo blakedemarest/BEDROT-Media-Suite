@@ -4,6 +4,8 @@
 ### Executive Summary
 This report documents discrepancies found between the actual codebase implementation and the documentation (README.md and CLAUDE.md files).
 
+> Update (2025-10-28): The Random Slideshow and MV Maker modules were archived and moved under `archive/`. References below are retained for historical tracking and should be interpreted accordingly.
+
 ---
 
 ## Major Discrepancies Found

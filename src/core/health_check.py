@@ -576,7 +576,6 @@ class HealthChecker:
                 "config.json",
                 "yt_downloader_gui_settings.json",
                 "video_remixer_settings.json",
-                "combined_random_config.json",
                 "reel_tracker_config.json"
             ]
             

@@ -47,10 +47,8 @@ def get_script_path(script_key, fallback_path):
 # Script paths with environment variable support and fallbacks
 SCRIPT_1_PATH = get_script_path('media_download', 'src/media_download_app.py')
 SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.py') 
-SCRIPT_3_PATH = get_script_path('random_slideshow', 'src/random_slideshow/main.py')
-SCRIPT_4_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
-SCRIPT_5_PATH = get_script_path('mv_maker', 'src/mv_maker/main_app.py')
-SCRIPT_6_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
+SCRIPT_3_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
+SCRIPT_4_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -560,10 +558,10 @@ stop_button2 = ttk.Button(
 )
 stop_button2.pack(side=tk.LEFT, padx=5)
 
-# --- Tab 3: Random Slideshow ---
+# --- Tab 3: Reel Tracker ---
 tab3 = ttk.Frame(notebook, padding="10")
-notebook.add(tab3, text='Random Slideshow') # Set Tab Title
-label3 = ttk.Label(tab3, text="Run the Random Slideshow Generator script.")
+notebook.add(tab3, text='Reel Tracker') # Set Tab Title
+label3 = ttk.Label(tab3, text="Run the Reel Tracker application for CSV-based reel management.")
 label3.pack(pady=10)
 status_label3 = ttk.Label(tab3, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label3.pack(pady=5)
@@ -591,11 +589,12 @@ stop_button3 = ttk.Button(
     width=15
 )
 stop_button3.pack(side=tk.LEFT, padx=5)
+# --- END OF REEL TRACKER TAB ---
 
-# --- Tab 4: Reel Tracker ---
+# --- Tab 4: Release Calendar ---
 tab4 = ttk.Frame(notebook, padding="10")
-notebook.add(tab4, text='Reel Tracker') # Set Tab Title
-label4 = ttk.Label(tab4, text="Run the Reel Tracker application for CSV-based reel management.")
+notebook.add(tab4, text='Release Calendar')
+label4 = ttk.Label(tab4, text="Manage music release schedules with comprehensive deliverable tracking.")
 label4.pack(pady=10)
 status_label4 = ttk.Label(tab4, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
 status_label4.pack(pady=5)
@@ -623,76 +622,10 @@ stop_button4 = ttk.Button(
     width=15
 )
 stop_button4.pack(side=tk.LEFT, padx=5)
-# --- END OF REEL TRACKER TAB ---
-
-# --- Tab 5: MV Maker ---
-tab5 = ttk.Frame(notebook, padding="10")
-notebook.add(tab5, text='MV Maker')
-label5 = ttk.Label(tab5, text="Generate time-synchronized captions for videos using AI speech recognition.")
-label5.pack(pady=10)
-status_label5 = ttk.Label(tab5, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
-status_label5.pack(pady=5)
-
-# Button frame for Run/Stop buttons
-button_frame5 = ttk.Frame(tab5)
-button_frame5.pack(pady=20)
-
-# Run button
-run_button5 = ttk.Button(
-    button_frame5,
-    text="RUN",
-    command=lambda: run_script(SCRIPT_5_PATH, status_label5, log_area),
-    style='Run.TButton',
-    width=15
-)
-run_button5.pack(side=tk.LEFT, padx=5)
-
-# Stop button
-stop_button5 = ttk.Button(
-    button_frame5,
-    text="STOP",
-    command=lambda: stop_script(SCRIPT_5_PATH, status_label5, log_area),
-    style='Stop.TButton',
-    width=15
-)
-stop_button5.pack(side=tk.LEFT, padx=5)
-# --- END OF MV MAKER TAB ---
-
-# --- Tab 6: Release Calendar ---
-tab6 = ttk.Frame(notebook, padding="10")
-notebook.add(tab6, text='Release Calendar')
-label6 = ttk.Label(tab6, text="Manage music release schedules with comprehensive deliverable tracking.")
-label6.pack(pady=10)
-status_label6 = ttk.Label(tab6, text="Status: Idle", width=50, anchor="w", style='Status.TLabel')
-status_label6.pack(pady=5)
-
-# Button frame for Run/Stop buttons
-button_frame6 = ttk.Frame(tab6)
-button_frame6.pack(pady=20)
-
-# Run button
-run_button6 = ttk.Button(
-    button_frame6,
-    text="RUN",
-    command=lambda: run_script(SCRIPT_6_PATH, status_label6, log_area),
-    style='Run.TButton',
-    width=15
-)
-run_button6.pack(side=tk.LEFT, padx=5)
-
-# Stop button
-stop_button6 = ttk.Button(
-    button_frame6,
-    text="STOP",
-    command=lambda: stop_script(SCRIPT_6_PATH, status_label6, log_area),
-    style='Stop.TButton',
-    width=15
-)
-stop_button6.pack(side=tk.LEFT, padx=5)
 
 # Note: Release Calendar requires PyQt6
-req_label6 = ttk.Label(tab6, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", style='Note.TLabel')
-req_label6.pack(pady=5)
+req_label4 = ttk.Label(tab4, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", style='Note.TLabel')
+req_label4.pack(pady=5)
 # --- END OF RELEASE CALENDAR TAB ---
 
 

@@ -82,16 +82,6 @@ class ConfigManager:
                 'aspect_ratio': get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', '16:9'),
                 'temp_directory': str(self.path_resolver.get_temp_directory())
             },
-            'random_slideshow': {
-                'input_directory': '',
-                'output_directory': str(self.path_resolver.resolve_output_path()),
-                'aspect_ratio': get_env_var('SLIDESHOW_DEFAULT_ASPECT_RATIO', '16:9'),
-                'min_duration': 3,
-                'max_duration': 8,
-                'transition_duration': 0.5,
-                'continuous_generation': True,
-                'generation_count': 0
-            },
             'reel_tracker': {
                 'csv_file_path': '',
                 'auto_save_enabled': True,
@@ -117,15 +107,6 @@ class ConfigManager:
                 'duration_per_image': 3.0,
                 'transition_duration': 0.5,
                 'recent_folders': []
-            },
-            'mv_maker': {
-                'output_directory': str(self.path_resolver.resolve_output_path()),
-                'model_size': 'base',
-                'language': 'en',
-                'export_formats': ['srt', 'vtt'],
-                'transcription_api': 'whisper',
-                'api_key': get_env_var('ELEVENLABS_API_KEY', ''),
-                'audio_temp_directory': str(self.path_resolver.get_temp_directory())
             }
         }
         
@@ -240,21 +221,12 @@ class ConfigManager:
                 'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO',
                 'temp_directory': 'SLIDESHOW_TEMP_DIR'
             },
-            'random_slideshow': {
-                'output_directory': 'SLIDESHOW_DEFAULT_OUTPUT_DIR',
-                'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO'
-            },
             'reel_tracker': {
                 'file_organization.master_export_folder': 'SLIDESHOW_DEFAULT_EXPORTS_DIR'
             },
             'bedrot_media_suite': {
                 'output_directory': 'SLIDESHOW_DEFAULT_OUTPUT_DIR',
                 'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO'
-            },
-            'mv_maker': {
-                'output_directory': 'SLIDESHOW_DEFAULT_EXPORTS_DIR',
-                'audio_temp_directory': 'SLIDESHOW_TEMP_DIR',
-                'api_key': 'ELEVENLABS_API_KEY'
             }
         }
         
@@ -341,16 +313,6 @@ class ConfigManager:
                         errors.append("Duration must be positive")
                 except ValueError:
                     errors.append("Duration must be a valid number")
-        
-        elif app_name == 'random_slideshow':
-            if 'min_duration' in config and 'max_duration' in config:
-                try:
-                    min_dur = float(config['min_duration'])
-                    max_dur = float(config['max_duration'])
-                    if min_dur >= max_dur:
-                        errors.append("Minimum duration must be less than maximum duration")
-                except ValueError:
-                    errors.append("Durations must be valid numbers")
         
         return errors
 
