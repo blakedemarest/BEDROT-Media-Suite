@@ -21,8 +21,18 @@ from core.env_loader import get_env_var
 
 # Constants
 BPM_UNITS = {
-    "1/6 Beat": 1.0/6.0, "1/4 Beat": 1.0/4.0, "1/3 Beat": 1.0/3.0,
-    "1/2 Beat": 1.0/2.0, "Beat": 1.0, "Bar": 4.0
+    "1/16 Beat": 1.0/16.0,
+    "1/6 Beat": 1.0/6.0,
+    "1/4 Beat": 1.0/4.0,
+    "1/3 Beat": 1.0/3.0,
+    "1/2 Beat": 1.0/2.0,
+    "Beat": 1.0,
+    "1/16 Bar": 4.0/16.0,
+    "1/6 Bar": 4.0/6.0,
+    "1/4 Bar": 4.0/4.0,
+    "1/3 Bar": 4.0/3.0,
+    "1/2 Bar": 4.0/2.0,
+    "Bar": 4.0
 }
 DEFAULT_BPM_UNIT = "Beat"
 

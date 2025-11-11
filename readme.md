@@ -1,4 +1,4 @@
-﻿# Bedrot Productions - Media Tool Suite
+# Bedrot Productions - Media Tool Suite
 
 > **Important:** This repository is maintained for internal workflows at Bedrot Productions and is provided publicly for educational and referential purposes only. The suite targets Windows environments exclusively and is not supported on macOS or Linux.
 
@@ -54,6 +54,7 @@ bedrot-media-suite/
 3. **Snippet Remixer** - Creates remixed videos from random snippets
 4. **Reel Tracker** - Advanced content tracking with CSV backend
 5. **Release Calendar** - Music release scheduling (requires PyQt6)
+6. **Lyric Video Uploader** - Manual tempo lyric video pipeline (Tkinter GUI + Typer CLI, see `docs/lyric_video_uploader/`)
 
 > Archived modules: MV Maker and Random Slideshow now live under `archive/` for historical access only.
 
@@ -162,9 +163,15 @@ python src/reel_tracker_modular.py
 # Release Calendar (requires PyQt6)
 python src/release_calendar_modular.py
 
+# Lyric Video Uploader (placeholder GUI)
+python src/lyric_video_uploader_modular.py
+
 # Tools
 python tools/slideshow_editor.py
 python tools/xyimagescaler.py
+
+# Lyric Video Uploader CLI
+python -m src.lyric_video_uploader.cli --help
 
 # Archived modules (reference only)
 # See archive/mv_maker/ and archive/random_slideshow/ for legacy entry points.
@@ -225,8 +232,8 @@ python tools/xyimagescaler.py
 
 ### Archived Modules (reference only)
 
-- Random Slideshow (`archive/random_slideshow/`) — legacy PyQt5 generator and original configs now stored under `config_root/`.
-- MV Maker (`archive/mv_maker/`) — legacy captioning suite with archived configs under `config_root/`.
+- Random Slideshow (`archive/random_slideshow/`) Ã¢â‚¬â€ legacy PyQt5 generator and original configs now stored under `config_root/`.
+- MV Maker (`archive/mv_maker/`) Ã¢â‚¬â€ legacy captioning suite with archived configs under `config_root/`.
 
 ## Additional Tools
 

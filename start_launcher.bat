@@ -39,6 +39,9 @@ IF EXIST "%BASEDIR%requirements.txt" (
     IF ERRORLEVEL 1 (
         echo Failed to install some dependencies. Continuing anyway...
     )
+    echo.
+    echo [INFO] Lyric Video Uploader requires additional CUDA/Demucs packages detailed in docs/lyric_video_uploader/.
+    echo [INFO] Run "%VENV_PYTHON%" -m src.lyric_video_uploader.cli <project_dir> --ensure-structure after setup to stage workspaces.
 ) ELSE (
     echo requirements.txt not found!
     pause

@@ -45,3 +45,12 @@ icalendar==5.0.11
 openpyxl==3.1.2
 xlsxwriter==3.1.9
 pytz==2024.1
+
+# Lyric Video Uploader dependencies
+# NOTE: Install CUDA-enabled builds per docs/lyric_video_uploader/DEPENDENCIES.md
+torch
+torchaudio
+demucs
+pysubs2
+typer
+tqdm

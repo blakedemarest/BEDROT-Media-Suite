@@ -46,9 +46,10 @@ def get_script_path(script_key, fallback_path):
 
 # Script paths with environment variable support and fallbacks
 SCRIPT_1_PATH = get_script_path('media_download', 'src/media_download_app.py')
-SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.py') 
+SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.py')
 SCRIPT_3_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
 SCRIPT_4_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
+SCRIPT_5_PATH = get_script_path('lyric_video', 'src/lyric_video_uploader_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -558,7 +559,55 @@ stop_button2 = ttk.Button(
 )
 stop_button2.pack(side=tk.LEFT, padx=5)
 
-# --- Tab 3: Reel Tracker ---
+# --- Tab 3: Lyric Video Uploader ---
+tab_lv = ttk.Frame(notebook, padding="10")
+notebook.add(tab_lv, text='Lyric Video Uploader')
+label_lv = ttk.Label(
+    tab_lv,
+    text="Launch the Lyric Video Uploader (manual tempo, Demucs/ElevenLabs workflow)."
+)
+label_lv.pack(pady=10)
+status_label_lv = ttk.Label(
+    tab_lv,
+    text="Status: Idle",
+    width=50,
+    anchor="w",
+    style='Status.TLabel'
+)
+status_label_lv.pack(pady=5)
+
+button_frame_lv = ttk.Frame(tab_lv)
+button_frame_lv.pack(pady=20)
+
+run_button_lv = ttk.Button(
+    button_frame_lv,
+    text="RUN",
+    command=lambda: run_script(SCRIPT_5_PATH, status_label_lv, log_area),
+    style='Run.TButton',
+    width=15
+)
+run_button_lv.pack(side=tk.LEFT, padx=5)
+
+stop_button_lv = ttk.Button(
+    button_frame_lv,
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_5_PATH, status_label_lv, log_area),
+    style='Stop.TButton',
+    width=15
+)
+stop_button_lv.pack(side=tk.LEFT, padx=5)
+
+note_label_lv = ttk.Label(
+    tab_lv,
+    text=(
+        "Note: This tab currently launches a placeholder UI while the full workflow "
+        "is under active development."
+    ),
+    style='Note.TLabel'
+)
+note_label_lv.pack(pady=5)
+
+# --- Tab 4: Reel Tracker ---
 tab3 = ttk.Frame(notebook, padding="10")
 notebook.add(tab3, text='Reel Tracker') # Set Tab Title
 label3 = ttk.Label(tab3, text="Run the Reel Tracker application for CSV-based reel management.")
@@ -591,7 +640,7 @@ stop_button3 = ttk.Button(
 stop_button3.pack(side=tk.LEFT, padx=5)
 # --- END OF REEL TRACKER TAB ---
 
-# --- Tab 4: Release Calendar ---
+# --- Tab 5: Release Calendar ---
 tab4 = ttk.Frame(notebook, padding="10")
 notebook.add(tab4, text='Release Calendar')
 label4 = ttk.Label(tab4, text="Manage music release schedules with comprehensive deliverable tracking.")

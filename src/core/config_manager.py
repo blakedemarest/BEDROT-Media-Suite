@@ -107,6 +107,64 @@ class ConfigManager:
                 'duration_per_image': 3.0,
                 'transition_duration': 0.5,
                 'recent_folders': []
+            },
+            'lyric_video': {
+                'project_root': str(self.path_resolver.resolve_output_path('lyric_video_projects')),
+                'stems': {
+                    'engine': 'demucs',
+                    'model': 'htdemucs_ft',
+                    'cache_enabled': True,
+                    'overwrite_existing': False,
+                    'chunk_size_seconds': 60,
+                    'gpu_required': True
+                },
+                'stt': {
+                    'provider': 'elevenlabs',
+                    'language': 'en',
+                    'model_id': 'eleven_multilingual_v2',
+                    'base_url': 'https://api.elevenlabs.io',
+                    'api_key_env': 'ELEVENLABS_API_KEY',
+                    'request_timeout': 60,
+                    'max_retries': 2
+                },
+                'tempo': {
+                    'default_bpm': 120.0,
+                    'default_offset_seconds': 0.0,
+                    'allow_tempo_map': True,
+                    'tempo_map_pattern': '*.csv',
+                    'snap_words_to_beats': False
+                },
+                'render': {
+                    'preset': 'default',
+                    'encoder': 'h264_nvenc',
+                    'video_bitrate': '25M',
+                    'audio_bitrate': '320k',
+                    'include_ass': True,
+                    'include_words_srt': True,
+                    'max_render_duration_minutes': 15
+                },
+                'render_presets': {
+                    'default': {
+                        'description': 'Looped background with overlaid ASS subtitles.',
+                        'background': 'backgrounds/default_loop.mp4',
+                        'font': 'fonts/default.ttf',
+                        'font_size': 48,
+                        'font_color': '#FFFFFF',
+                        'outline_color': '#000000',
+                        'shadow_color': '#000000'
+                    }
+                },
+                'exports': {
+                    'bundle_metadata': True,
+                    'bundle_sections': True,
+                    'ready_for_upload_dirname': 'ready_for_upload',
+                    'snippet_bridge_dirname': 'snippet_bridge',
+                    'metadata_template': 'metadata_template.json'
+                },
+                'logging': {
+                    'level': 'INFO',
+                    'propagate_to_root': False
+                }
             }
         }
         
@@ -227,6 +285,10 @@ class ConfigManager:
             'bedrot_media_suite': {
                 'output_directory': 'SLIDESHOW_DEFAULT_OUTPUT_DIR',
                 'aspect_ratio': 'SLIDESHOW_DEFAULT_ASPECT_RATIO'
+            },
+            'lyric_video': {
+                'project_root': 'SLIDESHOW_LYRIC_VIDEO_PROJECT_ROOT',
+                'render.output_directory': 'SLIDESHOW_DEFAULT_EXPORTS_DIR'
             }
         }
         

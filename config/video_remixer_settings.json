@@ -1,12 +1,12 @@
 {
-    "last_input_folder": "E:/VIDEOS/A03_SNIPPET_REMIXER_OUTPUTS",
+    "last_input_folder": "E:/VIDEOS/A05_SORA_VIDS",
     "output_folder": "E:/VIDEOS/A03_SNIPPET_REMIXER_OUTPUTS",
     "length_mode": "BPM",
     "duration_seconds": 132.0,
-    "bpm": 185.0,
-    "bpm_unit": "1/4 Beat",
-    "num_units": 300,
-    "aspect_ratio": "1920x1080 (16:9 Landscape)",
+    "bpm": 180.0,
+    "bpm_unit": "Beat",
+    "num_units": 48,
+    "aspect_ratio": "1080x1920 (9:16 Portrait)",
     "export_settings": {
         "custom_width": null,
         "custom_height": null,
@@ -24,7 +24,7 @@
     },
     "continuous_mode": false,
     "jitter_enabled": true,
-    "jitter_intensity": 26,
+    "jitter_intensity": 0,
     "aspect_ratio_mode": "Crop to Fill",
     "mute_audio": true
 }

@@ -1,0 +1,62 @@
+{
+  "project_root": "projects/lyric_video",
+  "stems": {
+    "engine": "demucs",
+    "model": "htdemucs_ft",
+    "cache_enabled": true,
+    "overwrite_existing": false,
+    "chunk_size_seconds": 60,
+    "gpu_required": true
+  },
+  "stt": {
+    "provider": "elevenlabs",
+    "language": "en",
+    "model_id": "eleven_multilingual_v2",
+    "base_url": "https://api.elevenlabs.io",
+    "api_key_env": "ELEVENLABS_API_KEY",
+    "request_timeout": 60,
+    "max_retries": 2
+  },
+  "tempo": {
+    "default_bpm": 120.0,
+    "default_offset_seconds": 0.0,
+    "allow_tempo_map": true,
+    "tempo_map_pattern": "*.csv",
+    "snap_words_to_beats": false
+  },
+  "render": {
+    "preset": "default",
+    "encoder": "h264_nvenc",
+    "video_bitrate": "25M",
+    "audio_bitrate": "320k",
+    "include_ass": true,
+    "include_words_srt": true,
+    "max_render_duration_minutes": 15
+  },
+  "render_presets": {
+    "default": {
+      "description": "Looped background with overlaid ASS subtitles.",
+      "background": "backgrounds/default_loop.mp4",
+      "font": "fonts/default.ttf",
+      "font_size": 48,
+      "font_color": "#FFFFFF",
+      "outline_color": "#000000",
+      "shadow_color": "#000000"
+    }
+  },
+  "exports": {
+    "bundle_metadata": true,
+    "bundle_sections": true,
+    "ready_for_upload_dirname": "ready_for_upload",
+    "snippet_bridge_dirname": "snippet_bridge",
+    "metadata_template": "metadata_template.json"
+  },
+  "logging": {
+    "level": "INFO",
+    "propagate_to_root": false
+  },
+  "_metadata": {
+    "version": "0.1.0",
+    "description": "Lyric Video Uploader configuration defaults (manual tempo workflows, ElevenLabs STT)."
+  }
+}
