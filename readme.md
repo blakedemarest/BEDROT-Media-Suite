@@ -25,6 +25,7 @@ bedrot-media-suite/
 |-- config/                        # Primary configuration directory
 |   |-- yt_downloader_gui_settings.json     # Media Downloader settings
 |   |-- video_remixer_settings.json         # Snippet Remixer settings
+|   |-- video_splitter_settings.json        # Video Splitter settings
 |   |-- config.json                        # Slideshow Editor settings
 |   |-- reel_tracker_config.json           # Reel Tracker settings
 |   |-- release_calendar_config.json       # Release Calendar settings
@@ -33,9 +34,11 @@ bedrot-media-suite/
 |   |-- core/                      # Centralized utilities (shared)
 |   |-- media_download_app.py      # Standalone media downloader
 |   |-- snippet_remixer_modular.py # Snippet Remixer entry point
+|   |-- video_splitter_modular.py  # Video Splitter entry point
 |   |-- reel_tracker_modular.py    # Reel Tracker entry point
 |   |-- release_calendar_modular.py# Release Calendar entry point
 |   |-- snippet_remixer/           # Snippet Remixer package
+|   |-- video_splitter/            # Video Splitter package
 |   |-- reel_tracker/              # Reel Tracker package
 |   `-- release_calendar/          # Release Calendar package
 |-- archive/                       # Archived modules retained for reference
@@ -52,9 +55,10 @@ bedrot-media-suite/
 1. **Launcher (`launcher.py`)** - Central control hub with tabbed interface for all tools
 2. **Media Downloader** - YouTube/media downloader with format conversion
 3. **Snippet Remixer** - Creates remixed videos from random snippets
-4. **Reel Tracker** - Advanced content tracking with CSV backend
-5. **Release Calendar** - Music release scheduling (requires PyQt6)
-6. **Lyric Video Uploader** - Manual tempo lyric video pipeline (Tkinter GUI + Typer CLI, see `docs/lyric_video_uploader/`)
+4. **Video Splitter** - Batch slices long-form videos into configurable clip lengths with jitter
+5. **Reel Tracker** - Advanced content tracking with CSV backend
+6. **Release Calendar** - Music release scheduling (requires PyQt6)
+7. **Lyric Video Uploader** - Manual tempo lyric video pipeline (Tkinter GUI + Typer CLI, see `docs/lyric_video_uploader/`)
 
 > Archived modules: MV Maker and Random Slideshow now live under `archive/` for historical access only.
 
@@ -157,6 +161,9 @@ python src/media_download_app.py
 # Snippet Remixer (use modular version)
 python src/snippet_remixer_modular.py
 
+# Video Splitter
+python src/video_splitter_modular.py
+
 # Reel Tracker
 python src/reel_tracker_modular.py
 
@@ -203,7 +210,19 @@ python -m src.lyric_video_uploader.cli --help
 - Automatic temp file cleanup
 - Output naming with unique suffixes
 
-### 3. Reel Tracker (`src/reel_tracker_modular.py`)
+### 3. Video Splitter (`src/video_splitter_modular.py`)
+
+**GUI Framework:** Tkinter  
+**Config:** `config/video_splitter_settings.json`
+
+**Features:**
+- Queue-based source list with file/folder drag-and-drop
+- Configurable clip length plus minimum guardrail
+- Jitter slider randomizes segment durations for organic edits
+- Autosaves preferences (output directory, jitter, timestamps)
+- Stream-copy splitting with optional `-reset_timestamps 1`
+
+### 4. Reel Tracker (`src/reel_tracker_modular.py`)
 
 **GUI Framework:** PyQt5  
 **Config:** `config/reel_tracker_config.json`
@@ -216,7 +235,7 @@ python -m src.lyric_video_uploader.cli --help
 - Media randomization tools
 - Custom metadata fields
 
-### 4. Release Calendar (`src/release_calendar_modular.py`)
+### 5. Release Calendar (`src/release_calendar_modular.py`)
 
 **GUI Framework:** PyQt6 (Note: Different from other tools!)  
 **Config:** `config/release_calendar_config.json`, `config/calendar_data.json`

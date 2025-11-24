@@ -177,6 +177,10 @@ class FunctionRegistryGenerator:
                             if target.id.isupper():  # Convention for constants
                                 try:
                                     value = ast.literal_eval(node.value)
+                                    if isinstance(value, set):
+                                        value = sorted(value)
+                                    elif isinstance(value, tuple):
+                                        value = list(value)
                                     file_info["constants"].append({
                                         "name": target.id,
                                         "value": value,

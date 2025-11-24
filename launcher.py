@@ -50,6 +50,7 @@ SCRIPT_2_PATH = get_script_path('snippet_remixer', 'src/snippet_remixer_modular.
 SCRIPT_3_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
 SCRIPT_4_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
 SCRIPT_5_PATH = get_script_path('lyric_video', 'src/lyric_video_uploader_modular.py')
+SCRIPT_6_PATH = get_script_path('video_splitter', 'src/video_splitter_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -559,7 +560,52 @@ stop_button2 = ttk.Button(
 )
 stop_button2.pack(side=tk.LEFT, padx=5)
 
-# --- Tab 3: Lyric Video Uploader ---
+# --- Tab 3: Video Splitter ---
+tab_vs = ttk.Frame(notebook, padding="10")
+notebook.add(tab_vs, text='Video Splitter')
+label_vs = ttk.Label(
+    tab_vs,
+    text="Quickly split long videos into N-second clips with jittered durations."
+)
+label_vs.pack(pady=10)
+status_label_vs = ttk.Label(
+    tab_vs,
+    text="Status: Idle",
+    width=50,
+    anchor="w",
+    style='Status.TLabel'
+)
+status_label_vs.pack(pady=5)
+
+button_frame_vs = ttk.Frame(tab_vs)
+button_frame_vs.pack(pady=20)
+
+run_button_vs = ttk.Button(
+    button_frame_vs,
+    text="RUN",
+    command=lambda: run_script(SCRIPT_6_PATH, status_label_vs, log_area),
+    style='Run.TButton',
+    width=15
+)
+run_button_vs.pack(side=tk.LEFT, padx=5)
+
+stop_button_vs = ttk.Button(
+    button_frame_vs,
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_6_PATH, status_label_vs, log_area),
+    style='Stop.TButton',
+    width=15
+)
+stop_button_vs.pack(side=tk.LEFT, padx=5)
+
+note_label_vs = ttk.Label(
+    tab_vs,
+    text="Tip: Configure clip length, jitter, and drag-and-drop inputs inside the Video Splitter UI.",
+    style='Note.TLabel'
+)
+note_label_vs.pack(pady=5)
+
+# --- Tab 4: Lyric Video Uploader ---
 tab_lv = ttk.Frame(notebook, padding="10")
 notebook.add(tab_lv, text='Lyric Video Uploader')
 label_lv = ttk.Label(
@@ -607,7 +653,7 @@ note_label_lv = ttk.Label(
 )
 note_label_lv.pack(pady=5)
 
-# --- Tab 4: Reel Tracker ---
+# --- Tab 5: Reel Tracker ---
 tab3 = ttk.Frame(notebook, padding="10")
 notebook.add(tab3, text='Reel Tracker') # Set Tab Title
 label3 = ttk.Label(tab3, text="Run the Reel Tracker application for CSV-based reel management.")
@@ -640,7 +686,7 @@ stop_button3 = ttk.Button(
 stop_button3.pack(side=tk.LEFT, padx=5)
 # --- END OF REEL TRACKER TAB ---
 
-# --- Tab 5: Release Calendar ---
+# --- Tab 6: Release Calendar ---
 tab4 = ttk.Frame(notebook, padding="10")
 notebook.add(tab4, text='Release Calendar')
 label4 = ttk.Label(tab4, text="Manage music release schedules with comprehensive deliverable tracking.")

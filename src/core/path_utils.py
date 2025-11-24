@@ -176,7 +176,8 @@ class PathResolver:
                 'SLIDESHOW_REEL_TRACKER_SCRIPT': 'src/reel_tracker_modular.py',
                 'SLIDESHOW_EDITOR_SCRIPT': 'tools/slideshow_editor.py',
                 'SLIDESHOW_RELEASE_CALENDAR_SCRIPT': 'src/release_calendar_modular.py',
-                'SLIDESHOW_LYRIC_VIDEO_SCRIPT': 'src/lyric_video_uploader_modular.py'
+                'SLIDESHOW_LYRIC_VIDEO_SCRIPT': 'src/lyric_video_uploader_modular.py',
+                'SLIDESHOW_VIDEO_SPLITTER_SCRIPT': 'src/video_splitter_modular.py'
             }
             
             if script_path in script_defaults:

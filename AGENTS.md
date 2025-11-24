@@ -10,6 +10,13 @@ Before writing any code, open `CLAUDE.md` and follow its directives. That file c
 ## Project Structure & Entry Points
 `launcher.py` is the orchestrator; run it from the repo root to keep relative paths intact. Core apps live under `src/` with wrappers such as `src/snippet_remixer_modular.py`, but note the launcher still targets the legacy `src/snippet_remixer.py`. Configuration defaults sit in `config/` (plus a few module-level duplicates) and per-tool docs live in `docs/`. Utility scripts are in `tools/`; reproducible diagnostics live in `tests/`.
 
+**Video Splitter Module**
+- Entry script: `src/video_splitter_modular.py`
+- Package: `src/video_splitter/`
+- Config: `config/video_splitter_settings.json`
+- Reference doc: `docs/video_splitter.md`
+- Launcher tab: “Video Splitter” (between Snippet Remixer and Lyric Video Uploader)
+
 ## Function Registry & Modularity
 Before adding code, inspect `bedrot_media_suite_function_registry.json` to reuse existing utilities and avoid duplicates like `parse_aspect_ratio`, `generate_unique_suffix`, or redundant config accessors. After structural changes, regenerate the registry with `python tools/generate_function_registry.py` so future agents get accurate locations.
 
