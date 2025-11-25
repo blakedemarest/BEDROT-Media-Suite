@@ -31,6 +31,120 @@ class ProcessingWorker:
         self.processing_active = False
         self.abort_requested = False
         self.thread = None
+
+    @staticmethod
+    def build_linear_modulation_schedule(start_bpm, end_bpm, total_duration_sec, unit_beats, min_duration=0.1):
+        """
+        Build a list of snippet durations that linearly ramp BPM over the clip.
+        
+        Args:
+            start_bpm (float): Starting BPM
+            end_bpm (float): Ending BPM
+            total_duration_sec (float): Target clip duration in seconds
+            unit_beats (float): Number of beats per snippet unit
+            min_duration (float): Minimum snippet duration safeguard
+            
+        Returns:
+            list: Durations for each snippet in seconds
+        """
+        if total_duration_sec <= 0 or unit_beats <= 0 or start_bpm <= 0 or end_bpm <= 0:
+            return []
+        
+        schedule = []
+        elapsed = 0.0
+        total_duration_sec = float(total_duration_sec)
+        max_iterations = 20000  # Prevent runaway in extreme settings
+        
+        while elapsed < total_duration_sec - 1e-6 and len(schedule) < max_iterations:
+            progress = elapsed / total_duration_sec if total_duration_sec > 0 else 0.0
+            current_bpm = start_bpm + (end_bpm - start_bpm) * progress
+            current_bpm = max(current_bpm, 0.001)
+            
+            seconds_per_beat = 60.0 / current_bpm
+            snippet_duration = max(min_duration, seconds_per_beat * unit_beats)
+            
+            # Clamp final snippet to end exactly at target duration
+            if elapsed + snippet_duration > total_duration_sec:
+                snippet_duration = total_duration_sec - elapsed
+            
+            if snippet_duration <= 0:
+                break
+            
+            schedule.append(snippet_duration)
+            elapsed += snippet_duration
+        
+        if elapsed < total_duration_sec and len(schedule) < max_iterations:
+            # Pad final micro-portion if floating point left a tiny remainder
+            remainder = total_duration_sec - elapsed
+            if remainder > 1e-6:
+                schedule.append(remainder)
+        
+        return schedule
+
+    @staticmethod
+    def build_graph_modulation_schedule(points, unit_beats, min_duration=0.1):
+        """
+        Build a snippet schedule from an arbitrary tempo automation curve.
+        
+        Args:
+            points (list): List of dicts with 'time' and 'bpm'
+            unit_beats (float): Beats per snippet unit
+            min_duration (float): Minimum snippet duration
+            
+        Returns:
+            list: Durations for each snippet
+        """
+        if not points or len(points) < 2 or unit_beats <= 0:
+            return []
+        # Sanitize and sort
+        sanitized = []
+        for p in points:
+            try:
+                t = float(p.get("time", 0.0))
+                bpm_val = float(p.get("bpm", 0.0))
+            except (TypeError, ValueError):
+                continue
+            if t < 0 or bpm_val <= 0:
+                continue
+            sanitized.append({"time": t, "bpm": bpm_val})
+        if len(sanitized) < 2:
+            return []
+        sanitized.sort(key=lambda x: x["time"])
+        end_time = sanitized[-1]["time"]
+        if end_time <= 0:
+            return []
+
+        def interp_bpm(t):
+            # Find segment containing t
+            for i in range(len(sanitized) - 1):
+                p1 = sanitized[i]
+                p2 = sanitized[i + 1]
+                if t <= p2["time"]:
+                    span = max(1e-6, p2["time"] - p1["time"])
+                    alpha = max(0.0, min(1.0, (t - p1["time"]) / span))
+                    return p1["bpm"] + (p2["bpm"] - p1["bpm"]) * alpha
+            return sanitized[-1]["bpm"]
+
+        schedule = []
+        elapsed = 0.0
+        max_iter = 20000
+        while elapsed < end_time - 1e-6 and len(schedule) < max_iter:
+            bpm_val = interp_bpm(elapsed)
+            bpm_val = max(0.001, bpm_val)
+            seconds_per_beat = 60.0 / bpm_val
+            snippet_duration = max(min_duration, seconds_per_beat * unit_beats)
+            if elapsed + snippet_duration > end_time:
+                snippet_duration = end_time - elapsed
+            if snippet_duration <= 0:
+                break
+            schedule.append(snippet_duration)
+            elapsed += snippet_duration
+
+        if elapsed < end_time and len(schedule) < max_iter:
+            remainder = end_time - elapsed
+            if remainder > 1e-6:
+                schedule.append(remainder)
+        return schedule
     
     def calculate_durations(self, length_mode, settings):
         """
@@ -41,44 +155,75 @@ class ProcessingWorker:
             settings (dict): Settings containing duration/BPM parameters
             
         Returns:
-            tuple: (target_total_duration_sec, snippet_duration_sec)
+            tuple: (target_total_duration_sec, snippet_duration_spec)
+                   snippet_duration_spec is either a float (fixed) or a list (variable)
         """
+        tempo_mod_enabled = settings.get("tempo_mod_enabled", False) and length_mode == "BPM"
+        
         if length_mode == "Seconds":
             target_total_duration_sec = float(settings["duration_seconds"])
             if target_total_duration_sec <= 0:
                 raise ValueError("Duration (s) must be positive.")
-            snippet_duration_sec = max(0.1, target_total_duration_sec / 30.0)
-            if snippet_duration_sec <= 0:
+            snippet_duration_spec = max(0.1, target_total_duration_sec / 30.0)
+            if snippet_duration_spec <= 0:
                 raise ValueError("Calculated snippet duration invalid.")
                 
         elif length_mode == "BPM":
-            bpm = float(settings["bpm"])
-            num_units = int(settings["num_units"])
-            bpm_unit_name = settings["bpm_unit"]
-            
-            if bpm <= 0:
-                raise ValueError("BPM must be positive.")
-            if num_units <= 0:
-                raise ValueError("Units must be positive.")
-                
             # Import BPM_UNITS from config_manager
             from .config_manager import BPM_UNITS
-            if bpm_unit_name not in BPM_UNITS:
-                raise ValueError("Invalid BPM unit.")
-                
-            seconds_per_beat = 60.0 / bpm
-            snippet_duration_sec = seconds_per_beat * BPM_UNITS[bpm_unit_name]
-            target_total_duration_sec = snippet_duration_sec * num_units
             
-            if snippet_duration_sec <= 0:
-                raise ValueError("Calculated snippet duration invalid.")
+            if tempo_mod_enabled:
+                start_bpm = float(settings.get("tempo_mod_start_bpm", settings.get("bpm", 0)))
+                end_bpm = float(settings.get("tempo_mod_end_bpm", start_bpm))
+                clip_duration = float(settings.get("tempo_mod_duration_seconds", settings.get("duration_seconds", 0)))
+                bpm_unit_name = settings.get("bpm_unit")
+                
+                if start_bpm <= 0 or end_bpm <= 0:
+                    raise ValueError("Tempo modulation BPM values must be positive.")
+                if clip_duration <= 0:
+                    raise ValueError("Tempo modulation duration must be positive.")
+                if bpm_unit_name not in BPM_UNITS:
+                    raise ValueError("Invalid BPM unit.")
+                
+                unit_beats = BPM_UNITS[bpm_unit_name]
+                mod_points = settings.get("tempo_mod_points")
+                snippet_schedule = []
+                if mod_points:
+                    snippet_schedule = self.build_graph_modulation_schedule(mod_points, unit_beats)
+                if not snippet_schedule:
+                    snippet_schedule = self.build_linear_modulation_schedule(
+                        start_bpm, end_bpm, clip_duration, unit_beats
+                    )
+                if not snippet_schedule:
+                    raise ValueError("Tempo modulation produced no snippet schedule.")
+                
+                target_total_duration_sec = sum(snippet_schedule)
+                snippet_duration_spec = snippet_schedule
+            else:
+                bpm = float(settings["bpm"])
+                num_units = int(settings["num_units"])
+                bpm_unit_name = settings["bpm_unit"]
+                
+                if bpm <= 0:
+                    raise ValueError("BPM must be positive.")
+                if num_units <= 0:
+                    raise ValueError("Units must be positive.")
+                if bpm_unit_name not in BPM_UNITS:
+                    raise ValueError("Invalid BPM unit.")
+                    
+                seconds_per_beat = 60.0 / bpm
+                snippet_duration_spec = seconds_per_beat * BPM_UNITS[bpm_unit_name]
+                target_total_duration_sec = snippet_duration_spec * num_units
+                
+                if snippet_duration_spec <= 0:
+                    raise ValueError("Calculated snippet duration invalid.")
         else:
             raise ValueError("Invalid length mode selected.")
             
         if target_total_duration_sec <= 0:
             raise ValueError("Calculated total duration is invalid.")
             
-        return target_total_duration_sec, snippet_duration_sec
+        return target_total_duration_sec, snippet_duration_spec
     
     def generate_output_filename(self, aspect_ratio_selection, output_folder):
         """
@@ -101,7 +246,7 @@ class ProcessingWorker:
         return os.path.join(output_folder, output_filename_generated)
     
     def process_videos(self, input_files, final_output_path, target_total_duration_sec, 
-                      snippet_duration_sec, aspect_ratio_selection, 
+                      snippet_duration_spec, aspect_ratio_selection, 
                       export_settings=None,
                       progress_callback=None, error_callback=None, 
                       completion_callback=None):
@@ -112,7 +257,7 @@ class ProcessingWorker:
             input_files (list): List of input video file paths
             final_output_path (str): Path for final output file
             target_total_duration_sec (float): Target total duration
-            snippet_duration_sec (float): Duration per snippet
+            snippet_duration_spec (float or list): Fixed snippet duration or per-snippet schedule
             aspect_ratio_selection (str): Target aspect ratio
             export_settings (dict): Optional export settings
             progress_callback (callable): Progress update callback
@@ -127,9 +272,35 @@ class ProcessingWorker:
         self.logger.info(f"Input files: {len(input_files)}")
         self.logger.info(f"Output path: {final_output_path}")
         self.logger.info(f"Target duration: {target_total_duration_sec:.2f}s")
-        self.logger.info(f"Snippet duration: {snippet_duration_sec:.2f}s")
         self.logger.info(f"Aspect ratio: {aspect_ratio_selection}")
         self.logger.info("="*80)
+        
+        # Determine snippet characteristics (fixed or modulated)
+        if isinstance(snippet_duration_spec, (list, tuple)):
+            if len(snippet_duration_spec) == 0:
+                raise ValueError("Snippet schedule is empty.")
+            max_snippet_duration = max(snippet_duration_spec)
+            avg_snippet_duration = sum(snippet_duration_spec) / len(snippet_duration_spec)
+            snippet_count_estimate = len(snippet_duration_spec)
+            self.logger.info(f"Snippet schedule: {snippet_count_estimate} segments "
+                             f"(avg {avg_snippet_duration:.2f}s, max {max_snippet_duration:.2f}s)")
+        else:
+            max_snippet_duration = snippet_duration_spec
+            snippet_count_estimate = math.ceil(target_total_duration_sec / snippet_duration_spec)
+            self.logger.info(f"Snippet duration: {snippet_duration_spec:.2f}s "
+                             f"(~{snippet_count_estimate} segments)")
+
+        # Pre-compute jitter impact so file validation uses worst case duration
+        jitter_settings = None
+        jitter_multiplier = 1.0
+        if export_settings:
+            jitter_settings = {
+                "jitter_enabled": export_settings.get("jitter_enabled", False),
+                "jitter_intensity": export_settings.get("jitter_intensity", 50)
+            }
+            if jitter_settings["jitter_enabled"]:
+                jitter_multiplier += (jitter_settings["jitter_intensity"] / 100.0) * 0.5
+        max_snippet_duration *= jitter_multiplier
         
         try:
             # Check tools availability
@@ -146,16 +317,16 @@ class ProcessingWorker:
                 progress_callback("Analyzing input video durations...")
                 
             valid_inputs, files_too_short = self.video_processor.analyze_video_durations(
-                input_files, snippet_duration_sec, progress_callback
+                input_files, max_snippet_duration, progress_callback
             )
             
             if files_too_short and error_callback:
                 error_callback("warning", "Files Skipped", 
-                             f"Skipped files (duration < {snippet_duration_sec:.2f}s):\\n" + 
+                             f"Skipped files (duration < {max_snippet_duration:.2f}s):\\n" + 
                              "\\n".join(files_too_short))
             
             if not valid_inputs:
-                self.logger.error(f"No valid input videos found with duration >= {snippet_duration_sec:.2f}s")
+                self.logger.error(f"No valid input videos found with duration >= {max_snippet_duration:.2f}s")
                 raise Exception("No valid input videos found or none are long enough.")
             
             # Stage 2: Generate Snippet List
@@ -165,16 +336,8 @@ class ProcessingWorker:
             if progress_callback:
                 progress_callback("Generating random snippet list...")
             
-            # Extract jitter settings from export_settings
-            jitter_settings = None
-            if export_settings:
-                jitter_settings = {
-                    "jitter_enabled": export_settings.get("jitter_enabled", False),
-                    "jitter_intensity": export_settings.get("jitter_intensity", 50)
-                }
-                
             snippet_definitions = self.video_processor.generate_snippet_definitions(
-                valid_inputs, target_total_duration_sec, snippet_duration_sec, jitter_settings
+                valid_inputs, target_total_duration_sec, snippet_duration_spec, jitter_settings
             )
             
             # Stage 3: Create Temp Dir & Cut Snippets
@@ -294,7 +457,7 @@ class ProcessingWorker:
                 completion_callback(not processing_failed, final_output_path)
     
     def start_processing_thread(self, input_files, final_output_path, target_total_duration_sec,
-                               snippet_duration_sec, aspect_ratio_selection,
+                               snippet_duration_spec, aspect_ratio_selection,
                                export_settings=None,
                                progress_callback=None, error_callback=None, 
                                completion_callback=None):
@@ -305,7 +468,7 @@ class ProcessingWorker:
             input_files (list): List of input video file paths
             final_output_path (str): Path for final output file
             target_total_duration_sec (float): Target total duration
-            snippet_duration_sec (float): Duration per snippet
+            snippet_duration_spec (float or list): Duration per snippet (fixed) or schedule (list)
             aspect_ratio_selection (str): Target aspect ratio
             export_settings (dict): Optional export settings
             progress_callback (callable): Progress update callback
@@ -324,7 +487,7 @@ class ProcessingWorker:
         self.thread = threading.Thread(
             target=self.process_videos,
             args=(input_files, final_output_path, target_total_duration_sec, 
-                  snippet_duration_sec, aspect_ratio_selection),
+                  snippet_duration_spec, aspect_ratio_selection),
             kwargs={
                 'export_settings': export_settings,
                 'progress_callback': progress_callback,

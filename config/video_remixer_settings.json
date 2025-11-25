@@ -1,12 +1,12 @@
 {
-    "last_input_folder": "E:/VIDEOS/A05_SORA_VIDS",
+    "last_input_folder": "E:/VIDEOS/A04_MEDIADOWNLOADEROUTPUTS",
     "output_folder": "E:/VIDEOS/A03_SNIPPET_REMIXER_OUTPUTS",
     "length_mode": "BPM",
     "duration_seconds": 132.0,
-    "bpm": 172.0,
+    "bpm": 180.0,
     "bpm_unit": "1/4 Bar",
-    "num_units": 55,
-    "aspect_ratio": "1080x1920 (9:16 Portrait)",
+    "num_units": 90,
+    "aspect_ratio": "1920x1080 (16:9 Landscape)",
     "export_settings": {
         "custom_width": null,
         "custom_height": null,
@@ -22,9 +22,47 @@
         "jitter_intensity": 72,
         "aspect_ratio_mode": "Crop to Fill"
     },
-    "continuous_mode": false,
-    "jitter_enabled": false,
+    "continuous_mode": true,
+    "jitter_enabled": true,
     "jitter_intensity": 0,
     "aspect_ratio_mode": "Crop to Fill",
-    "mute_audio": true
+    "mute_audio": true,
+    "tempo_mod_enabled": false,
+    "tempo_mod_start_bpm": 120.0,
+    "tempo_mod_end_bpm": 120.0,
+    "tempo_mod_duration_seconds": 15.0,
+    "tempo_mod_points": [
+        {
+            "time": 0.0,
+            "bpm": 120.0
+        },
+        {
+            "time": 0.48859934853420195,
+            "bpm": 100.0
+        },
+        {
+            "time": 2.895310796074155,
+            "bpm": 87.2972972972973
+        },
+        {
+            "time": 3.754089422028353,
+            "bpm": 137.2972972972973
+        },
+        {
+            "time": 7.2546346782988005,
+            "bpm": 125.13513513513513
+        },
+        {
+            "time": 7.982551799345693,
+            "bpm": 212.97297297297297
+        },
+        {
+            "time": 14.98,
+            "bpm": 240.0
+        },
+        {
+            "time": 15.0,
+            "bpm": 240.0
+        }
+    ]
 }

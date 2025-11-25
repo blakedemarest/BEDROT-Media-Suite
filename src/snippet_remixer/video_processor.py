@@ -218,21 +218,27 @@ class VideoProcessor:
         
         return valid_inputs, files_too_short
     
-    def generate_snippet_definitions(self, valid_inputs, target_total_duration_sec, snippet_duration_sec, jitter_settings=None):
+    def generate_snippet_definitions(self, valid_inputs, target_total_duration_sec, snippet_duration_spec, jitter_settings=None):
         """
         Generate random snippet definitions from valid input videos.
         
         Args:
             valid_inputs (dict): Dictionary of filepath -> duration
             target_total_duration_sec (float): Target total duration
-            snippet_duration_sec (float): Duration per snippet
+            snippet_duration_spec (float or list): Duration per snippet (fixed) or list for modulated schedule
             jitter_settings (dict): Optional jitter settings with 'enabled' and 'intensity' keys
             
         Returns:
             list: List of (filepath, start_time, duration) tuples
         """
-        num_snippets_needed = math.ceil(target_total_duration_sec / snippet_duration_sec)
-        if num_snippets_needed <= 0:
+        if isinstance(snippet_duration_spec, (list, tuple)):
+            num_snippets_needed = len(snippet_duration_spec)
+            snippet_durations = list(snippet_duration_spec)
+        else:
+            num_snippets_needed = math.ceil(target_total_duration_sec / snippet_duration_spec)
+            snippet_durations = [snippet_duration_spec] * num_snippets_needed
+
+        if num_snippets_needed <= 0 or len(snippet_durations) == 0:
             raise ValueError("Calculated snippets needed is zero or negative.")
             
         snippet_definitions = []
@@ -248,22 +254,25 @@ class VideoProcessor:
         # Calculate jitter range (0-100% maps to 0-50% variation)
         jitter_factor = (jitter_intensity / 100.0) * 0.5  # Max 50% variation
         
-        safe_print(f"Need {num_snippets_needed} snippets of {snippet_duration_sec:.3f}s each.")
+        if isinstance(snippet_duration_spec, (list, tuple)):
+            safe_print(f"Need {num_snippets_needed} snippets (variable durations).")
+        else:
+            safe_print(f"Need {num_snippets_needed} snippets of {snippet_duration_spec:.3f}s each.")
         if jitter_enabled:
-            safe_print(f"Jitter enabled with intensity {jitter_intensity}% (±{jitter_factor*100:.1f}% variation)")
+            safe_print(f"Jitter enabled with intensity {jitter_intensity}% (~{jitter_factor*100:.1f}% variation)")
         
         for i in range(num_snippets_needed):
             if not available_files:
                 raise ValueError("Ran out of source material unexpectedly.")
-                
+            
             chosen_file = random.choice(available_files)
             
             # Apply jitter to duration if enabled
-            actual_duration = snippet_duration_sec
+            actual_duration = snippet_durations[i]
             if jitter_enabled and jitter_factor > 0:
                 # Random variation between -jitter_factor and +jitter_factor
                 duration_variation = random.uniform(-jitter_factor, jitter_factor)
-                actual_duration = snippet_duration_sec * (1 + duration_variation)
+                actual_duration = snippet_durations[i] * (1 + duration_variation)
                 # Ensure minimum duration of 0.1 seconds
                 actual_duration = max(0.1, actual_duration)
             

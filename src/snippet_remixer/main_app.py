@@ -72,12 +72,22 @@ class VideoRemixerApp:
         self.bpm_var = tk.StringVar(value=f"{self.settings['bpm']:.1f}")
         self.bpm_unit_var = tk.StringVar(value=self.settings["bpm_unit"])
         self.num_units_var = tk.StringVar(value=str(self.settings["num_units"]))
+        self.tempo_mod_enabled_var = tk.BooleanVar(value=self.settings.get("tempo_mod_enabled", False))
+        self.tempo_mod_start_bpm_var = tk.StringVar(value=f"{self.settings.get('tempo_mod_start_bpm', self.settings['bpm']):.1f}")
+        self.tempo_mod_end_bpm_var = tk.StringVar(value=f"{self.settings.get('tempo_mod_end_bpm', self.settings['bpm']):.1f}")
+        self.tempo_mod_duration_var = tk.StringVar(value=f"{self.settings.get('tempo_mod_duration_seconds', self.settings['duration_seconds']):.1f}")
+        # Canvas constraints for tempo modulation graph
+        self._mod_canvas_pad = 12
+        self._mod_canvas_min_bpm = 40.0
+        self._mod_canvas_max_bpm = 240.0
         self.aspect_ratio_var = tk.StringVar(value=self.settings["aspect_ratio"])
         self.aspect_ratio_mode_var = tk.StringVar(value=self.settings.get("aspect_ratio_mode", "Crop to Fill"))
         self.status_var = tk.StringVar(value="Ready")
         self.continuous_mode_var = tk.BooleanVar(value=self.settings.get("continuous_mode", False))
         self.mute_audio_var = tk.BooleanVar(value=self.settings.get("mute_audio", False))
-
+        self.tempo_mod_points = self._init_tempo_mod_points()
+        self._mod_drag_index = None
+        
         # Internal state
         self.last_input_folder = self.settings["last_input_folder"]
         self.continuous_processing = False
@@ -101,6 +111,10 @@ class VideoRemixerApp:
         self.bpm_var.trace_add("write", self.update_duration_estimate)
         self.bpm_unit_var.trace_add("write", self.update_duration_estimate)
         self.num_units_var.trace_add("write", self.update_duration_estimate)
+        self.tempo_mod_enabled_var.trace_add("write", self.update_duration_estimate)
+        self.tempo_mod_start_bpm_var.trace_add("write", self.update_duration_estimate)
+        self.tempo_mod_end_bpm_var.trace_add("write", self.update_duration_estimate)
+        self.tempo_mod_duration_var.trace_add("write", self.update_duration_estimate)
         
         # Add bindings for continuous mode counter updates
         self.bpm_var.trace_add("write", self.update_continuous_counter_on_change)
@@ -108,6 +122,10 @@ class VideoRemixerApp:
         self.num_units_var.trace_add("write", self.update_continuous_counter_on_change)
         self.duration_seconds_var.trace_add("write", self.update_continuous_counter_on_change)
         self.length_mode_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.tempo_mod_enabled_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.tempo_mod_start_bpm_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.tempo_mod_end_bpm_var.trace_add("write", self.update_continuous_counter_on_change)
+        self.tempo_mod_duration_var.trace_add("write", self.update_continuous_counter_on_change)
 
         # Window Setup - compact size that fits all elements including queue status
         self.root.geometry("700x720")  # Sized to fit all controls with queue status
@@ -633,7 +651,7 @@ class VideoRemixerApp:
         length_container.pack(fill=tk.X, pady=5)
         
         # Label for the section
-        length_label = tk.Label(length_container, text=" REMIX LENGTH ", bg='#121212', fg='#00ffff', 
+        length_label = tk.Label(length_container, text=" REMIX LOGIC ", bg='#121212', fg='#00ffff', 
                                font=('Segoe UI', 10, 'bold'))
         length_label.pack(anchor='w', padx=15)
         
@@ -702,8 +720,9 @@ class VideoRemixerApp:
         )
         self.bpm_unit_combo.pack(side=tk.LEFT, padx=5)
         
-        tk.Label(self.bpm_input_frame, text="Total Units:", bg='#121212', fg='#e0e0e0',
-                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(15, 5))
+        self.num_units_label = tk.Label(self.bpm_input_frame, text="Total Units:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10))
+        self.num_units_label.pack(side=tk.LEFT, padx=(15, 5))
         self.num_units_entry = ttk.Entry(
             self.bpm_input_frame, 
             textvariable=self.num_units_var, 
@@ -722,6 +741,78 @@ class VideoRemixerApp:
             style='Blue.TLabel'
         )
         self.duration_estimate_label.pack(side=tk.LEFT, padx=(15, 5))
+
+        # Linear tempo modulator controls
+        mod_toggle_frame = tk.Frame(length_frame, bg='#121212')
+        mod_toggle_frame.pack(fill=tk.X, pady=(8, 2))
+        self.tempo_mod_check = ttk.Checkbutton(
+            mod_toggle_frame,
+            text="Linear tempo modulator (ramp BPM across clip)",
+            variable=self.tempo_mod_enabled_var,
+            command=self.toggle_tempo_mod_ui
+        )
+        self.tempo_mod_check.pack(side=tk.LEFT, padx=5)
+        
+        self.tempo_mod_frame = tk.Frame(length_frame, bg='#121212')
+        self.tempo_mod_frame.pack(fill=tk.X, pady=(0, 5))
+        
+        tk.Label(self.tempo_mod_frame, text="Start BPM:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=5)
+        self.tempo_mod_start_entry = ttk.Entry(
+            self.tempo_mod_frame,
+            textvariable=self.tempo_mod_start_bpm_var,
+            width=8
+        )
+        self.tempo_mod_start_entry.pack(side=tk.LEFT, padx=5)
+        self.tempo_mod_start_entry.bind('<Return>', self.on_entry_update)
+        self.tempo_mod_start_entry.bind('<FocusOut>', self.on_entry_update)
+        
+        tk.Label(self.tempo_mod_frame, text="End BPM:", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(15,5))
+        self.tempo_mod_end_entry = ttk.Entry(
+            self.tempo_mod_frame,
+            textvariable=self.tempo_mod_end_bpm_var,
+            width=8
+        )
+        self.tempo_mod_end_entry.pack(side=tk.LEFT, padx=5)
+        self.tempo_mod_end_entry.bind('<Return>', self.on_entry_update)
+        self.tempo_mod_end_entry.bind('<FocusOut>', self.on_entry_update)
+        
+        tk.Label(self.tempo_mod_frame, text="Clip Duration (s):", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10)).pack(side=tk.LEFT, padx=(15,5))
+        self.tempo_mod_duration_entry = ttk.Entry(
+            self.tempo_mod_frame,
+            textvariable=self.tempo_mod_duration_var,
+            width=8
+        )
+        self.tempo_mod_duration_entry.pack(side=tk.LEFT, padx=5)
+        self.tempo_mod_duration_entry.bind('<Return>', self.on_entry_update)
+        self.tempo_mod_duration_entry.bind('<FocusOut>', self.on_entry_update)
+
+        # Modulation graph canvas (automation-style)
+        canvas_frame = tk.Frame(length_frame, bg='#121212')
+        canvas_frame.pack(fill=tk.X, pady=(2, 5))
+        tk.Label(canvas_frame, text="Tempo Automation (Time vs BPM)", bg='#121212', fg='#e0e0e0',
+                font=('Segoe UI', 10, 'bold')).pack(anchor='w', padx=5)
+        self.tempo_mod_canvas = tk.Canvas(
+            canvas_frame,
+            width=420,
+            height=170,
+            bg='#0f0f0f',
+            highlightthickness=1,
+            highlightbackground='#404040'
+        )
+        self.tempo_mod_canvas.pack(fill=tk.X, padx=5, pady=(4, 2))
+        self.tempo_mod_canvas.bind("<Button-1>", self.on_mod_canvas_click)
+        self.tempo_mod_canvas.bind("<B1-Motion>", self.on_mod_canvas_drag)
+        self.tempo_mod_canvas.bind("<ButtonRelease-1>", self.on_mod_canvas_release)
+        self.tempo_mod_canvas.bind("<Double-Button-1>", self.on_mod_canvas_double_click)
+        self._mod_handle_map = {}
+        self._mod_index_to_handle = {}
+        self._mod_canvas_pad = 12
+        self._mod_canvas_min_bpm = 40.0
+        self._mod_canvas_max_bpm = 240.0
+        self._draw_tempo_mod_canvas()
         
         # Jitter controls frame
         jitter_frame = tk.Frame(length_frame, bg='#121212')
@@ -919,6 +1010,266 @@ class VideoRemixerApp:
             else:
                 self.seconds_input_frame.pack_forget()
                 self.bpm_input_frame.pack_forget()
+        # Ensure tempo modulation controls follow the selected mode
+        if hasattr(self, 'tempo_mod_check'):
+            self.toggle_tempo_mod_ui()
+    
+    def toggle_tempo_mod_ui(self, *args):
+        """Enable/disable tempo modulation controls based on mode and toggle state."""
+        mode = self.length_mode_var.get()
+        mod_requested = self.tempo_mod_enabled_var.get()
+        mod_enabled = mod_requested and mode == "BPM"
+        
+        # Disable modulation when not in BPM mode
+        if mode != "BPM":
+            if mod_requested:
+                self.tempo_mod_enabled_var.set(False)
+            self.tempo_mod_check.state(['disabled'])
+        else:
+            self.tempo_mod_check.state(['!disabled'])
+        
+        # Configure input states
+        entry_state = tk.NORMAL if mod_enabled else tk.DISABLED
+        for entry in [getattr(self, attr, None) for attr in [
+            "tempo_mod_start_entry", "tempo_mod_end_entry", "tempo_mod_duration_entry"
+        ]]:
+            if entry:
+                entry.config(state=entry_state)
+        
+        # Disable manual unit entry when modulation drives tempo
+        if hasattr(self, "num_units_entry"):
+            self.num_units_entry.config(state=tk.DISABLED if mod_enabled else tk.NORMAL)
+        if hasattr(self, "num_units_label"):
+            self.num_units_label.configure(fg='#666666' if mod_enabled else '#e0e0e0')
+        
+        # Refresh estimates to reflect new mode
+        self.update_duration_estimate()
+        
+        # Show or hide modulation canvas
+        if hasattr(self, "tempo_mod_frame"):
+            if mod_enabled:
+                self.tempo_mod_frame.pack(fill=tk.X, pady=(0, 5))
+            else:
+                self.tempo_mod_frame.pack_forget()
+        if hasattr(self, "tempo_mod_canvas"):
+            if mod_enabled:
+                self.tempo_mod_canvas.master.pack(fill=tk.X, pady=(2, 5))
+            else:
+                self.tempo_mod_canvas.master.pack_forget()
+        if mod_enabled:
+            self._sync_mod_duration_to_entry()
+            self._draw_tempo_mod_canvas()
+
+    def _init_tempo_mod_points(self):
+        """Initialize tempo modulation points from settings."""
+        points = self.settings.get("tempo_mod_points")
+        return self._sanitize_mod_points(points)
+
+    def _sanitize_mod_points(self, points, new_duration=None):
+        """Ensure modulation points are valid, sorted, and span the clip."""
+        try:
+            duration_val = float(new_duration) if new_duration is not None else float(self.tempo_mod_duration_var.get())
+        except (TypeError, ValueError):
+            duration_val = self.settings.get("tempo_mod_duration_seconds", 15.0)
+        if duration_val <= 0:
+            duration_val = 15.0
+
+        if not isinstance(points, list):
+            points = []
+        sanitized = []
+        for p in points:
+            if not isinstance(p, dict):
+                continue
+            try:
+                t = float(p.get("time", 0.0))
+                bpm_val = float(p.get("bpm", float(self.bpm_var.get())))
+            except (TypeError, ValueError):
+                continue
+            if t < 0 or bpm_val <= 0:
+                continue
+            sanitized.append({"time": t, "bpm": bpm_val})
+
+        if len(sanitized) < 2:
+            sanitized = [
+                {"time": 0.0, "bpm": float(self.tempo_mod_start_bpm_var.get())},
+                {"time": duration_val, "bpm": float(self.tempo_mod_end_bpm_var.get())}
+            ]
+
+        sanitized.sort(key=lambda x: x["time"])
+
+        # Anchor start and end
+        if sanitized[0]["time"] != 0.0:
+            sanitized[0]["time"] = 0.0
+        if sanitized[-1]["time"] <= 0 or abs(sanitized[-1]["time"] - duration_val) > 1e-6:
+            sanitized[-1]["time"] = duration_val
+
+        # Clamp BPMs
+        min_bpm, max_bpm = self._mod_canvas_min_bpm, self._mod_canvas_max_bpm
+        for p in sanitized:
+            p["bpm"] = max(min_bpm, min(max_bpm, p["bpm"]))
+
+        return sanitized
+
+    def _sync_mod_duration_to_entry(self):
+        """Keep modulation points aligned with the current duration entry."""
+        try:
+            new_duration = float(self.tempo_mod_duration_var.get())
+        except (TypeError, ValueError):
+            return
+        if new_duration <= 0:
+            return
+        old_end = self.tempo_mod_points[-1]["time"] if self.tempo_mod_points else new_duration
+        if old_end <= 0:
+            old_end = new_duration
+        scale = new_duration / old_end if old_end else 1.0
+        for idx, pt in enumerate(self.tempo_mod_points):
+            if idx == 0:
+                pt["time"] = 0.0
+            elif idx == len(self.tempo_mod_points) - 1:
+                pt["time"] = new_duration
+            else:
+                pt["time"] = pt["time"] * scale
+        self.tempo_mod_points = self._sanitize_mod_points(self.tempo_mod_points, new_duration)
+
+    def _get_mod_duration_value(self):
+        try:
+            return float(self.tempo_mod_duration_var.get())
+        except (TypeError, ValueError):
+            return self.settings.get("tempo_mod_duration_seconds", 15.0)
+
+    def _draw_tempo_mod_canvas(self):
+        """Render the tempo automation graph."""
+        if not hasattr(self, "tempo_mod_canvas"):
+            return
+        canvas = self.tempo_mod_canvas
+        canvas.delete("all")
+        pad = self._mod_canvas_pad
+        w = int(canvas.winfo_width() or 420)
+        h = int(canvas.winfo_height() or 170)
+        min_bpm = self._mod_canvas_min_bpm
+        max_bpm = self._mod_canvas_max_bpm
+        duration = max(self._get_mod_duration_value(), 0.001)
+
+        def t_to_x(t):
+            return pad + (t / duration) * (w - 2 * pad)
+
+        def bpm_to_y(b):
+            norm = (b - min_bpm) / (max_bpm - min_bpm)
+            norm = max(0.0, min(1.0, norm))
+            return pad + (1 - norm) * (h - 2 * pad)
+
+        # Grid lines
+        for i in range(5):
+            y = pad + i * (h - 2 * pad) / 4
+            canvas.create_line(pad, y, w - pad, y, fill="#202020")
+        for i in range(5):
+            x = pad + i * (w - 2 * pad) / 4
+            canvas.create_line(x, pad, x, h - pad, fill="#202020")
+
+        # Axis labels
+        canvas.create_text(pad, pad - 2, text=f"{max_bpm:.0f} BPM", anchor="nw", fill="#888888", font=("Segoe UI", 8))
+        canvas.create_text(pad, h - pad + 2, text=f"{min_bpm:.0f} BPM", anchor="sw", fill="#888888", font=("Segoe UI", 8))
+        canvas.create_text(w - pad, h - pad + 2, text=f"{duration:.1f}s", anchor="se", fill="#888888", font=("Segoe UI", 8))
+
+        # Polyline and handles
+        coords = []
+        for pt in self.tempo_mod_points:
+            coords.extend([t_to_x(pt["time"]), bpm_to_y(pt["bpm"])])
+        if len(coords) >= 4:
+            canvas.create_line(*coords, fill="#00ff88", width=2, smooth=True)
+
+        self._mod_handle_map = {}
+        self._mod_index_to_handle = {}
+        for idx, pt in enumerate(self.tempo_mod_points):
+            x = t_to_x(pt["time"])
+            y = bpm_to_y(pt["bpm"])
+            handle = canvas.create_oval(x - 5, y - 5, x + 5, y + 5, fill="#00ffff", outline="#ffffff")
+            self._mod_handle_map[handle] = idx
+            self._mod_index_to_handle[idx] = handle
+
+    def _mod_xy_to_time_bpm(self, x, y):
+        pad = self._mod_canvas_pad
+        w = int(self.tempo_mod_canvas.winfo_width() or 420)
+        h = int(self.tempo_mod_canvas.winfo_height() or 170)
+        duration = max(self._get_mod_duration_value(), 0.001)
+        t = (x - pad) / max(1, (w - 2 * pad)) * duration
+        t = max(0.0, min(duration, t))
+        norm = 1 - (y - pad) / max(1, (h - 2 * pad))
+        bpm_val = self._mod_canvas_min_bpm + norm * (self._mod_canvas_max_bpm - self._mod_canvas_min_bpm)
+        bpm_val = max(self._mod_canvas_min_bpm, min(self._mod_canvas_max_bpm, bpm_val))
+        return t, bpm_val
+
+    def _find_mod_handle(self, x, y, radius=8):
+        """Return index of handle under cursor or None."""
+        for handle_id, idx in self._mod_handle_map.items():
+            coords = self.tempo_mod_canvas.coords(handle_id)
+            cx = (coords[0] + coords[2]) / 2
+            cy = (coords[1] + coords[3]) / 2
+            if (cx - x) ** 2 + (cy - y) ** 2 <= radius ** 2:
+                return idx
+        return None
+
+    def _add_mod_point(self, time_val, bpm_val):
+        self.tempo_mod_points.append({"time": time_val, "bpm": bpm_val})
+        self.tempo_mod_points.sort(key=lambda p: p["time"])
+        self.tempo_mod_points = self._sanitize_mod_points(self.tempo_mod_points)
+        self._draw_tempo_mod_canvas()
+        self.update_duration_estimate()
+
+    def _remove_mod_point(self, idx):
+        if len(self.tempo_mod_points) <= 2:
+            return
+        if idx == 0 or idx == len(self.tempo_mod_points) - 1:
+            return
+        self.tempo_mod_points.pop(idx)
+        self._draw_tempo_mod_canvas()
+        self.update_duration_estimate()
+
+    def _move_mod_point(self, idx, new_time, new_bpm):
+        # Keep endpoints locked in time
+        duration = self._get_mod_duration_value()
+        if idx == 0:
+            new_time = 0.0
+        elif idx == len(self.tempo_mod_points) - 1:
+            new_time = duration
+        # Constrain time between neighbors
+        prev_t = self.tempo_mod_points[idx - 1]["time"] + 0.02 if idx > 0 else 0.0
+        next_t = self.tempo_mod_points[idx + 1]["time"] - 0.02 if idx < len(self.tempo_mod_points) - 1 else duration
+        new_time = max(prev_t, min(next_t, new_time))
+        new_bpm = max(self._mod_canvas_min_bpm, min(self._mod_canvas_max_bpm, new_bpm))
+        self.tempo_mod_points[idx]["time"] = new_time
+        self.tempo_mod_points[idx]["bpm"] = new_bpm
+        self.tempo_mod_points = self._sanitize_mod_points(self.tempo_mod_points)
+        self._draw_tempo_mod_canvas()
+        self.update_duration_estimate()
+
+    def on_mod_canvas_click(self, event):
+        if not self.tempo_mod_enabled_var.get():
+            return
+        idx = self._find_mod_handle(event.x, event.y)
+        if idx is not None:
+            self._mod_drag_index = idx
+        else:
+            t, bpm_val = self._mod_xy_to_time_bpm(event.x, event.y)
+            self._add_mod_point(t, bpm_val)
+
+    def on_mod_canvas_drag(self, event):
+        if not self.tempo_mod_enabled_var.get():
+            return
+        if self._mod_drag_index is None:
+            return
+        t, bpm_val = self._mod_xy_to_time_bpm(event.x, event.y)
+        self._move_mod_point(self._mod_drag_index, t, bpm_val)
+
+    def on_mod_canvas_release(self, event):
+        self._mod_drag_index = None
+
+    def on_mod_canvas_double_click(self, event):
+        if not self.tempo_mod_enabled_var.get():
+            return
+        idx = self._find_mod_handle(event.x, event.y)
+        if idx is not None:
+            self._remove_mod_point(idx)
     
     def toggle_jitter_ui(self):
         """Toggle jitter slider visibility based on checkbox state."""
@@ -948,6 +1299,38 @@ class VideoRemixerApp:
             return
         
         try:
+            # Handle linear tempo modulation preview
+            if self.tempo_mod_enabled_var.get():
+                bpm_unit_name = self.bpm_unit_var.get()
+                # Import BPM_UNITS from config_manager
+                from .config_manager import BPM_UNITS
+                if bpm_unit_name not in BPM_UNITS:
+                    self.duration_estimate_label.configure(text="")
+                    return
+                
+                self._sync_mod_duration_to_entry()
+                unit_beats = BPM_UNITS[bpm_unit_name]
+                schedule = self.processing_worker.build_graph_modulation_schedule(
+                    self.tempo_mod_points,
+                    unit_beats
+                )
+                if not schedule:
+                    self.duration_estimate_label.configure(text="")
+                    return
+                
+                total_duration_sec = sum(schedule)
+                est_snippets = len(schedule)
+                start_bpm = self.tempo_mod_points[0]["bpm"]
+                end_bpm = self.tempo_mod_points[-1]["bpm"]
+                duration_text = (f"Modulated: {total_duration_sec:.1f}s, {est_snippets} snippets "
+                                 f"({start_bpm:.1f}->{end_bpm:.1f} BPM)")
+                self.duration_estimate_label.configure(text=duration_text)
+                
+                # Reflect auto unit count for transparency
+                if str(est_snippets) != self.num_units_var.get():
+                    self.num_units_var.set(str(est_snippets))
+                return
+            
             bpm = float(self.bpm_var.get())
             num_units = int(self.num_units_var.get())
             bpm_unit_name = self.bpm_unit_var.get()
@@ -1109,7 +1492,7 @@ class VideoRemixerApp:
             # Also add to the status text area
             self._append_to_status_text(message)
         except tk.TclError:
-            safe_print(f"Status update ignored (window closing?): {message}")
+            safe_print(f"Status update ignored (window closing->): {message}")
     
     def _append_to_status_text(self, message, msg_type="INFO"):
         """Append message to the status text area."""
@@ -1173,7 +1556,7 @@ class VideoRemixerApp:
                         state=tk.NORMAL
                     ))
         except tk.TclError:
-            safe_print("Generate button state change ignored (window closing?).")
+            safe_print("Generate button state change ignored (window closing->).")
 
     
     def start_processing_thread(self):
@@ -1236,11 +1619,15 @@ class VideoRemixerApp:
                 "bpm": self.bpm_var.get(),
                 "num_units": self.num_units_var.get(),
                 "bpm_unit": self.bpm_unit_var.get(),
+                "tempo_mod_enabled": self.tempo_mod_enabled_var.get(),
+                "tempo_mod_start_bpm": self.tempo_mod_start_bpm_var.get(),
+                "tempo_mod_end_bpm": self.tempo_mod_end_bpm_var.get(),
+                "tempo_mod_duration_seconds": self.tempo_mod_duration_var.get(),
                 "jitter_enabled": self.jitter_enabled_var.get(),
                 "jitter_intensity": self.jitter_intensity_var.get()
             }
             
-            target_total_duration_sec, snippet_duration_sec = self.processing_worker.calculate_durations(
+            target_total_duration_sec, snippet_duration_spec = self.processing_worker.calculate_durations(
                 length_mode, settings
             )
 
@@ -1266,10 +1653,10 @@ class VideoRemixerApp:
 
         # Small delay before starting, so user sees the name
         self.root.after(500, self._start_thread_delayed, input_files, final_output_path, 
-                       target_total_duration_sec, snippet_duration_sec, aspect_ratio_selection, settings)
+                       target_total_duration_sec, snippet_duration_spec, aspect_ratio_selection, settings)
 
     def _start_thread_delayed(self, input_files, final_output_path, target_total_duration_sec, 
-                             snippet_duration_sec, aspect_ratio_selection, settings):
+                             snippet_duration_spec, aspect_ratio_selection, settings):
         """Helper to start the thread after a short GUI delay."""
         start_msg = "Starting processing..."
         self.update_status(start_msg)
@@ -1339,7 +1726,7 @@ class VideoRemixerApp:
         # Start processing
         self.processing_worker.start_processing_thread(
             input_files, final_output_path, target_total_duration_sec,
-            snippet_duration_sec, aspect_ratio_selection,
+            snippet_duration_spec, aspect_ratio_selection,
             export_settings,
             progress_callback, error_callback, completion_callback
         )
@@ -1366,7 +1753,7 @@ class VideoRemixerApp:
         if self.processing_worker.is_processing():
             if not messagebox.askokcancel(
                 "Quit", 
-                "Processing is active. Quitting now may leave temporary files.\\nAre you sure you want to quit?"
+                "Processing is active. Quitting now may leave temporary files.\\nAre you sure you want to quit->"
             ):
                 return
 
@@ -1376,6 +1763,8 @@ class VideoRemixerApp:
         self.settings["length_mode"] = self.length_mode_var.get()
         self.settings["aspect_ratio"] = self.aspect_ratio_var.get()
         self.settings["aspect_ratio_mode"] = self.aspect_ratio_mode_var.get()
+        self.settings["tempo_mod_enabled"] = self.tempo_mod_enabled_var.get()
+        self.settings["tempo_mod_points"] = self.tempo_mod_points
         
         try:
             self.settings["duration_seconds"] = float(self.duration_seconds_var.get())
@@ -1386,6 +1775,21 @@ class VideoRemixerApp:
             self.settings["bpm"] = float(self.bpm_var.get())
         except ValueError:
             safe_print("Warning: Invalid BPM value not saved.")
+            
+        try:
+            self.settings["tempo_mod_start_bpm"] = float(self.tempo_mod_start_bpm_var.get())
+        except ValueError:
+            safe_print("Warning: Invalid start BPM value not saved.")
+        
+        try:
+            self.settings["tempo_mod_end_bpm"] = float(self.tempo_mod_end_bpm_var.get())
+        except ValueError:
+            safe_print("Warning: Invalid end BPM value not saved.")
+        
+        try:
+            self.settings["tempo_mod_duration_seconds"] = float(self.tempo_mod_duration_var.get())
+        except ValueError:
+            safe_print("Warning: Invalid tempo mod duration value not saved.")
             
         self.settings["bpm_unit"] = self.bpm_unit_var.get()
         
@@ -1461,7 +1865,13 @@ class VideoRemixerApp:
             self._last_continuous_settings = current_settings.copy()
             
             # Create enhanced status message with current settings
-            if self.length_mode_var.get() == "BPM":
+            if self.tempo_mod_enabled_var.get():
+                start_bpm = current_settings.get("tempo_mod_start_bpm", "N/A")
+                end_bpm = current_settings.get("tempo_mod_end_bpm", "N/A")
+                mod_duration = current_settings.get("tempo_mod_duration_seconds", "N/A")
+                status_msg = (f"Starting remix #{self.continuous_count + 1} "
+                              f"(BPM ramp: {start_bpm}->{end_bpm} over {mod_duration}s)...")
+            elif self.length_mode_var.get() == "BPM":
                 bpm = current_settings.get("bpm", "N/A")
                 units = current_settings.get("num_units", "N/A")
                 unit_type = current_settings.get("bpm_unit", "N/A")
@@ -1483,6 +1893,11 @@ class VideoRemixerApp:
             "bpm": self.bpm_var.get(),
             "num_units": self.num_units_var.get(),
             "bpm_unit": self.bpm_unit_var.get(),
+            "tempo_mod_enabled": self.tempo_mod_enabled_var.get(),
+            "tempo_mod_start_bpm": self.tempo_mod_start_bpm_var.get(),
+            "tempo_mod_end_bpm": self.tempo_mod_end_bpm_var.get(),
+            "tempo_mod_duration_seconds": self.tempo_mod_duration_var.get(),
+            "tempo_mod_points": self.tempo_mod_points.copy(),
             "jitter_enabled": self.jitter_enabled_var.get(),
             "jitter_intensity": self.jitter_intensity_var.get(),
             "length_mode": self.length_mode_var.get(),
@@ -1497,16 +1912,32 @@ class VideoRemixerApp:
         
         # Check for important setting changes
         if old_settings.get("bpm") != new_settings.get("bpm"):
-            changes.append(f"BPM {old_settings.get('bpm')} → {new_settings.get('bpm')}")
+            changes.append(f"BPM {old_settings.get('bpm')} -> {new_settings.get('bpm')}")
         
         if old_settings.get("num_units") != new_settings.get("num_units"):
-            changes.append(f"Units {old_settings.get('num_units')} → {new_settings.get('num_units')}")
+            changes.append(f"Units {old_settings.get('num_units')} -> {new_settings.get('num_units')}")
         
         if old_settings.get("bpm_unit") != new_settings.get("bpm_unit"):
-            changes.append(f"Unit type {old_settings.get('bpm_unit')} → {new_settings.get('bpm_unit')}")
+            changes.append(f"Unit type {old_settings.get('bpm_unit')} -> {new_settings.get('bpm_unit')}")
         
         if old_settings.get("duration_seconds") != new_settings.get("duration_seconds"):
-            changes.append(f"Duration {old_settings.get('duration_seconds')}s → {new_settings.get('duration_seconds')}s")
+            changes.append(f"Duration {old_settings.get('duration_seconds')}s -> {new_settings.get('duration_seconds')}s")
+
+        if old_settings.get("tempo_mod_enabled") != new_settings.get("tempo_mod_enabled"):
+            mod_state = "enabled" if new_settings.get("tempo_mod_enabled") else "disabled"
+            changes.append(f"Tempo modulation {mod_state}")
+        
+        if old_settings.get("tempo_mod_start_bpm") != new_settings.get("tempo_mod_start_bpm"):
+            changes.append(f"Start BPM {old_settings.get('tempo_mod_start_bpm')} -> {new_settings.get('tempo_mod_start_bpm')}")
+        
+        if old_settings.get("tempo_mod_end_bpm") != new_settings.get("tempo_mod_end_bpm"):
+            changes.append(f"End BPM {old_settings.get('tempo_mod_end_bpm')} -> {new_settings.get('tempo_mod_end_bpm')}")
+        
+        if old_settings.get("tempo_mod_duration_seconds") != new_settings.get("tempo_mod_duration_seconds"):
+            changes.append(f"Mod clip {old_settings.get('tempo_mod_duration_seconds')}s -> {new_settings.get('tempo_mod_duration_seconds')}s")
+        
+        if old_settings.get("tempo_mod_points") != new_settings.get("tempo_mod_points"):
+            changes.append("Tempo graph updated")
         
         if old_settings.get("jitter_enabled") != new_settings.get("jitter_enabled"):
             jitter_state = "enabled" if new_settings.get("jitter_enabled") else "disabled"
@@ -1514,20 +1945,20 @@ class VideoRemixerApp:
         
         if (old_settings.get("jitter_enabled") and new_settings.get("jitter_enabled") and 
             old_settings.get("jitter_intensity") != new_settings.get("jitter_intensity")):
-            changes.append(f"Jitter intensity {old_settings.get('jitter_intensity')}% → {new_settings.get('jitter_intensity')}%")
+            changes.append(f"Jitter intensity {old_settings.get('jitter_intensity')}% -> {new_settings.get('jitter_intensity')}%")
         
         if old_settings.get("aspect_ratio") != new_settings.get("aspect_ratio"):
-            changes.append(f"Aspect ratio {old_settings.get('aspect_ratio')} → {new_settings.get('aspect_ratio')}")
+            changes.append(f"Aspect ratio {old_settings.get('aspect_ratio')} -> {new_settings.get('aspect_ratio')}")
         
         if old_settings.get("mute_audio") != new_settings.get("mute_audio"):
             audio_state = "muted" if new_settings.get("mute_audio") else "enabled"
             changes.append(f"Audio {audio_state}")
         
         if old_settings.get("length_mode") != new_settings.get("length_mode"):
-            changes.append(f"Mode {old_settings.get('length_mode')} → {new_settings.get('length_mode')}")
+            changes.append(f"Mode {old_settings.get('length_mode')} -> {new_settings.get('length_mode')}")
         
         return changes
-    
+
     def stop_continuous_mode(self):
         """Stop continuous mode."""
         self.continuous_processing = False
@@ -1553,7 +1984,12 @@ class VideoRemixerApp:
             counter_text = f"Remixes created: {self.continuous_count}"
             
             # Always show current live values from GUI widgets, not cached settings
-            if self.length_mode_var.get() == "BPM":
+            if self.tempo_mod_enabled_var.get():
+                start_bpm = self.tempo_mod_start_bpm_var.get()
+                end_bpm = self.tempo_mod_end_bpm_var.get()
+                duration = self.tempo_mod_duration_var.get()
+                settings_info = f" | Current: {start_bpm}->{end_bpm} BPM over {duration}s"
+            elif self.length_mode_var.get() == "BPM":
                 # Read current values directly from GUI
                 bpm = self.bpm_var.get()
                 units = self.num_units_var.get()
@@ -1596,6 +2032,20 @@ class VideoRemixerApp:
                         self.update_status(f"Units updated to {self.num_units_var.get()} - will apply to next remix")
                     elif widget == self.seconds_entry:
                         self.update_status(f"Duration updated to {self.duration_seconds_var.get()}s - will apply to next remix")
+                    elif widget == getattr(self, "tempo_mod_start_entry", None):
+                        self.update_status(f"Start BPM updated to {self.tempo_mod_start_bpm_var.get()} - will apply to next remix")
+                        if self.tempo_mod_points:
+                            self.tempo_mod_points[0]["bpm"] = float(self.tempo_mod_start_bpm_var.get())
+                            self._draw_tempo_mod_canvas()
+                    elif widget == getattr(self, "tempo_mod_end_entry", None):
+                        self.update_status(f"End BPM updated to {self.tempo_mod_end_bpm_var.get()} - will apply to next remix")
+                        if self.tempo_mod_points:
+                            self.tempo_mod_points[-1]["bpm"] = float(self.tempo_mod_end_bpm_var.get())
+                            self._draw_tempo_mod_canvas()
+                    elif widget == getattr(self, "tempo_mod_duration_entry", None):
+                        self.update_status(f"Clip duration updated to {self.tempo_mod_duration_var.get()}s - will apply to next remix")
+                        self._sync_mod_duration_to_entry()
+                        self._draw_tempo_mod_canvas()
                     else:
                         self.update_status("Settings updated - will apply to next remix")
                     
@@ -1614,6 +2064,12 @@ class VideoRemixerApp:
                 self.root.focus()
             elif widget == self.seconds_entry:
                 # Clear focus after seconds entry to apply the change
+                self.root.focus()
+            elif widget == getattr(self, "tempo_mod_start_entry", None):
+                self.tempo_mod_end_entry.focus()
+            elif widget == getattr(self, "tempo_mod_end_entry", None):
+                self.tempo_mod_duration_entry.focus()
+            elif widget == getattr(self, "tempo_mod_duration_entry", None):
                 self.root.focus()
             else:
                 event.widget.tk_focusNext().focus()
@@ -1643,11 +2099,15 @@ class VideoRemixerApp:
                 "bpm": self.bpm_var.get(),
                 "num_units": self.num_units_var.get(),
                 "bpm_unit": self.bpm_unit_var.get(),
+                "tempo_mod_enabled": self.tempo_mod_enabled_var.get(),
+                "tempo_mod_start_bpm": self.tempo_mod_start_bpm_var.get(),
+                "tempo_mod_end_bpm": self.tempo_mod_end_bpm_var.get(),
+                "tempo_mod_duration_seconds": self.tempo_mod_duration_var.get(),
                 "jitter_enabled": self.jitter_enabled_var.get(),
                 "jitter_intensity": self.jitter_intensity_var.get()
             }
             
-            target_total_duration_sec, snippet_duration_sec = self.processing_worker.calculate_durations(
+            target_total_duration_sec, snippet_duration_spec = self.processing_worker.calculate_durations(
                 length_mode, settings
             )
             
@@ -1668,13 +2128,18 @@ class VideoRemixerApp:
                 input_files=input_files.copy(),
                 output_path=final_output_path,
                 target_duration=target_total_duration_sec,
-                snippet_duration=snippet_duration_sec,
+                snippet_duration=snippet_duration_spec,
                 aspect_ratio=aspect_ratio_selection,
                 export_settings=export_settings.copy(),
                 length_mode=length_mode,
                 bpm=float(self.bpm_var.get()),
                 num_units=int(self.num_units_var.get()),
                 bpm_unit=self.bpm_unit_var.get(),
+                tempo_mod_enabled=self.tempo_mod_enabled_var.get(),
+                tempo_mod_start_bpm=float(self.tempo_mod_start_bpm_var.get()),
+                tempo_mod_end_bpm=float(self.tempo_mod_end_bpm_var.get()),
+                tempo_mod_duration_seconds=float(self.tempo_mod_duration_var.get()),
+                tempo_mod_points=self.tempo_mod_points.copy(),
                 jitter_enabled=self.jitter_enabled_var.get(),
                 jitter_intensity=self.jitter_intensity_var.get()
             )

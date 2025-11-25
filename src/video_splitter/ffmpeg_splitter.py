@@ -5,6 +5,7 @@ FFmpeg utilities for the Video Splitter module.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import random
 import subprocess
@@ -75,6 +76,7 @@ def generate_segments(job: SplitJob, duration: float, rng: Optional[random.Rando
     base_length = job.clip_length
     current_start = 0.0
     segments: List[SplitSegment] = []
+    unique_stem = _build_unique_stem(job.source_path)
 
     if jitter_fraction == 0.0:
         jitter_multiplier = 1.0
@@ -96,7 +98,7 @@ def generate_segments(job: SplitJob, duration: float, rng: Optional[random.Rando
         if segment_length > remaining:
             segment_length = remaining
 
-        output_name = f"{job.source_path.stem}_clip_{index:03d}.mp4"
+        output_name = f"{unique_stem}_clip_{index:03d}.mp4"
         segment = SplitSegment(
             index=index,
             start=current_start,
@@ -114,7 +116,7 @@ def generate_segments(job: SplitJob, duration: float, rng: Optional[random.Rando
     # Handle tail shorter than min_clip_length
     remaining_tail = duration - current_start
     if remaining_tail >= 0.5 and remaining_tail < job.min_clip_length:
-        output_name = f"{job.source_path.stem}_clip_{index:03d}.mp4"
+        output_name = f"{unique_stem}_clip_{index:03d}.mp4"
         segments.append(
             SplitSegment(
                 index=index,
@@ -159,3 +161,17 @@ def build_segment_command(job: SplitJob, segment: SplitSegment) -> List[str]:
 
     command.append(str(segment.output_path))
     return command
+
+
+def _build_unique_stem(source_path: Path) -> str:
+    """
+    Derive a deterministic, ASCII-only stem per source path to avoid name collisions
+    when different videos share the same basename.
+    """
+    try:
+        normalized = str(source_path.resolve(strict=False))
+    except Exception:
+        normalized = str(source_path)
+
+    digest = hashlib.sha1(normalized.encode("utf-8")).hexdigest()[:8]
+    return f"{source_path.stem}_{digest}"

@@ -83,7 +83,6 @@ class VideoSplitterApp:
             selectforeground="#000000",
             highlightbackground=colors["border"],
             highlightcolor=colors["accent_cyan"],
-            insertbackground=colors["accent_cyan"],
         )
 
         scrollbar = ttk.Scrollbar(source_frame, orient="vertical", command=listbox.yview, style="Bedrot.Vertical.TScrollbar")
@@ -219,10 +218,6 @@ class VideoSplitterApp:
         )
         self.log_widget.grid(row=0, column=0, sticky="nsew")
 
-        vsb = getattr(self.log_widget, "vbar", None)
-        if vsb:
-            vsb.configure(style="Bedrot.Vertical.TScrollbar")
-
     def _bind_variable_traces(self) -> None:
         self.output_dir_var.trace_add("write", lambda *_: self._persist_setting("output_dir", self.output_dir_var.get()))
         self.clip_length_var.trace_add(
@@ -266,7 +261,7 @@ class VideoSplitterApp:
         style.theme_use("clam")
 
         self.root.configure(bg=colors["bg"])
-        self.root.option_add("*Font", "Segoe UI 10")
+        self.root.option_add("*Font", "{Segoe UI} 10")
 
         style.configure("TFrame", background=colors["bg"], borderwidth=0)
         style.configure(
@@ -582,7 +577,7 @@ class VideoSplitterApp:
 
     def _update_jitter_label(self) -> None:
         value = float(self.jitter_var.get())
-        self.jitter_label.config(text=f"±{value:.0f}%")
+        self.jitter_label.config(text=f"+/- {value:.0f}%")
 
     def _set_running_state(self, running: bool) -> None:
         state = tk.DISABLED if running else tk.NORMAL

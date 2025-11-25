@@ -36,7 +36,7 @@ class ProcessingJob:
     input_files: List[str] = field(default_factory=list)
     output_path: str = ""
     target_duration: float = 0.0
-    snippet_duration: float = 0.0
+    snippet_duration: Any = 0.0
     aspect_ratio: str = "16:9"
     export_settings: Dict[str, Any] = field(default_factory=dict)
     
@@ -45,6 +45,11 @@ class ProcessingJob:
     bpm: float = 120.0
     num_units: int = 4
     bpm_unit: str = "bars"
+    tempo_mod_enabled: bool = False
+    tempo_mod_start_bpm: float = 120.0
+    tempo_mod_end_bpm: float = 120.0
+    tempo_mod_duration_seconds: float = 15.0
+    tempo_mod_points: List[Dict[str, float]] = field(default_factory=list)
     jitter_enabled: bool = False
     jitter_intensity: int = 50
     
@@ -58,6 +63,9 @@ class ProcessingJob:
     def get_display_name(self) -> str:
         """Get a friendly display name for the job."""
         if self.length_mode == "BPM":
+            if self.tempo_mod_enabled:
+                return (f"Job #{self.job_id}: {self.tempo_mod_start_bpm:.0f}->"
+                        f"{self.tempo_mod_end_bpm:.0f} BPM, {self.tempo_mod_duration_seconds:.1f}s")
             return f"Job #{self.job_id}: {self.bpm:.0f} BPM, {self.num_units} {self.bpm_unit}"
         else:
             return f"Job #{self.job_id}: {self.target_duration:.1f}s @ {self.aspect_ratio}"
@@ -65,6 +73,9 @@ class ProcessingJob:
     def get_duration_text(self) -> str:
         """Get formatted duration text."""
         if self.length_mode == "BPM":
+            if self.tempo_mod_enabled:
+                return (f"{self.tempo_mod_start_bpm:.0f}->{self.tempo_mod_end_bpm:.0f} BPM, "
+                        f"{self.tempo_mod_duration_seconds:.1f}s")
             return f"{self.bpm:.0f} BPM, {self.num_units} {self.bpm_unit}"
         else:
             return f"{self.target_duration:.1f} seconds"
@@ -84,6 +95,11 @@ class ProcessingJob:
             'bpm': self.bpm,
             'num_units': self.num_units,
             'bpm_unit': self.bpm_unit,
+            'tempo_mod_enabled': self.tempo_mod_enabled,
+            'tempo_mod_start_bpm': self.tempo_mod_start_bpm,
+            'tempo_mod_end_bpm': self.tempo_mod_end_bpm,
+            'tempo_mod_duration_seconds': self.tempo_mod_duration_seconds,
+            'tempo_mod_points': self.tempo_mod_points,
             'jitter_enabled': self.jitter_enabled,
             'jitter_intensity': self.jitter_intensity,
             'status': self.status.value,
