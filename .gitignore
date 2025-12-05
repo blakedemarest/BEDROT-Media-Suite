@@ -88,3 +88,4 @@ backups/*.csv
 
 # Function registry cache (ADDED)
 function_registry_cache.json
+nul

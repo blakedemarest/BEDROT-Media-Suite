@@ -29,7 +29,8 @@
       "Bash(fi)",
       "Bash(if [ -f \"$dir/main_app.py\" ])",
       "Bash(then echo \"$dir: main_app.py exists\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

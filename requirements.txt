@@ -24,6 +24,7 @@ numpy
 
 # MV Maker dependencies
 # ElevenLabs API (primary)
+elevenlabs
 requests  # Already listed above
 
 # Audio/video processing

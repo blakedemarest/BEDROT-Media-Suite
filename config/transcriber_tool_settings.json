@@ -1,0 +1,8 @@
+{
+    "output_folder": "output/transcripts",
+    "api_key_env": "ELEVENLABS_API_KEY",
+    "supported_formats": [".mp3", ".mp4", ".wav", ".m4a", ".flac"],
+    "language_code": "eng",
+    "enable_diarization": true,
+    "tag_audio_events": true
+}

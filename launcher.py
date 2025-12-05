@@ -37,10 +37,13 @@ def get_script_path(script_key, fallback_path):
     """Get script path with fallback to hardcoded path."""
     if config_manager:
         try:
-            return str(config_manager.get_script_path(script_key))
+            resolved = str(config_manager.get_script_path(script_key))
+            # Only use resolved path if it actually exists
+            if os.path.exists(resolved):
+                return resolved
         except Exception as e:
             print(f"Warning: Could not resolve script path for {script_key}: {e}")
-    
+
     # Fallback to hardcoded path
     return os.path.join(SCRIPT_DIR, fallback_path)
 
@@ -51,6 +54,7 @@ SCRIPT_3_PATH = get_script_path('reel_tracker', 'src/reel_tracker_modular.py')
 SCRIPT_4_PATH = get_script_path('release_calendar', 'src/release_calendar_modular.py')
 SCRIPT_5_PATH = get_script_path('lyric_video', 'src/lyric_video_uploader_modular.py')
 SCRIPT_6_PATH = get_script_path('video_splitter', 'src/video_splitter_modular.py')
+SCRIPT_7_PATH = get_script_path('transcriber_tool', 'src/transcriber_tool_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -722,6 +726,52 @@ stop_button4.pack(side=tk.LEFT, padx=5)
 req_label4 = ttk.Label(tab4, text="Note: This module requires PyQt6 (separate from PyQt5 used by other modules)", style='Note.TLabel')
 req_label4.pack(pady=5)
 # --- END OF RELEASE CALENDAR TAB ---
+
+# --- Tab 7: Transcriber Tool ---
+tab_tt = ttk.Frame(notebook, padding="10")
+notebook.add(tab_tt, text='Transcriber Tool')
+label_tt = ttk.Label(
+    tab_tt,
+    text="Drag-and-drop audio/video transcription using ElevenLabs Speech-to-Text API."
+)
+label_tt.pack(pady=10)
+status_label_tt = ttk.Label(
+    tab_tt,
+    text="Status: Idle",
+    width=50,
+    anchor="w",
+    style='Status.TLabel'
+)
+status_label_tt.pack(pady=5)
+
+button_frame_tt = ttk.Frame(tab_tt)
+button_frame_tt.pack(pady=20)
+
+run_button_tt = ttk.Button(
+    button_frame_tt,
+    text="RUN",
+    command=lambda: run_script(SCRIPT_7_PATH, status_label_tt, log_area),
+    style='Run.TButton',
+    width=15
+)
+run_button_tt.pack(side=tk.LEFT, padx=5)
+
+stop_button_tt = ttk.Button(
+    button_frame_tt,
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_7_PATH, status_label_tt, log_area),
+    style='Stop.TButton',
+    width=15
+)
+stop_button_tt.pack(side=tk.LEFT, padx=5)
+
+note_label_tt = ttk.Label(
+    tab_tt,
+    text="Note: Requires ELEVENLABS_API_KEY in .env file. Supports MP3, MP4, WAV, M4A, FLAC formats.",
+    style='Note.TLabel'
+)
+note_label_tt.pack(pady=5)
+# --- END OF TRANSCRIBER TOOL TAB ---
 
 
 notebook.pack(expand=True, fill='both') # Pack notebook after adding all tabs
