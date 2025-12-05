@@ -14,7 +14,10 @@ start_launcher.bat (Windows Entry Point)
             ├── media_download_app.py (Tkinter)
             ├── reel_tracker_modular.py → reel_tracker package (PyQt5)
             ├── snippet_remixer_modular.py → snippet_remixer package (Tkinter)
-            └── random_slideshow/main.py (PyQt5)
+            ├── random_slideshow/main.py (PyQt5)
+            ├── video_splitter_modular.py → video_splitter package (Tkinter)
+            ├── transcriber_tool_modular.py → transcriber_tool package (PyQt5)
+            └── caption_generator_modular.py → caption_generator package (PyQt5)
 ```
 
 ### Process Management Architecture
@@ -145,6 +148,9 @@ To test a module's launcher integration:
 | reel_tracker | PyQt5 | None | pandas |
 | snippet_remixer | Tkinter | FFmpeg, FFprobe | Standard library |
 | random_slideshow | PyQt5 | FFmpeg | MoviePy, Pillow |
+| video_splitter | Tkinter | FFmpeg, FFprobe | Standard library |
+| transcriber_tool | PyQt5 | None | elevenlabs, pysrt, webvtt-py |
+| caption_generator | PyQt5 | FFmpeg | pysrt, webvtt-py |
 
 ### Adding New Modules
 

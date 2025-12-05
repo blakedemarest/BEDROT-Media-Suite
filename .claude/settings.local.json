@@ -32,7 +32,8 @@
       "Bash(done)",
       "Bash(cat:*)",
       "WebFetch(domain:elevenlabs.io)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(ffprobe:*)"
     ],
     "deny": []
   }

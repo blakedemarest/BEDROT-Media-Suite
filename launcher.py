@@ -55,6 +55,7 @@ SCRIPT_4_PATH = get_script_path('release_calendar', 'src/release_calendar_modula
 SCRIPT_5_PATH = get_script_path('lyric_video', 'src/lyric_video_uploader_modular.py')
 SCRIPT_6_PATH = get_script_path('video_splitter', 'src/video_splitter_modular.py')
 SCRIPT_7_PATH = get_script_path('transcriber_tool', 'src/transcriber_tool_modular.py')
+SCRIPT_8_PATH = get_script_path('caption_generator', 'src/caption_generator_modular.py')
 
 PYTHON_EXECUTABLE = sys.executable
 
@@ -772,6 +773,52 @@ note_label_tt = ttk.Label(
 )
 note_label_tt.pack(pady=5)
 # --- END OF TRANSCRIBER TOOL TAB ---
+
+# --- Tab 8: Caption Generator ---
+tab_cg = ttk.Frame(notebook, padding="10")
+notebook.add(tab_cg, text='Caption Generator')
+label_cg = ttk.Label(
+    tab_cg,
+    text="Create lyric/caption videos from SRT/VTT subtitle files and audio."
+)
+label_cg.pack(pady=10)
+status_label_cg = ttk.Label(
+    tab_cg,
+    text="Status: Idle",
+    width=50,
+    anchor="w",
+    style='Status.TLabel'
+)
+status_label_cg.pack(pady=5)
+
+button_frame_cg = ttk.Frame(tab_cg)
+button_frame_cg.pack(pady=20)
+
+run_button_cg = ttk.Button(
+    button_frame_cg,
+    text="RUN",
+    command=lambda: run_script(SCRIPT_8_PATH, status_label_cg, log_area),
+    style='Run.TButton',
+    width=15
+)
+run_button_cg.pack(side=tk.LEFT, padx=5)
+
+stop_button_cg = ttk.Button(
+    button_frame_cg,
+    text="STOP",
+    command=lambda: stop_script(SCRIPT_8_PATH, status_label_cg, log_area),
+    style='Stop.TButton',
+    width=15
+)
+stop_button_cg.pack(side=tk.LEFT, padx=5)
+
+note_label_cg = ttk.Label(
+    tab_cg,
+    text="Note: Uses ffmpeg to burn subtitles onto video. Supports SRT/VTT + WAV/MP3/FLAC audio.",
+    style='Note.TLabel'
+)
+note_label_cg.pack(pady=5)
+# --- END OF CAPTION GENERATOR TAB ---
 
 
 notebook.pack(expand=True, fill='both') # Pack notebook after adding all tabs

@@ -109,22 +109,22 @@ class Worker(QThread):
                     saved_formats.append("TXT")
                     self.log_signal.emit(f"[OK] Saved TXT: {os.path.basename(txt_file)}")
 
-                # Save SRT
+                # Save SRT (word-by-word for precise timing)
                 if self.export_formats.get("srt", False) and words:
                     from .subtitle_generator import words_to_segments, generate_srt
                     srt_file = os.path.join(self.output_folder, base + ".srt")
-                    segments = words_to_segments(words)
+                    segments = words_to_segments(words, max_words=1)
                     if generate_srt(segments, srt_file):
                         saved_formats.append("SRT")
                         self.log_signal.emit(f"[OK] Saved SRT: {os.path.basename(srt_file)}")
                     else:
                         self.log_signal.emit(f"[WARN] SRT generation failed for: {filename}")
 
-                # Save VTT
+                # Save VTT (word-by-word for precise timing)
                 if self.export_formats.get("vtt", False) and words:
                     from .subtitle_generator import words_to_segments, generate_vtt
                     vtt_file = os.path.join(self.output_folder, base + ".vtt")
-                    segments = words_to_segments(words)
+                    segments = words_to_segments(words, max_words=1)
                     if generate_vtt(segments, vtt_file):
                         saved_formats.append("VTT")
                         self.log_signal.emit(f"[OK] Saved VTT: {os.path.basename(vtt_file)}")

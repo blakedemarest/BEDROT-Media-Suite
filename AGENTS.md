@@ -15,7 +15,26 @@ Before writing any code, open `CLAUDE.md` and follow its directives. That file c
 - Package: `src/video_splitter/`
 - Config: `config/video_splitter_settings.json`
 - Reference doc: `docs/video_splitter.md`
-- Launcher tab: “Video Splitter” (between Snippet Remixer and Lyric Video Uploader)
+- Launcher tab: "Video Splitter" (between Snippet Remixer and Lyric Video Uploader)
+
+**Transcriber Tool Module**
+- Entry script: `src/transcriber_tool_modular.py`
+- Package: `src/transcriber_tool/`
+- Config: `config/transcriber_tool_settings.json`
+- Launcher tab: "Transcriber Tool"
+- Features: ElevenLabs Speech-to-Text API integration, drag-and-drop audio/video transcription
+- Exports: TXT (plain text), SRT (SubRip), VTT (WebVTT) with word-level timestamps
+- Dependencies: `elevenlabs`, `pysrt`, `webvtt-py`
+
+**Caption Generator Module**
+- Entry script: `src/caption_generator_modular.py`
+- Package: `src/caption_generator/`
+- Config: `config/caption_generator_settings.json`
+- Launcher tab: "Caption Generator"
+- Features: Creates lyric/caption videos from SRT/VTT + audio files using ffmpeg
+- Style options: Font, size, color, background color, alignment (top/center/bottom)
+- Video options: Resolution (1080p, 720p, 4K, vertical), FPS
+- Dependencies: PyQt5, ffmpeg (system)
 
 ## Function Registry & Modularity
 Before adding code, inspect `bedrot_media_suite_function_registry.json` to reuse existing utilities and avoid duplicates like `parse_aspect_ratio`, `generate_unique_suffix`, or redundant config accessors. After structural changes, regenerate the registry with `python tools/generate_function_registry.py` so future agents get accurate locations.
