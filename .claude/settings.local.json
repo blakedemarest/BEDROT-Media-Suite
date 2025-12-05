@@ -30,7 +30,9 @@
       "Bash(if [ -f \"$dir/main_app.py\" ])",
       "Bash(then echo \"$dir: main_app.py exists\")",
       "Bash(done)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "WebFetch(domain:elevenlabs.io)",
+      "WebSearch"
     ],
     "deny": []
   }

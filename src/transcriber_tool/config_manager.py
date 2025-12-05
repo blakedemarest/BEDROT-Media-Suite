@@ -48,7 +48,12 @@ class ConfigManager:
             "supported_formats": SUPPORTED_FORMATS.copy(),
             "language_code": "eng",
             "enable_diarization": True,
-            "tag_audio_events": True
+            "tag_audio_events": True,
+            "export_formats": {
+                "txt": True,
+                "srt": True,
+                "vtt": False
+            }
         }
 
     def load_config(self):

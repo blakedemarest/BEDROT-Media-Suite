@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QTextEdit, QMessageBox,
-    QHBoxLayout, QLineEdit, QPushButton, QFileDialog
+    QHBoxLayout, QLineEdit, QPushButton, QFileDialog, QCheckBox, QGroupBox
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
@@ -37,10 +37,11 @@ class Worker(QThread):
     batch_summary_signal = pyqtSignal(dict)  # Batch statistics
     finished_signal = pyqtSignal()
 
-    def __init__(self, files, output_folder):
+    def __init__(self, files, output_folder, export_formats=None):
         super().__init__()
         self.files = files
         self.output_folder = output_folder
+        self.export_formats = export_formats or {"txt": True, "srt": False, "vtt": False}
         self.config = get_config()
         self.batch_stats = {
             'total_files': len(files),
@@ -81,8 +82,8 @@ class Worker(QThread):
                 self.file_completed_signal.emit(filename, "[OK] Converted")
 
             # Step 2: Transcribe audio
-            transcription_text = self.transcribe_audio(mp3_file)
-            if transcription_text is None:
+            transcription = self.transcribe_audio(mp3_file)
+            if transcription is None:
                 self.batch_stats['transcription_failures'] += 1
                 self.file_completed_signal.emit(filename, "[FAILED] Transcription Failed")
                 self.log_signal.emit(f"[{index}/{self.batch_stats['total_files']}] Transcription failed: {filename}")
@@ -90,14 +91,52 @@ class Worker(QThread):
             else:
                 self.batch_stats['successful_transcriptions'] += 1
 
-            # Step 3: Save transcription
+            # Step 3: Save transcription(s) in selected formats
             base = os.path.splitext(os.path.basename(file_path))[0]
-            txt_file = os.path.join(self.output_folder, base + ".txt")
+
+            # Extract text and words from transcription object
+            text = getattr(transcription, 'text', str(transcription))
+            words = getattr(transcription, 'words', []) or []
+
             try:
-                with open(txt_file, "w", encoding="utf-8") as f:
-                    f.write(transcription_text)
-                self.file_completed_signal.emit(filename, "[OK] Complete")
-                self.log_signal.emit(f"[{index}/{self.batch_stats['total_files']}] Saved: {os.path.basename(txt_file)}")
+                saved_formats = []
+
+                # Save TXT
+                if self.export_formats.get("txt", True):
+                    txt_file = os.path.join(self.output_folder, base + ".txt")
+                    with open(txt_file, "w", encoding="utf-8") as f:
+                        f.write(text)
+                    saved_formats.append("TXT")
+                    self.log_signal.emit(f"[OK] Saved TXT: {os.path.basename(txt_file)}")
+
+                # Save SRT
+                if self.export_formats.get("srt", False) and words:
+                    from .subtitle_generator import words_to_segments, generate_srt
+                    srt_file = os.path.join(self.output_folder, base + ".srt")
+                    segments = words_to_segments(words)
+                    if generate_srt(segments, srt_file):
+                        saved_formats.append("SRT")
+                        self.log_signal.emit(f"[OK] Saved SRT: {os.path.basename(srt_file)}")
+                    else:
+                        self.log_signal.emit(f"[WARN] SRT generation failed for: {filename}")
+
+                # Save VTT
+                if self.export_formats.get("vtt", False) and words:
+                    from .subtitle_generator import words_to_segments, generate_vtt
+                    vtt_file = os.path.join(self.output_folder, base + ".vtt")
+                    segments = words_to_segments(words)
+                    if generate_vtt(segments, vtt_file):
+                        saved_formats.append("VTT")
+                        self.log_signal.emit(f"[OK] Saved VTT: {os.path.basename(vtt_file)}")
+                    else:
+                        self.log_signal.emit(f"[WARN] VTT generation failed for: {filename}")
+
+                if saved_formats:
+                    self.file_completed_signal.emit(filename, f"[OK] {', '.join(saved_formats)}")
+                else:
+                    self.log_signal.emit(f"[WARN] No export formats selected for: {filename}")
+                    self.file_completed_signal.emit(filename, "[WARN] No formats selected")
+
             except Exception as e:
                 self.batch_stats['transcription_failures'] += 1
                 self.file_completed_signal.emit(filename, "[FAILED] Save Failed")
@@ -184,7 +223,7 @@ class Worker(QThread):
     def transcribe_audio(self, mp3_file):
         """
         Transcribes the given MP3 file using the ElevenLabs Speech to Text API.
-        Returns the transcription text or None if an error occurred.
+        Returns the full transcription object (with words array) or None if an error occurred.
         """
         # Load environment and get API key
         load_environment()
@@ -220,9 +259,10 @@ class Worker(QThread):
                 model_id="scribe_v1",
                 tag_audio_events=tag_audio_events,
                 language_code=language_code,
-                diarize=enable_diarization
+                diarize=enable_diarization,
+                timestamps_granularity="word"
             )
-            return transcription.text
+            return transcription  # Return full object with words array
         except Exception as e:
             self.log_signal.emit(f"[ERROR] Transcription error: {e}")
             return None
@@ -273,6 +313,33 @@ class TranscriberApp(QWidget):
         folder_layout.addWidget(open_btn)
         layout.addLayout(folder_layout)
 
+        # Export Format Selection
+        format_group = QGroupBox("Export Formats")
+        format_layout = QHBoxLayout()
+
+        self.txt_checkbox = QCheckBox("TXT")
+        self.srt_checkbox = QCheckBox("SRT")
+        self.vtt_checkbox = QCheckBox("VTT")
+
+        # Load saved preferences
+        export_formats = self.config.get("export_formats", {"txt": True, "srt": True, "vtt": False})
+        self.txt_checkbox.setChecked(export_formats.get("txt", True))
+        self.srt_checkbox.setChecked(export_formats.get("srt", True))
+        self.vtt_checkbox.setChecked(export_formats.get("vtt", False))
+
+        # Connect to save on change
+        self.txt_checkbox.stateChanged.connect(self.save_format_preferences)
+        self.srt_checkbox.stateChanged.connect(self.save_format_preferences)
+        self.vtt_checkbox.stateChanged.connect(self.save_format_preferences)
+
+        format_layout.addWidget(self.txt_checkbox)
+        format_layout.addWidget(self.srt_checkbox)
+        format_layout.addWidget(self.vtt_checkbox)
+        format_layout.addStretch()
+
+        format_group.setLayout(format_layout)
+        layout.addWidget(format_group)
+
         # Log output area
         log_label = QLabel("Log Output:")
         layout.addWidget(log_label)
@@ -310,6 +377,15 @@ class TranscriberApp(QWidget):
                 self.update_log(f"[ERROR] Failed to open folder: {e}")
         else:
             self.update_log("[ERROR] Output folder not set or doesn't exist")
+
+    def save_format_preferences(self):
+        """Save export format preferences to config."""
+        export_formats = {
+            "txt": self.txt_checkbox.isChecked(),
+            "srt": self.srt_checkbox.isChecked(),
+            "vtt": self.vtt_checkbox.isChecked()
+        }
+        self.config.set("export_formats", export_formats)
 
     def dragEnterEvent(self, event):
         """Accept drag enter events with URLs."""
@@ -352,7 +428,13 @@ class TranscriberApp(QWidget):
 
     def start_processing(self, files):
         """Start the worker thread for batch processing."""
-        self.worker = Worker(files, self.output_folder)
+        # Get current export format selections
+        export_formats = {
+            "txt": self.txt_checkbox.isChecked(),
+            "srt": self.srt_checkbox.isChecked(),
+            "vtt": self.vtt_checkbox.isChecked()
+        }
+        self.worker = Worker(files, self.output_folder, export_formats)
 
         # Connect all signals
         self.worker.log_signal.connect(self.update_log)
@@ -459,6 +541,43 @@ def main():
         }
         QLabel {
             color: #e0e0e0;
+        }
+        QGroupBox {
+            border: 1px solid #404040;
+            border-radius: 4px;
+            margin-top: 10px;
+            padding-top: 10px;
+            font-weight: bold;
+            font-size: 11px;
+            color: #00ffff;
+            background-color: #1a1a1a;
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 5px;
+            color: #00ffff;
+            background-color: #1a1a1a;
+        }
+        QCheckBox {
+            color: #e0e0e0;
+            spacing: 8px;
+            font-size: 12px;
+            padding: 4px;
+        }
+        QCheckBox::indicator {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #404040;
+            border-radius: 3px;
+            background-color: #1a1a1a;
+        }
+        QCheckBox::indicator:checked {
+            background-color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        QCheckBox::indicator:unchecked:hover {
+            border: 1px solid #00ffff;
         }
     """)
 
