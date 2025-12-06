@@ -2,7 +2,7 @@
 """
 Main Application Module for Caption Generator.
 
-A PyQt5 application for creating caption/lyric videos from SRT/VTT files.
+A PyQt5 application for creating caption/lyric videos from SRT files.
 Supports drag-and-drop, bulk processing, and auto-transcription.
 """
 
@@ -109,7 +109,7 @@ class CaptionGeneratorApp(QMainWindow):
         srt_label = QLabel("SRT:")
         srt_label.setFixedWidth(35)
         self.srt_input = QLineEdit()
-        self.srt_input.setPlaceholderText("Select SRT or VTT file...")
+        self.srt_input.setPlaceholderText("Select SRT file...")
         srt_browse = QPushButton("Browse")
         srt_browse.clicked.connect(self._browse_srt)
 
@@ -587,7 +587,7 @@ class CaptionGeneratorApp(QMainWindow):
         last_folder = self.config.get("last_srt_folder", "")
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select Subtitle File", last_folder,
-            "Subtitle Files (*.srt *.vtt);;All Files (*.*)"
+            "Subtitle Files (*.srt);;All Files (*.*)"
         )
         if file_path:
             self.srt_input.setText(file_path)
@@ -873,7 +873,7 @@ class CaptionGeneratorApp(QMainWindow):
         last_folder = self.config.get("last_srt_folder", "")
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select Subtitle File", last_folder,
-            "Subtitle Files (*.srt *.vtt);;All Files (*.*)"
+            "Subtitle Files (*.srt);;All Files (*.*)"
         )
 
         if file_path:

@@ -46,7 +46,6 @@ class ConfigManager:
             # New settings for drag-and-drop and batch processing
             "history_db_path": default_history_db,
             "auto_transcribe_on_drop": True,
-            "save_vtt_with_srt": True,
             "transcription_output_folder": default_transcripts,
             "api_key_env": "ELEVENLABS_API_KEY",
             "max_words_per_segment": 1,

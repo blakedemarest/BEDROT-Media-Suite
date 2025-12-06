@@ -779,7 +779,7 @@ tab_cg = ttk.Frame(notebook, padding="10")
 notebook.add(tab_cg, text='Caption Generator')
 label_cg = ttk.Label(
     tab_cg,
-    text="Create lyric/caption videos from SRT/VTT subtitle files and audio."
+    text="Create lyric/caption videos from SRT subtitle files and audio."
 )
 label_cg.pack(pady=10)
 status_label_cg = ttk.Label(
@@ -814,7 +814,7 @@ stop_button_cg.pack(side=tk.LEFT, padx=5)
 
 note_label_cg = ttk.Label(
     tab_cg,
-    text="Note: Uses ffmpeg to burn subtitles onto video. Supports SRT/VTT + WAV/MP3/FLAC audio.",
+    text="Note: Uses ffmpeg to burn subtitles onto video. Supports SRT + WAV/MP3/FLAC audio.",
     style='Note.TLabel'
 )
 note_label_cg.pack(pady=5)

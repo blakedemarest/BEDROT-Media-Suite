@@ -51,8 +51,7 @@ class ConfigManager:
             "tag_audio_events": True,
             "export_formats": {
                 "txt": True,
-                "srt": True,
-                "vtt": False
+                "srt": True
             }
         }
 

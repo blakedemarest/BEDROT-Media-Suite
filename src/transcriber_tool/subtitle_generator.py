@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Subtitle generation utilities for SRT and VTT formats.
+Subtitle generation utilities for SRT format.
 
-Converts ElevenLabs word-level timestamps to subtitle formats.
+Converts ElevenLabs word-level timestamps to SRT subtitle format.
 """
 
 import pysrt
-import webvtt
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 
 def words_to_segments(words: List[Any],
@@ -112,46 +111,6 @@ def generate_srt(segments: List[Dict], output_path: str) -> bool:
             srt_file.append(item)
 
         srt_file.save(output_path, encoding='utf-8')
-        return True
-    except Exception:
-        return False
-
-
-def seconds_to_vtt_timestamp(seconds: float) -> str:
-    """Convert seconds to VTT timestamp format (HH:MM:SS.mmm)."""
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = int(seconds % 60)
-    millis = int((seconds % 1) * 1000)
-    return f"{hours:02d}:{minutes:02d}:{secs:02d}.{millis:03d}"
-
-
-def generate_vtt(segments: List[Dict], output_path: str) -> bool:
-    """
-    Generate VTT file from segments.
-
-    Args:
-        segments: List of dicts with 'text', 'start', 'end'
-        output_path: Output .vtt file path
-
-    Returns:
-        True if successful, False otherwise
-    """
-    if not segments:
-        return False
-
-    try:
-        vtt = webvtt.WebVTT()
-
-        for segment in segments:
-            caption = webvtt.Caption(
-                start=seconds_to_vtt_timestamp(segment["start"]),
-                end=seconds_to_vtt_timestamp(segment["end"]),
-                text=segment["text"]
-            )
-            vtt.captions.append(caption)
-
-        vtt.save(output_path)
         return True
     except Exception:
         return False

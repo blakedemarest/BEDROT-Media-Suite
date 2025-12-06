@@ -13,7 +13,6 @@
     "transparent_background": false,
     "history_db_path": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\config\\caption_generator_history.db",
     "auto_transcribe_on_drop": true,
-    "save_vtt_with_srt": true,
     "transcription_output_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src\\transcripts",
     "api_key_env": "ELEVENLABS_API_KEY",
     "max_words_per_segment": 1,

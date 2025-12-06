@@ -2,7 +2,7 @@
 """
 Pairing History Module for Caption Generator.
 
-SQLite-based persistent storage for audio file to SRT/VTT pairings.
+SQLite-based persistent storage for audio file to SRT pairings.
 Enables auto-detection of previously generated subtitles when audio files
 are dropped into the Caption Generator.
 """
@@ -190,7 +190,6 @@ class PairingHistory:
                 'audio_id': int,
                 'srt_id': int,
                 'srt_path': str,
-                'vtt_path': str,
                 'source': str,  # 'auto_transcribed' or 'user_provided'
                 'paired_at': str
             }
@@ -251,7 +250,6 @@ class PairingHistory:
         return None
 
     def add_pairing(self, audio_path: str, srt_path: str,
-                    vtt_path: Optional[str] = None,
                     source: str = 'auto_transcribed') -> int:
         """
         Add a new audio-to-SRT pairing.
@@ -261,7 +259,6 @@ class PairingHistory:
         Args:
             audio_path: Full path to audio file
             srt_path: Full path to SRT file
-            vtt_path: Optional full path to VTT file
             source: 'auto_transcribed' or 'user_provided'
 
         Returns:
@@ -269,19 +266,17 @@ class PairingHistory:
         """
         audio_path = os.path.normpath(audio_path)
         srt_path = os.path.normpath(srt_path)
-        if vtt_path:
-            vtt_path = os.path.normpath(vtt_path)
 
         audio_id = self._get_or_create_audio(audio_path)
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
 
-            # Create SRT file record
+            # Create SRT file record (vtt_path kept as NULL for backwards compatibility)
             cursor.execute(
                 """INSERT INTO srt_files (audio_id, srt_path, vtt_path, source)
-                   VALUES (?, ?, ?, ?)""",
-                (audio_id, srt_path, vtt_path, source)
+                   VALUES (?, ?, NULL, ?)""",
+                (audio_id, srt_path, source)
             )
             srt_id = cursor.lastrowid
 
@@ -303,7 +298,6 @@ class PairingHistory:
             return pairing_id
 
     def update_pairing(self, audio_path: str, srt_path: str,
-                       vtt_path: Optional[str] = None,
                        source: str = 'user_provided') -> bool:
         """
         Update an existing pairing with a new SRT file.
@@ -311,7 +305,6 @@ class PairingHistory:
         Args:
             audio_path: Full path to audio file
             srt_path: Full path to new SRT file
-            vtt_path: Optional full path to new VTT file
             source: 'auto_transcribed' or 'user_provided'
 
         Returns:
@@ -324,7 +317,7 @@ class PairingHistory:
             return False
 
         # Add new pairing (this will replace the old one)
-        self.add_pairing(audio_path, srt_path, vtt_path, source)
+        self.add_pairing(audio_path, srt_path, source)
         return True
 
     def delete_pairing(self, audio_path: str) -> bool:
@@ -417,13 +410,13 @@ class PairingHistory:
 
     def verify_pairing_files_exist(self, audio_path: str) -> Dict[str, bool]:
         """
-        Check if the SRT/VTT files in a pairing still exist.
+        Check if the SRT file in a pairing still exists.
 
         Args:
             audio_path: Full path to audio file
 
         Returns:
-            Dict with 'srt_exists' and 'vtt_exists' booleans,
+            Dict with 'srt_exists' boolean,
             or empty dict if no pairing found
         """
         pairing = self.find_pairing(audio_path)
@@ -431,15 +424,11 @@ class PairingHistory:
             return {}
 
         result = {
-            'srt_exists': False,
-            'vtt_exists': False
+            'srt_exists': False
         }
 
         if pairing.get('srt_path'):
             result['srt_exists'] = os.path.exists(pairing['srt_path'])
-
-        if pairing.get('vtt_path'):
-            result['vtt_exists'] = os.path.exists(pairing['vtt_path'])
 
         return result
 

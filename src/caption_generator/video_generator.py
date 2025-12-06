@@ -160,7 +160,7 @@ def build_ffmpeg_command(
     Build the ffmpeg command for generating a caption video.
 
     Args:
-        srt_path: Path to SRT/VTT subtitle file
+        srt_path: Path to SRT subtitle file
         audio_path: Path to audio file (WAV, MP3, FLAC, etc.)
         output_path: Path for output video file (MP4 or WebM)
         settings: Dictionary with style settings
@@ -253,7 +253,7 @@ def generate_caption_video(
     Generate a caption video using ffmpeg.
 
     Args:
-        srt_path: Path to SRT/VTT subtitle file
+        srt_path: Path to SRT subtitle file
         audio_path: Path to audio file
         output_path: Path for output video file (MP4 or WebM)
         settings: Dictionary with style settings

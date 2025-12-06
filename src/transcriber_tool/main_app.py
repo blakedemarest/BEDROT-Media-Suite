@@ -41,7 +41,7 @@ class Worker(QThread):
         super().__init__()
         self.files = files
         self.output_folder = output_folder
-        self.export_formats = export_formats or {"txt": True, "srt": False, "vtt": False}
+        self.export_formats = export_formats or {"txt": True, "srt": False}
         self.config = get_config()
         self.batch_stats = {
             'total_files': len(files),
@@ -119,17 +119,6 @@ class Worker(QThread):
                         self.log_signal.emit(f"[OK] Saved SRT: {os.path.basename(srt_file)}")
                     else:
                         self.log_signal.emit(f"[WARN] SRT generation failed for: {filename}")
-
-                # Save VTT (word-by-word for precise timing)
-                if self.export_formats.get("vtt", False) and words:
-                    from .subtitle_generator import words_to_segments, generate_vtt
-                    vtt_file = os.path.join(self.output_folder, base + ".vtt")
-                    segments = words_to_segments(words, max_words=1)
-                    if generate_vtt(segments, vtt_file):
-                        saved_formats.append("VTT")
-                        self.log_signal.emit(f"[OK] Saved VTT: {os.path.basename(vtt_file)}")
-                    else:
-                        self.log_signal.emit(f"[WARN] VTT generation failed for: {filename}")
 
                 if saved_formats:
                     self.file_completed_signal.emit(filename, f"[OK] {', '.join(saved_formats)}")
@@ -319,22 +308,18 @@ class TranscriberApp(QWidget):
 
         self.txt_checkbox = QCheckBox("TXT")
         self.srt_checkbox = QCheckBox("SRT")
-        self.vtt_checkbox = QCheckBox("VTT")
 
         # Load saved preferences
-        export_formats = self.config.get("export_formats", {"txt": True, "srt": True, "vtt": False})
+        export_formats = self.config.get("export_formats", {"txt": True, "srt": True})
         self.txt_checkbox.setChecked(export_formats.get("txt", True))
         self.srt_checkbox.setChecked(export_formats.get("srt", True))
-        self.vtt_checkbox.setChecked(export_formats.get("vtt", False))
 
         # Connect to save on change
         self.txt_checkbox.stateChanged.connect(self.save_format_preferences)
         self.srt_checkbox.stateChanged.connect(self.save_format_preferences)
-        self.vtt_checkbox.stateChanged.connect(self.save_format_preferences)
 
         format_layout.addWidget(self.txt_checkbox)
         format_layout.addWidget(self.srt_checkbox)
-        format_layout.addWidget(self.vtt_checkbox)
         format_layout.addStretch()
 
         format_group.setLayout(format_layout)
@@ -382,8 +367,7 @@ class TranscriberApp(QWidget):
         """Save export format preferences to config."""
         export_formats = {
             "txt": self.txt_checkbox.isChecked(),
-            "srt": self.srt_checkbox.isChecked(),
-            "vtt": self.vtt_checkbox.isChecked()
+            "srt": self.srt_checkbox.isChecked()
         }
         self.config.set("export_formats", export_formats)
 
@@ -431,8 +415,7 @@ class TranscriberApp(QWidget):
         # Get current export format selections
         export_formats = {
             "txt": self.txt_checkbox.isChecked(),
-            "srt": self.srt_checkbox.isChecked(),
-            "vtt": self.vtt_checkbox.isChecked()
+            "srt": self.srt_checkbox.isChecked()
         }
         self.worker = Worker(files, self.output_folder, export_formats)
 

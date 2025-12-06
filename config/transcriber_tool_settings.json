@@ -13,7 +13,6 @@
     "tag_audio_events": true,
     "export_formats": {
         "txt": false,
-        "srt": true,
-        "vtt": true
+        "srt": true
     }
 }

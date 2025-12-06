@@ -3,7 +3,7 @@
 Batch Worker Module for Caption Generator.
 
 QThread-based worker for batch transcription and caption video generation.
-Handles ElevenLabs API integration, SRT/VTT generation, and ffmpeg video creation.
+Handles ElevenLabs API integration, SRT generation, and ffmpeg video creation.
 """
 
 import os
@@ -18,7 +18,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from core.env_loader import load_environment, get_env_var
-from transcriber_tool.subtitle_generator import words_to_segments, generate_srt, generate_vtt
+from transcriber_tool.subtitle_generator import words_to_segments, generate_srt
 from .video_generator import generate_caption_video
 from .pairing_history import PairingHistory
 
@@ -29,7 +29,7 @@ class BatchCaptionWorker(QThread):
 
     Handles:
     - Audio transcription via ElevenLabs API (when needed)
-    - SRT/VTT subtitle generation
+    - SRT subtitle generation
     - Caption video generation via ffmpeg
     - Progress tracking and error handling
     """
@@ -60,7 +60,7 @@ class BatchCaptionWorker(QThread):
                 - needs_transcription: bool - Whether to transcribe
             settings: Video generation settings (font, color, resolution, etc.)
             output_folder: Where to save generated videos
-            transcript_folder: Where to save generated SRT/VTT files
+            transcript_folder: Where to save generated SRT files
             pairing_history: PairingHistory instance for recording pairings
             continue_on_error: Whether to continue processing on individual file errors
         """
@@ -116,30 +116,28 @@ class BatchCaptionWorker(QThread):
             try:
                 # Step 1: Get or generate SRT
                 srt_path = item.get('srt_path')
-                vtt_path = None
 
                 if item.get('needs_transcription', False) or not srt_path:
                     # Need to transcribe
                     self.transcription_started.emit(filename)
                     self.log_signal.emit(f"[TRANSCRIBE] Transcribing: {filename}")
 
-                    result = self._transcribe_and_generate_subtitles(audio_path)
+                    srt_path = self._transcribe_and_generate_subtitles(audio_path)
 
-                    if result is None:
+                    if srt_path is None:
                         self.stats['transcription_failures'] += 1
                         self.file_error.emit(filename, "Transcription failed")
                         if not self.continue_on_error:
                             break
                         continue
 
-                    srt_path, vtt_path = result
                     self.stats['successful_transcriptions'] += 1
                     self.transcription_completed.emit(filename, srt_path)
                     self.log_signal.emit(f"[OK] Transcription complete: {os.path.basename(srt_path)}")
 
                     # Save pairing to history
                     self.pairing_history.add_pairing(
-                        audio_path, srt_path, vtt_path, source='auto_transcribed'
+                        audio_path, srt_path, source='auto_transcribed'
                     )
 
                 # Step 2: Generate video
@@ -211,15 +209,15 @@ class BatchCaptionWorker(QThread):
         self.log_signal.emit(f"[SUMMARY] Generation Failures: {self.stats['generation_failures']}")
         self.log_signal.emit(f"[SUMMARY] Processing Time: {duration_str}")
 
-    def _transcribe_and_generate_subtitles(self, audio_path: str) -> Optional[tuple]:
+    def _transcribe_and_generate_subtitles(self, audio_path: str) -> Optional[str]:
         """
-        Transcribe audio and generate SRT/VTT files.
+        Transcribe audio and generate SRT file.
 
         Args:
             audio_path: Path to the audio file
 
         Returns:
-            Tuple of (srt_path, vtt_path) or None if failed
+            Path to SRT file or None if failed
         """
         # Load environment and get API key
         load_environment()
@@ -269,14 +267,13 @@ class BatchCaptionWorker(QThread):
 
             self.log_signal.emit(f"[TRANSCRIBE] Received {len(words)} words from API")
 
-            # Generate SRT and VTT
+            # Generate SRT
             base_name = os.path.splitext(os.path.basename(audio_path))[0]
 
             # Ensure transcript folder exists
             os.makedirs(self.transcript_folder, exist_ok=True)
 
             srt_path = os.path.join(self.transcript_folder, f"{base_name}.srt")
-            vtt_path = os.path.join(self.transcript_folder, f"{base_name}.vtt")
 
             # Generate segments with word-by-word timing
             segments = words_to_segments(words, max_words=1)
@@ -288,14 +285,7 @@ class BatchCaptionWorker(QThread):
                 self.log_signal.emit("[ERROR] Failed to generate SRT file")
                 return None
 
-            # Generate VTT
-            if generate_vtt(segments, vtt_path):
-                self.log_signal.emit(f"[OK] Saved VTT: {os.path.basename(vtt_path)}")
-            else:
-                self.log_signal.emit("[WARN] Failed to generate VTT file")
-                vtt_path = None
-
-            return (srt_path, vtt_path)
+            return srt_path
 
         except Exception as e:
             self.log_signal.emit(f"[ERROR] Transcription error: {e}")
