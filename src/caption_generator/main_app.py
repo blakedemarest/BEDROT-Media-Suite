@@ -24,6 +24,7 @@ from .video_generator import generate_caption_video, get_audio_duration
 from .drop_zone import DropZoneWidget
 from .pairing_history import PairingHistory
 from .batch_worker import BatchCaptionWorker
+from .srt_editor_dialog import SRTEditorDialog
 
 
 class GeneratorWorker(QThread):
@@ -148,7 +149,7 @@ class CaptionGeneratorApp(QMainWindow):
         self.queue_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.queue_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
         self.queue_table.setColumnWidth(1, 120)
-        self.queue_table.setColumnWidth(3, 150)
+        self.queue_table.setColumnWidth(3, 195)
         self.queue_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.queue_table.setAlternatingRowColors(True)
         self.queue_table.setMinimumHeight(120)
@@ -845,6 +846,12 @@ class CaptionGeneratorApp(QMainWindow):
         browse_btn.setToolTip("Browse for SRT file")
         browse_btn.clicked.connect(lambda checked, r=row: self._browse_srt_for_row(r))
 
+        edit_btn = QPushButton("Edit")
+        edit_btn.setFixedWidth(40)
+        edit_btn.setToolTip("Edit SRT file")
+        edit_btn.setEnabled(bool(srt_path and os.path.exists(srt_path)))
+        edit_btn.clicked.connect(lambda checked, r=row: self._edit_srt_for_row(r))
+
         regen_btn = QPushButton("Re")
         regen_btn.setFixedWidth(30)
         regen_btn.setToolTip("Regenerate transcription")
@@ -857,6 +864,7 @@ class CaptionGeneratorApp(QMainWindow):
         remove_btn.clicked.connect(lambda checked, r=row: self._remove_from_queue(r))
 
         actions_layout.addWidget(browse_btn)
+        actions_layout.addWidget(edit_btn)
         actions_layout.addWidget(regen_btn)
         actions_layout.addWidget(remove_btn)
         actions_layout.addStretch()
@@ -896,7 +904,39 @@ class CaptionGeneratorApp(QMainWindow):
             srt_item.setText(os.path.basename(file_path))
             srt_item.setToolTip(file_path)
 
+            # Enable Edit button
+            actions_widget = self.queue_table.cellWidget(row, 3)
+            if actions_widget:
+                layout = actions_widget.layout()
+                if layout and layout.count() >= 2:
+                    edit_btn = layout.itemAt(1).widget()
+                    if edit_btn:
+                        edit_btn.setEnabled(True)
+
             self._log(f"[QUEUE] SRT updated for row {row + 1}: {os.path.basename(file_path)}")
+
+    def _edit_srt_for_row(self, row):
+        """Open SRT editor for a specific queue row."""
+        if row >= len(self.queue):
+            return
+
+        srt_path = self.queue[row].get('srt_path')
+
+        if not srt_path or not os.path.exists(srt_path):
+            QMessageBox.warning(
+                self, "No SRT File",
+                "No SRT file is associated with this audio file.\n"
+                "Please assign an SRT file first."
+            )
+            return
+
+        # Open SRT editor dialog
+        dialog = SRTEditorDialog(srt_path, self)
+        dialog.exec_()
+
+        # Log the action
+        filename = os.path.basename(srt_path)
+        self._log(f"[QUEUE] SRT editor closed for: {filename}")
 
     def _regenerate_srt_for_row(self, row):
         """Mark a queue item to regenerate its transcription."""
@@ -942,21 +982,30 @@ class CaptionGeneratorApp(QMainWindow):
             actions_widget = self.queue_table.cellWidget(row, 3)
             if actions_widget:
                 layout = actions_widget.layout()
-                if layout and layout.count() >= 3:
-                    # Browse button
+                if layout and layout.count() >= 4:
+                    # Browse button (index 0)
                     browse_btn = layout.itemAt(0).widget()
                     if browse_btn:
                         browse_btn.clicked.disconnect()
                         browse_btn.clicked.connect(lambda checked, r=row: self._browse_srt_for_row(r))
 
-                    # Regen button
-                    regen_btn = layout.itemAt(1).widget()
+                    # Edit button (index 1)
+                    edit_btn = layout.itemAt(1).widget()
+                    if edit_btn:
+                        edit_btn.clicked.disconnect()
+                        edit_btn.clicked.connect(lambda checked, r=row: self._edit_srt_for_row(r))
+                        # Update enabled state based on SRT existence
+                        srt_path = self.queue[row].get('srt_path') if row < len(self.queue) else None
+                        edit_btn.setEnabled(bool(srt_path and os.path.exists(srt_path)))
+
+                    # Regen button (index 2)
+                    regen_btn = layout.itemAt(2).widget()
                     if regen_btn:
                         regen_btn.clicked.disconnect()
                         regen_btn.clicked.connect(lambda checked, r=row: self._regenerate_srt_for_row(r))
 
-                    # Remove button
-                    remove_btn = layout.itemAt(2).widget()
+                    # Remove button (index 3)
+                    remove_btn = layout.itemAt(3).widget()
                     if remove_btn:
                         remove_btn.clicked.disconnect()
                         remove_btn.clicked.connect(lambda checked, r=row: self._remove_from_queue(r))
@@ -1087,6 +1136,15 @@ class CaptionGeneratorApp(QMainWindow):
                 if srt_item:
                     srt_item.setText(os.path.basename(srt_path))
                     srt_item.setToolTip(srt_path)
+
+                # Enable Edit button
+                actions_widget = self.queue_table.cellWidget(row, 3)
+                if actions_widget:
+                    layout = actions_widget.layout()
+                    if layout and layout.count() >= 2:
+                        edit_btn = layout.itemAt(1).widget()
+                        if edit_btn:
+                            edit_btn.setEnabled(True)
                 break
 
     def _on_video_generated(self, filename, success, message):
