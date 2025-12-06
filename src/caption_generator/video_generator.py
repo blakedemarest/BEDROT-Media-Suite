@@ -8,6 +8,7 @@ Handles ffmpeg video generation with burned-in subtitles.
 import os
 import subprocess
 import re
+import tempfile
 from typing import Dict, Optional, Tuple
 
 
@@ -69,6 +70,83 @@ def escape_path_for_subtitles(path: str) -> str:
     escaped = path.replace('\\', '/')
     escaped = escaped.replace(':', '\\:')
     return escaped
+
+
+def transform_srt_text(srt_path: str, all_caps: bool, ignore_grammar: bool) -> Optional[str]:
+    """
+    Create a temporary SRT file with text transformations applied.
+
+    This function reads the original SRT file, applies the requested transformations
+    (uppercase, remove punctuation), and writes to a temporary file. The original
+    SRT file is NOT modified.
+
+    Args:
+        srt_path: Path to the original SRT file
+        all_caps: If True, convert all text to uppercase
+        ignore_grammar: If True, remove punctuation characters
+
+    Returns:
+        Path to the temporary SRT file with transformations applied,
+        or None if no transformations are needed or an error occurs
+    """
+    if not all_caps and not ignore_grammar:
+        return None
+
+    if not os.path.exists(srt_path):
+        return None
+
+    try:
+        # Read the original SRT file
+        with open(srt_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Apply transformations
+        lines = content.split('\n')
+        transformed_lines = []
+
+        for line in lines:
+            # Check if this is a timestamp line (contains --> )
+            if '-->' in line:
+                # Don't transform timestamp lines
+                transformed_lines.append(line)
+            elif line.strip().isdigit():
+                # Don't transform sequence numbers
+                transformed_lines.append(line)
+            elif line.strip() == '':
+                # Preserve empty lines
+                transformed_lines.append(line)
+            else:
+                # This is subtitle text - apply transformations
+                text = line
+
+                if ignore_grammar:
+                    # Remove punctuation characters
+                    # Pattern: period, comma, hyphen, exclamation, question, semicolon, colon,
+                    # apostrophe, quotation marks, parentheses, brackets, braces
+                    text = re.sub(r'[.,\-!?;:\'"()\[\]{}]', '', text)
+                    # Clean up any double spaces that may result
+                    text = re.sub(r'  +', ' ', text)
+                    text = text.strip()
+
+                if all_caps:
+                    text = text.upper()
+
+                transformed_lines.append(text)
+
+        transformed_content = '\n'.join(transformed_lines)
+
+        # Create a temporary file with the same extension
+        ext = os.path.splitext(srt_path)[1]
+        fd, temp_path = tempfile.mkstemp(suffix=ext, prefix='caption_transform_')
+
+        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+            f.write(transformed_content)
+
+        return temp_path
+
+    except Exception as e:
+        print(f"[Caption Generator] Error transforming SRT: {e}")
+        return None
 
 
 def build_ffmpeg_command(
@@ -197,14 +275,32 @@ def generate_caption_video(
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
 
-    # Build command
-    cmd = build_ffmpeg_command(srt_path, audio_path, output_path, settings, transparent)
+    # Apply text transformations if needed (creates temp file, preserves original)
+    temp_srt_path = None
+    all_caps = settings.get("all_caps", False)
+    ignore_grammar = settings.get("ignore_grammar", False)
+    effective_srt_path = srt_path
 
-    if progress_callback:
-        progress_callback(f"[Caption Generator] Running ffmpeg...")
-        progress_callback(f"[Caption Generator] Command: {' '.join(cmd[:5])}...")
+    if all_caps or ignore_grammar:
+        temp_srt_path = transform_srt_text(srt_path, all_caps, ignore_grammar)
+        if temp_srt_path:
+            effective_srt_path = temp_srt_path
+            if progress_callback:
+                transforms = []
+                if all_caps:
+                    transforms.append("ALL CAPS")
+                if ignore_grammar:
+                    transforms.append("No Punctuation")
+                progress_callback(f"[Caption Generator] Applying text transforms: {', '.join(transforms)}")
 
     try:
+        # Build command using the effective SRT path (original or transformed)
+        cmd = build_ffmpeg_command(effective_srt_path, audio_path, output_path, settings, transparent)
+
+        if progress_callback:
+            progress_callback(f"[Caption Generator] Running ffmpeg...")
+            progress_callback(f"[Caption Generator] Command: {' '.join(cmd[:5])}...")
+
         # Run ffmpeg with output capture
         process = subprocess.Popen(
             cmd,
@@ -244,6 +340,13 @@ def generate_caption_video(
         return False, "ffmpeg not found. Please ensure ffmpeg is installed and in PATH."
     except Exception as e:
         return False, f"Error running ffmpeg: {str(e)}"
+    finally:
+        # Clean up temporary SRT file
+        if temp_srt_path and os.path.exists(temp_srt_path):
+            try:
+                os.remove(temp_srt_path)
+            except Exception:
+                pass  # Ignore cleanup errors
 
 
 def get_audio_duration(audio_path: str) -> Optional[float]:

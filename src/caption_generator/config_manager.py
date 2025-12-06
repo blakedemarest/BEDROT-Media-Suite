@@ -50,7 +50,9 @@ class ConfigManager:
             "transcription_output_folder": default_transcripts,
             "api_key_env": "ELEVENLABS_API_KEY",
             "max_words_per_segment": 1,
-            "batch_continue_on_error": True
+            "batch_continue_on_error": True,
+            "all_caps": False,
+            "ignore_grammar": False
         }
 
     def load_config(self):

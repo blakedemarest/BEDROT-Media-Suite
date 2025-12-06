@@ -1,12 +1,12 @@
 {
-    "output_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src\\caption_videos",
+    "output_folder": "E:/VIDEOS/A07_CAPTION VIDEOS",
     "font_name": "Impact",
-    "font_size": 15,
-    "font_color": "#bdbd00",
+    "font_size": 50,
+    "font_color": "#ffff00",
     "background_color": "#000000",
-    "resolution": "1920x1080",
-    "fps": 30,
-    "alignment": "bottom",
+    "resolution": "1080x1920",
+    "fps": 60,
+    "alignment": "center",
     "outline_size": 2,
     "last_srt_folder": "C:/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/src/transcripts",
     "last_audio_folder": "C:/Users/Earth/OneDrive/Documents/Image-Line/FL Studio/Projects/AND UPON THIS ROCK",
@@ -17,5 +17,7 @@
     "transcription_output_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src\\transcripts",
     "api_key_env": "ELEVENLABS_API_KEY",
     "max_words_per_segment": 1,
-    "batch_continue_on_error": true
+    "batch_continue_on_error": true,
+    "all_caps": true,
+    "ignore_grammar": true
 }

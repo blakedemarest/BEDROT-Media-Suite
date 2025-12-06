@@ -229,6 +229,21 @@ class CaptionGeneratorApp(QMainWindow):
         transparent_row.addStretch()
         style_layout.addLayout(transparent_row)
 
+        # Text transformation row
+        transform_row = QHBoxLayout()
+        transform_label = QLabel("Text Options:")
+        transform_label.setFixedWidth(100)
+        self.all_caps_checkbox = QCheckBox("ALL CAPS")
+        self.all_caps_checkbox.setToolTip("Convert all text to uppercase in the video output")
+        self.ignore_grammar_checkbox = QCheckBox("Ignore Grammar (. , -)")
+        self.ignore_grammar_checkbox.setToolTip("Remove punctuation characters from the video output")
+        transform_row.addWidget(transform_label)
+        transform_row.addWidget(self.all_caps_checkbox)
+        transform_row.addSpacing(20)
+        transform_row.addWidget(self.ignore_grammar_checkbox)
+        transform_row.addStretch()
+        style_layout.addLayout(transform_row)
+
         # Alignment row
         align_row = QHBoxLayout()
         align_label = QLabel("Alignment:")
@@ -538,6 +553,10 @@ class CaptionGeneratorApp(QMainWindow):
         else:
             self.align_center.setChecked(True)
 
+        # Load text transformation settings
+        self.all_caps_checkbox.setChecked(self.config.get("all_caps", False))
+        self.ignore_grammar_checkbox.setChecked(self.config.get("ignore_grammar", False))
+
     def _save_settings(self):
         """Save current UI settings to config."""
         alignment = "center"
@@ -555,6 +574,8 @@ class CaptionGeneratorApp(QMainWindow):
         self.config.set("fps", self.fps_spin.value(), autosave=False)
         self.config.set("alignment", alignment, autosave=False)
         self.config.set("output_folder", self.output_folder.text(), autosave=False)
+        self.config.set("all_caps", self.all_caps_checkbox.isChecked(), autosave=False)
+        self.config.set("ignore_grammar", self.ignore_grammar_checkbox.isChecked(), autosave=False)
         self.config.save_config()
 
     def _log(self, message):
@@ -641,7 +662,9 @@ class CaptionGeneratorApp(QMainWindow):
             "resolution": self.res_combo.currentText(),
             "fps": self.fps_spin.value(),
             "alignment": alignment,
-            "outline_size": 2
+            "outline_size": 2,
+            "all_caps": self.all_caps_checkbox.isChecked(),
+            "ignore_grammar": self.ignore_grammar_checkbox.isChecked()
         }
 
     def _generate_video(self):
