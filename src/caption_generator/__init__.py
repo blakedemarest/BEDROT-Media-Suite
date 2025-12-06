@@ -3,9 +3,10 @@
 Caption Generator Module
 
 Creates lyric/caption videos from SRT/VTT subtitle files and audio.
+Supports drag-and-drop, bulk processing, and auto-transcription.
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "BEDROT Productions"
 
 # Lazy imports for faster startup
@@ -24,8 +25,26 @@ def get_video_generator():
     from . import video_generator
     return video_generator
 
+def get_pairing_history():
+    """Get the pairing history class."""
+    from .pairing_history import PairingHistory
+    return PairingHistory
+
+def get_batch_worker():
+    """Get the batch caption worker class."""
+    from .batch_worker import BatchCaptionWorker
+    return BatchCaptionWorker
+
+def get_drop_zone():
+    """Get the drop zone widget class."""
+    from .drop_zone import DropZoneWidget
+    return DropZoneWidget
+
 __all__ = [
     "get_main_app",
     "get_config_manager",
     "get_video_generator",
+    "get_pairing_history",
+    "get_batch_worker",
+    "get_drop_zone",
 ]

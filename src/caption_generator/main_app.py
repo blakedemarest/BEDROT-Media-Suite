@@ -3,6 +3,7 @@
 Main Application Module for Caption Generator.
 
 A PyQt5 application for creating caption/lyric videos from SRT/VTT files.
+Supports drag-and-drop, bulk processing, and auto-transcription.
 """
 
 import os
@@ -12,13 +13,17 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QComboBox, QSpinBox, QGroupBox,
     QTextEdit, QFileDialog, QRadioButton, QButtonGroup, QColorDialog,
-    QMessageBox, QProgressBar, QCheckBox
+    QMessageBox, QProgressBar, QCheckBox, QTableWidget, QTableWidgetItem,
+    QHeaderView, QAbstractItemView
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QColor
 
 from .config_manager import get_config
 from .video_generator import generate_caption_video, get_audio_duration
+from .drop_zone import DropZoneWidget
+from .pairing_history import PairingHistory
+from .batch_worker import BatchCaptionWorker
 
 
 class GeneratorWorker(QThread):
@@ -59,14 +64,21 @@ class CaptionGeneratorApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("BEDROT Caption Generator")
-        self.setMinimumSize(700, 650)
+        self.setMinimumSize(800, 850)
         self.config = get_config()
+
+        # Initialize pairing history
+        self.pairing_history = PairingHistory(self.config.get_history_db_path())
+
+        # Queue for batch processing: list of dicts with audio_path, srt_path, needs_transcription
+        self.queue = []
 
         self._setup_ui()
         self._apply_theme()
         self._load_settings()
 
         self.worker = None
+        self.batch_worker = None
 
     def _setup_ui(self):
         """Set up the user interface."""
@@ -85,31 +97,72 @@ class CaptionGeneratorApp(QMainWindow):
         input_group = QGroupBox("Input Files")
         input_layout = QVBoxLayout()
 
+        # Drop Zone
+        self.drop_zone = DropZoneWidget()
+        self.drop_zone.files_dropped.connect(self._on_files_dropped)
+        input_layout.addWidget(self.drop_zone)
+
+        # Manual input row (subtitle + audio)
+        manual_layout = QHBoxLayout()
+
         # Subtitle file
-        srt_layout = QHBoxLayout()
-        srt_label = QLabel("Subtitle File:")
-        srt_label.setFixedWidth(100)
+        srt_label = QLabel("SRT:")
+        srt_label.setFixedWidth(35)
         self.srt_input = QLineEdit()
         self.srt_input.setPlaceholderText("Select SRT or VTT file...")
         srt_browse = QPushButton("Browse")
         srt_browse.clicked.connect(self._browse_srt)
-        srt_layout.addWidget(srt_label)
-        srt_layout.addWidget(self.srt_input)
-        srt_layout.addWidget(srt_browse)
-        input_layout.addLayout(srt_layout)
 
         # Audio file
-        audio_layout = QHBoxLayout()
-        audio_label = QLabel("Audio File:")
-        audio_label.setFixedWidth(100)
+        audio_label = QLabel("Audio:")
+        audio_label.setFixedWidth(45)
         self.audio_input = QLineEdit()
-        self.audio_input.setPlaceholderText("Select WAV, MP3, or FLAC file...")
+        self.audio_input.setPlaceholderText("Select audio file...")
         audio_browse = QPushButton("Browse")
         audio_browse.clicked.connect(self._browse_audio)
-        audio_layout.addWidget(audio_label)
-        audio_layout.addWidget(self.audio_input)
-        audio_layout.addWidget(audio_browse)
-        input_layout.addLayout(audio_layout)
+
+        # Add to queue button
+        add_btn = QPushButton("Add")
+        add_btn.setToolTip("Add to queue")
+        add_btn.clicked.connect(self._add_manual_to_queue)
+
+        manual_layout.addWidget(srt_label)
+        manual_layout.addWidget(self.srt_input, 2)
+        manual_layout.addWidget(srt_browse)
+        manual_layout.addWidget(audio_label)
+        manual_layout.addWidget(self.audio_input, 2)
+        manual_layout.addWidget(audio_browse)
+        manual_layout.addWidget(add_btn)
+        input_layout.addLayout(manual_layout)
+
+        # Queue Table
+        queue_label = QLabel("Processing Queue:")
+        queue_label.setStyleSheet("color: #00ffff; font-weight: bold; margin-top: 10px;")
+        input_layout.addWidget(queue_label)
+
+        self.queue_table = QTableWidget()
+        self.queue_table.setColumnCount(4)
+        self.queue_table.setHorizontalHeaderLabels(["Audio File", "SRT Status", "SRT File", "Actions"])
+        self.queue_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.queue_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Fixed)
+        self.queue_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.queue_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
+        self.queue_table.setColumnWidth(1, 120)
+        self.queue_table.setColumnWidth(3, 150)
+        self.queue_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.queue_table.setAlternatingRowColors(True)
+        self.queue_table.setMinimumHeight(120)
+        self.queue_table.setMaximumHeight(180)
+        self.queue_table.verticalHeader().setVisible(False)
+        input_layout.addWidget(self.queue_table)
+
+        # Queue action buttons
+        queue_btn_layout = QHBoxLayout()
+        self.clear_queue_btn = QPushButton("Clear Queue")
+        self.clear_queue_btn.clicked.connect(self._clear_queue)
+        queue_btn_layout.addStretch()
+        queue_btn_layout.addWidget(self.clear_queue_btn)
+        input_layout.addLayout(queue_btn_layout)
 
         input_group.setLayout(input_layout)
         main_layout.addWidget(input_group)
@@ -243,15 +296,17 @@ class CaptionGeneratorApp(QMainWindow):
         output_group.setLayout(output_layout)
         main_layout.addWidget(output_group)
 
-        # Generate Button
+        # Generate Buttons
+        btn_layout = QHBoxLayout()
+
         self.generate_btn = QPushButton("GENERATE VIDEO")
         self.generate_btn.setStyleSheet("""
             QPushButton {
                 background-color: #00ff88;
                 color: #000000;
-                font-size: 16px;
+                font-size: 14px;
                 font-weight: bold;
-                padding: 15px;
+                padding: 12px;
                 border: none;
                 border-radius: 4px;
             }
@@ -264,12 +319,43 @@ class CaptionGeneratorApp(QMainWindow):
             }
         """)
         self.generate_btn.clicked.connect(self._generate_video)
-        main_layout.addWidget(self.generate_btn)
+        self.generate_btn.setToolTip("Generate video for manually selected files")
 
-        # Progress bar
+        self.generate_all_btn = QPushButton("GENERATE ALL VIDEOS")
+        self.generate_all_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #00ffff;
+                color: #000000;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 12px;
+                border: none;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #00cccc;
+            }
+            QPushButton:disabled {
+                background-color: #404040;
+                color: #808080;
+            }
+        """)
+        self.generate_all_btn.clicked.connect(self._generate_all_videos)
+        self.generate_all_btn.setToolTip("Process all files in the queue")
+
+        btn_layout.addWidget(self.generate_btn)
+        btn_layout.addWidget(self.generate_all_btn)
+        main_layout.addLayout(btn_layout)
+
+        # Progress bar and status
+        progress_layout = QHBoxLayout()
+        self.progress_label = QLabel("")
+        self.progress_label.setStyleSheet("color: #00ff88;")
         self.progress_bar = QProgressBar()
         self.progress_bar.setVisible(False)
-        main_layout.addWidget(self.progress_bar)
+        progress_layout.addWidget(self.progress_label)
+        progress_layout.addWidget(self.progress_bar, 1)
+        main_layout.addLayout(progress_layout)
 
         # Log Output
         log_label = QLabel("Log Output:")
@@ -400,6 +486,34 @@ class CaptionGeneratorApp(QMainWindow):
             QLabel {
                 color: #e0e0e0;
             }
+            QTableWidget {
+                background-color: #151515;
+                color: #cccccc;
+                gridline-color: #2a2a2a;
+                selection-background-color: rgba(0, 255, 255, 0.3);
+                border: 1px solid #404040;
+                border-radius: 4px;
+                alternate-background-color: #1a1a1a;
+            }
+            QTableWidget::item {
+                padding: 5px;
+                background-color: #1a1a1a;
+            }
+            QTableWidget::item:alternate {
+                background-color: #202020;
+            }
+            QTableWidget::item:selected {
+                background-color: rgba(0, 255, 255, 0.2);
+                color: #00ffff;
+            }
+            QHeaderView::section {
+                background-color: #252525;
+                color: #00ffff;
+                padding: 6px;
+                border: none;
+                border-bottom: 1px solid #404040;
+                font-weight: bold;
+            }
         """)
 
     def _load_settings(self):
@@ -486,6 +600,7 @@ class CaptionGeneratorApp(QMainWindow):
         )
         if folder:
             self.output_folder.setText(folder)
+            self.config.set("output_folder", folder)
             self._log(f"[Caption Generator] Output folder set: {folder}")
 
     def _open_output_folder(self):
@@ -588,6 +703,406 @@ class CaptionGeneratorApp(QMainWindow):
         else:
             self._log(f"[Caption Generator] [ERROR] {message}")
             QMessageBox.critical(self, "Error", message)
+
+    # =========================================================================
+    # Queue Management Methods
+    # =========================================================================
+
+    def _on_files_dropped(self, file_paths):
+        """Handle files dropped onto the drop zone."""
+        self._log(f"[DROP] Received {len(file_paths)} file(s)")
+
+        for file_path in file_paths:
+            self._add_to_queue(file_path)
+
+    def _add_manual_to_queue(self):
+        """Add manually selected files to the queue."""
+        audio_path = self.audio_input.text().strip()
+
+        if not audio_path:
+            QMessageBox.warning(self, "Missing Input", "Please select an audio file first.")
+            return
+
+        if not os.path.exists(audio_path):
+            QMessageBox.warning(self, "File Not Found", f"Audio file not found:\n{audio_path}")
+            return
+
+        # Use the SRT input if provided
+        srt_path = self.srt_input.text().strip() if self.srt_input.text().strip() else None
+
+        self._add_to_queue(audio_path, srt_path)
+
+        # Clear inputs after adding
+        self.audio_input.clear()
+        self.srt_input.clear()
+
+    def _add_to_queue(self, audio_path, srt_path=None):
+        """
+        Add an audio file to the processing queue.
+
+        Args:
+            audio_path: Path to audio file
+            srt_path: Optional path to SRT file (if None, will check history or transcribe)
+        """
+        filename = os.path.basename(audio_path)
+
+        # Check if already in queue
+        for item in self.queue:
+            if item['audio_path'] == audio_path:
+                self._log(f"[QUEUE] {filename} already in queue")
+                return
+
+        # Determine SRT status
+        needs_transcription = False
+        status_text = ""
+        status_color = ""
+
+        if srt_path and os.path.exists(srt_path):
+            # Manual SRT provided
+            status_text = "[OK] Paired"
+            status_color = "#00ffff"
+            # Save to history
+            self.pairing_history.add_pairing(audio_path, srt_path, source='user_provided')
+        else:
+            # Check history for existing pairing
+            pairing = self.pairing_history.find_pairing(audio_path)
+
+            if pairing and pairing.get('srt_path') and os.path.exists(pairing['srt_path']):
+                srt_path = pairing['srt_path']
+                status_text = "[AUTO] History"
+                status_color = "#00ff88"
+                self._log(f"[QUEUE] Found existing SRT for {filename}")
+            else:
+                # Need to transcribe
+                srt_path = None
+                needs_transcription = True
+                status_text = "[!] Will Transcribe"
+                status_color = "#ffaa00"
+                self._log(f"[QUEUE] {filename} will be transcribed")
+
+        # Add to queue data
+        self.queue.append({
+            'audio_path': audio_path,
+            'srt_path': srt_path,
+            'needs_transcription': needs_transcription
+        })
+
+        # Add row to table
+        row = self.queue_table.rowCount()
+        self.queue_table.insertRow(row)
+
+        # Audio file cell
+        audio_item = QTableWidgetItem(filename)
+        audio_item.setToolTip(audio_path)
+        audio_item.setFlags(audio_item.flags() & ~Qt.ItemIsEditable)
+        self.queue_table.setItem(row, 0, audio_item)
+
+        # Status cell
+        status_item = QTableWidgetItem(status_text)
+        status_item.setForeground(QColor(status_color))
+        status_item.setFlags(status_item.flags() & ~Qt.ItemIsEditable)
+        self.queue_table.setItem(row, 1, status_item)
+
+        # SRT file cell
+        srt_display = os.path.basename(srt_path) if srt_path else "(none)"
+        srt_item = QTableWidgetItem(srt_display)
+        if srt_path:
+            srt_item.setToolTip(srt_path)
+        srt_item.setFlags(srt_item.flags() & ~Qt.ItemIsEditable)
+        self.queue_table.setItem(row, 2, srt_item)
+
+        # Actions cell with buttons
+        actions_widget = QWidget()
+        actions_layout = QHBoxLayout(actions_widget)
+        actions_layout.setContentsMargins(2, 2, 2, 2)
+        actions_layout.setSpacing(4)
+
+        browse_btn = QPushButton("SRT")
+        browse_btn.setFixedWidth(40)
+        browse_btn.setToolTip("Browse for SRT file")
+        browse_btn.clicked.connect(lambda checked, r=row: self._browse_srt_for_row(r))
+
+        regen_btn = QPushButton("Re")
+        regen_btn.setFixedWidth(30)
+        regen_btn.setToolTip("Regenerate transcription")
+        regen_btn.clicked.connect(lambda checked, r=row: self._regenerate_srt_for_row(r))
+
+        remove_btn = QPushButton("X")
+        remove_btn.setFixedWidth(25)
+        remove_btn.setToolTip("Remove from queue")
+        remove_btn.setStyleSheet("color: #ff4444; font-weight: bold;")
+        remove_btn.clicked.connect(lambda checked, r=row: self._remove_from_queue(r))
+
+        actions_layout.addWidget(browse_btn)
+        actions_layout.addWidget(regen_btn)
+        actions_layout.addWidget(remove_btn)
+        actions_layout.addStretch()
+
+        self.queue_table.setCellWidget(row, 3, actions_widget)
+
+        self._log(f"[QUEUE] Added: {filename}")
+
+    def _browse_srt_for_row(self, row):
+        """Browse for SRT file for a specific queue row."""
+        if row >= len(self.queue):
+            return
+
+        last_folder = self.config.get("last_srt_folder", "")
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Select Subtitle File", last_folder,
+            "Subtitle Files (*.srt *.vtt);;All Files (*.*)"
+        )
+
+        if file_path:
+            self.config.set("last_srt_folder", os.path.dirname(file_path))
+
+            # Update queue data
+            audio_path = self.queue[row]['audio_path']
+            self.queue[row]['srt_path'] = file_path
+            self.queue[row]['needs_transcription'] = False
+
+            # Save to history
+            self.pairing_history.add_pairing(audio_path, file_path, source='user_provided')
+
+            # Update table
+            status_item = self.queue_table.item(row, 1)
+            status_item.setText("[OK] Paired")
+            status_item.setForeground(QColor("#00ffff"))
+
+            srt_item = self.queue_table.item(row, 2)
+            srt_item.setText(os.path.basename(file_path))
+            srt_item.setToolTip(file_path)
+
+            self._log(f"[QUEUE] SRT updated for row {row + 1}: {os.path.basename(file_path)}")
+
+    def _regenerate_srt_for_row(self, row):
+        """Mark a queue item to regenerate its transcription."""
+        if row >= len(self.queue):
+            return
+
+        self.queue[row]['srt_path'] = None
+        self.queue[row]['needs_transcription'] = True
+
+        # Update table
+        status_item = self.queue_table.item(row, 1)
+        status_item.setText("[!] Will Transcribe")
+        status_item.setForeground(QColor("#ffaa00"))
+
+        srt_item = self.queue_table.item(row, 2)
+        srt_item.setText("(pending)")
+        srt_item.setToolTip("")
+
+        filename = os.path.basename(self.queue[row]['audio_path'])
+        self._log(f"[QUEUE] {filename} marked for re-transcription")
+
+    def _remove_from_queue(self, row):
+        """Remove item from queue."""
+        if row >= len(self.queue):
+            return
+
+        filename = os.path.basename(self.queue[row]['audio_path'])
+
+        # Remove from data
+        self.queue.pop(row)
+
+        # Remove from table
+        self.queue_table.removeRow(row)
+
+        # Update button connections for remaining rows
+        self._update_queue_button_connections()
+
+        self._log(f"[QUEUE] Removed: {filename}")
+
+    def _update_queue_button_connections(self):
+        """Update button connections after row removal."""
+        for row in range(self.queue_table.rowCount()):
+            actions_widget = self.queue_table.cellWidget(row, 3)
+            if actions_widget:
+                layout = actions_widget.layout()
+                if layout and layout.count() >= 3:
+                    # Browse button
+                    browse_btn = layout.itemAt(0).widget()
+                    if browse_btn:
+                        browse_btn.clicked.disconnect()
+                        browse_btn.clicked.connect(lambda checked, r=row: self._browse_srt_for_row(r))
+
+                    # Regen button
+                    regen_btn = layout.itemAt(1).widget()
+                    if regen_btn:
+                        regen_btn.clicked.disconnect()
+                        regen_btn.clicked.connect(lambda checked, r=row: self._regenerate_srt_for_row(r))
+
+                    # Remove button
+                    remove_btn = layout.itemAt(2).widget()
+                    if remove_btn:
+                        remove_btn.clicked.disconnect()
+                        remove_btn.clicked.connect(lambda checked, r=row: self._remove_from_queue(r))
+
+    def _clear_queue(self):
+        """Clear all items from the queue."""
+        if not self.queue:
+            return
+
+        reply = QMessageBox.question(
+            self, "Clear Queue",
+            f"Remove all {len(self.queue)} items from the queue?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            self.queue.clear()
+            self.queue_table.setRowCount(0)
+            self._log("[QUEUE] Queue cleared")
+
+    # =========================================================================
+    # Batch Processing Methods
+    # =========================================================================
+
+    def _generate_all_videos(self):
+        """Start batch video generation for all items in queue."""
+        if not self.queue:
+            QMessageBox.warning(self, "Empty Queue", "No files in the processing queue.")
+            return
+
+        # Check for items that need transcription but API key might be missing
+        needs_transcription = any(item['needs_transcription'] for item in self.queue)
+
+        if needs_transcription:
+            # Quick check for API key
+            from core.env_loader import load_environment, get_env_var
+            load_environment()
+            api_key = get_env_var("ELEVENLABS_API_KEY")
+
+            if not api_key:
+                reply = QMessageBox.warning(
+                    self, "API Key Missing",
+                    "Some files need transcription but ELEVENLABS_API_KEY is not set.\n\n"
+                    "Files without existing SRT pairings will fail.\n\n"
+                    "Continue anyway?",
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No
+                )
+                if reply != QMessageBox.Yes:
+                    return
+
+        # Save settings
+        self._save_settings()
+
+        # Disable UI during processing
+        self._set_batch_processing_state(True)
+
+        # Get settings
+        settings = self._get_settings()
+        settings['transparent_background'] = self.transparent_checkbox.isChecked()
+
+        # Create and start batch worker
+        self.batch_worker = BatchCaptionWorker(
+            queue_items=self.queue.copy(),
+            settings=settings,
+            output_folder=self.output_folder.text().strip(),
+            transcript_folder=self.config.get_transcript_folder(),
+            pairing_history=self.pairing_history,
+            continue_on_error=self.config.get("batch_continue_on_error", True)
+        )
+
+        # Connect signals
+        self.batch_worker.log_signal.connect(self._log)
+        self.batch_worker.batch_started.connect(self._on_batch_started)
+        self.batch_worker.progress_signal.connect(self._on_batch_progress)
+        self.batch_worker.transcription_completed.connect(self._on_transcription_completed)
+        self.batch_worker.generation_completed.connect(self._on_video_generated)
+        self.batch_worker.batch_summary.connect(self._on_batch_summary)
+        self.batch_worker.finished.connect(self._on_batch_finished)
+
+        self.batch_worker.start()
+
+    def _set_batch_processing_state(self, processing):
+        """Enable/disable UI elements during batch processing."""
+        self.generate_btn.setEnabled(not processing)
+        self.generate_all_btn.setEnabled(not processing)
+        self.clear_queue_btn.setEnabled(not processing)
+        self.drop_zone.set_enabled_state(not processing)
+
+        if processing:
+            self.generate_all_btn.setText("PROCESSING...")
+            self.progress_bar.setVisible(True)
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.setValue(0)
+        else:
+            self.generate_all_btn.setText("GENERATE ALL VIDEOS")
+            self.progress_bar.setVisible(False)
+            self.progress_label.setText("")
+
+    def _on_batch_started(self, total):
+        """Handle batch processing start."""
+        self._log(f"[BATCH] Starting batch processing: {total} files")
+        self.progress_bar.setRange(0, total)
+        self.progress_bar.setValue(0)
+
+    def _on_batch_progress(self, current, total, filename):
+        """Handle batch progress update."""
+        self.progress_bar.setValue(current)
+        self.progress_label.setText(f"Processing {current}/{total}: {filename}")
+
+    def _on_transcription_completed(self, filename, srt_path):
+        """Handle transcription completion for a file."""
+        # Update queue table if file is still there
+        for row, item in enumerate(self.queue):
+            if os.path.basename(item['audio_path']) == filename:
+                # Update data
+                item['srt_path'] = srt_path
+                item['needs_transcription'] = False
+
+                # Update table
+                status_item = self.queue_table.item(row, 1)
+                if status_item:
+                    status_item.setText("[AUTO] Transcribed")
+                    status_item.setForeground(QColor("#00ff88"))
+
+                srt_item = self.queue_table.item(row, 2)
+                if srt_item:
+                    srt_item.setText(os.path.basename(srt_path))
+                    srt_item.setToolTip(srt_path)
+                break
+
+    def _on_video_generated(self, filename, success, message):
+        """Handle video generation completion for a file."""
+        if success:
+            # Mark row as complete (could add visual indicator)
+            for row, item in enumerate(self.queue):
+                if os.path.basename(item['audio_path']) == filename:
+                    status_item = self.queue_table.item(row, 1)
+                    if status_item:
+                        status_item.setText("[DONE]")
+                        status_item.setForeground(QColor("#00ff88"))
+                    break
+
+    def _on_batch_summary(self, stats):
+        """Handle batch summary."""
+        duration = stats.get('duration_seconds', 0)
+        duration_str = f"{duration:.1f}s" if duration < 60 else f"{duration / 60:.1f}m"
+
+        summary = (
+            f"Batch Processing Complete\n\n"
+            f"Total Files: {stats['total_files']}\n"
+            f"Successful Transcriptions: {stats['successful_transcriptions']}\n"
+            f"Successful Videos: {stats['successful_generations']}\n"
+            f"Failures: {stats['transcription_failures'] + stats['generation_failures']}\n"
+            f"Processing Time: {duration_str}"
+        )
+
+        if stats['successful_generations'] == stats['total_files']:
+            QMessageBox.information(self, "Batch Complete - All Successful!", summary)
+        elif stats['successful_generations'] > 0:
+            QMessageBox.information(self, "Batch Complete - Partial Success", summary)
+        else:
+            QMessageBox.warning(self, "Batch Complete - All Failed", summary)
+
+    def _on_batch_finished(self):
+        """Handle batch processing completion."""
+        self._set_batch_processing_state(False)
+        self._log("[BATCH] Batch processing complete")
 
 
 def main():

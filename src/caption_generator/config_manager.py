@@ -27,6 +27,8 @@ class ConfigManager:
     def get_default_config(self):
         """Returns the default configuration settings."""
         default_output = str(resolve_output_path("caption_videos"))
+        default_transcripts = str(resolve_output_path("transcripts"))
+        default_history_db = str(resolve_config_path("caption_generator_history.db"))
 
         return {
             "output_folder": default_output,
@@ -40,7 +42,15 @@ class ConfigManager:
             "alignment": "center",
             "outline_size": 2,
             "last_srt_folder": "",
-            "last_audio_folder": ""
+            "last_audio_folder": "",
+            # New settings for drag-and-drop and batch processing
+            "history_db_path": default_history_db,
+            "auto_transcribe_on_drop": True,
+            "save_vtt_with_srt": True,
+            "transcription_output_folder": default_transcripts,
+            "api_key_env": "ELEVENLABS_API_KEY",
+            "max_words_per_segment": 1,
+            "batch_continue_on_error": True
         }
 
     def load_config(self):
@@ -99,6 +109,14 @@ class ConfigManager:
     def get_output_folder(self):
         """Returns the output folder path."""
         return self.config.get("output_folder", str(resolve_output_path("caption_videos")))
+
+    def get_history_db_path(self):
+        """Returns the path to the pairing history database."""
+        return self.config.get("history_db_path", str(resolve_config_path("caption_generator_history.db")))
+
+    def get_transcript_folder(self):
+        """Returns the folder path for generated transcripts."""
+        return self.config.get("transcription_output_folder", str(resolve_output_path("transcripts")))
 
 
 # Global config instance
