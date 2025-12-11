@@ -84,10 +84,10 @@ Both scripts perform identical functions:
 ### Minimal Violations Found:
 
 1. **Configuration Files** (hardcoded Windows paths):
-   - `config/config.json`: `C:/Users/Earth/Videos`
-   - `config/reel_tracker_config.json`: `E:/VIDEOS/RELEASE CONTENT/`
-   - `config/video_remixer_settings.json`: `E:/VIDEOS/MIDJOURNEY VIDZ/`
-   - `config/yt_downloader_gui_settings.json`: `E:/REPOS/cat-video-overlay`
+   - `config/config.json`: `~/Videos`
+   - `config/reel_tracker_config.json`: `/path/to/videos/`
+   - `config/video_remixer_settings.json`: `/path/to/videos/`
+   - `config/yt_downloader_gui_settings.json`: `/path/to/projects`
    - Multiple `combined_random_config.json` files with different paths
 
 2. **Python Code** (acceptable defaults):
@@ -106,7 +106,7 @@ Both scripts perform identical functions:
 **File**: `.env`  
 **Line**: 184  
 **Type**: ElevenLabs API Key  
-**Value**: `sk_622e17c5fa059b13140e1c9f3c75362e85ba9c6cdd117d1a`
+**Value**: `sk_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
 
 ### Security Impact:
 - **HIGH RISK**: Real API key exposed in version control

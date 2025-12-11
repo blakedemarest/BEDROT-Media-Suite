@@ -49,7 +49,7 @@ Supports all common aspect ratios:
 
 ```bash
 # Navigate to tools directory
-cd "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools"
+cd "/path/to/bedrot-media-suite/tools"
 
 # Dry run to preview changes
 python apply_video_aspect_ratio_migration.py --dry-run

@@ -26,7 +26,7 @@ The aspect ratio migration has already been applied to production. To verify or 
 
 ```bash
 # Check current state (dry run)
-cd "C:\Users\Earth\BEDROT PRODUCTIONS\bedrot-media-suite"
+cd "/path/to/bedrot-media-suite"
 .\venv\Scripts\python.exe tools\apply_aspect_ratio_migration.py --dry-run
 
 # Apply migration (already done)

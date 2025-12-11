@@ -23,15 +23,9 @@ bedrot-media-suite/
 |-- .env                           # Environment configuration (create from .env.example)
 |-- .env.example                   # Template for environment variables
 |-- config/                        # Primary configuration directory
-|   |-- yt_downloader_gui_settings.json     # Media Downloader settings
-|   |-- video_remixer_settings.json         # Snippet Remixer settings
-|   |-- video_splitter_settings.json        # Video Splitter settings
-|   |-- config.json                        # Slideshow Editor settings
-|   |-- reel_tracker_config.json           # Reel Tracker settings
+|   |-- *.example.json                     # Example config templates (copy and rename)
 |   |-- release_calendar_config.json       # Release Calendar settings
-|   |-- calendar_data.json                 # Release Calendar data
-|   |-- transcriber_tool_settings.json     # Transcriber Tool settings
-|   `-- caption_generator_settings.json    # Caption Generator settings
+|   `-- lyric_video_config.json            # Lyric Video Uploader settings
 |-- src/                           # Source code directory
 |   |-- core/                      # Centralized utilities (shared)
 |   |-- media_download_app.py      # Standalone media downloader
@@ -82,8 +76,8 @@ bedrot-media-suite/
 
 1. **Clone the repository:**
    ```powershell
-   git clone https://github.com/yourusername/bedrot-media-suite.git
-   cd bedrot-media-suite
+   git clone https://github.com/blakedemarest/BEDROT-Media-Suite.git
+   cd BEDROT-Media-Suite
    ```
 
 2. **Run the Windows launcher:**
@@ -99,8 +93,8 @@ bedrot-media-suite/
 
 1. **Clone the repository:**
    ```powershell
-   git clone https://github.com/yourusername/bedrot-media-suite.git
-   cd bedrot-media-suite
+   git clone https://github.com/blakedemarest/BEDROT-Media-Suite.git
+   cd BEDROT-Media-Suite
    ```
 
 2. **Create virtual environment:**
@@ -124,7 +118,15 @@ bedrot-media-suite/
    # Edit .env with your preferred settings
    ```
 
-6. **Run the launcher:**
+6. **Set up config files (first run):**
+   ```powershell
+   # Config files are auto-created on first launch
+   # Or copy from examples manually:
+   Copy-Item config/*.example.json config/ -Force
+   # Rename by removing .example suffix
+   ```
+
+7. **Run the launcher:**
    ```powershell
    python launcher.py
    ```
@@ -295,8 +297,8 @@ python -m src.lyric_video_uploader.cli --help
 
 ### Archived Modules (reference only)
 
-- Random Slideshow (`archive/random_slideshow/`) Ã¢â‚¬â€ legacy PyQt5 generator and original configs now stored under `config_root/`.
-- MV Maker (`archive/mv_maker/`) Ã¢â‚¬â€ legacy captioning suite with archived configs under `config_root/`.
+- Random Slideshow (`archive/random_slideshow/`) - legacy PyQt5 generator and original configs now stored under `config_root/`.
+- MV Maker (`archive/mv_maker/`) - legacy captioning suite with archived configs under `config_root/`.
 
 ## Additional Tools
 
@@ -372,8 +374,4 @@ This project is actively maintained. When contributing:
 
 ## License
 
-[Add your license information here]
-
-
-
-
+MIT License - See [LICENSE](LICENSE) for details.

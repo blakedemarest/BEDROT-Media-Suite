@@ -108,7 +108,7 @@ SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, SETTINGS_FILENAME)
 default_output = os.path.join(os.path.expanduser("~"), "Videos", "RandomSlideshows")
 
 # gitingest.py
-repo_path = r"C:\Users\Earth\BEDROT PRODUCTIONS\slideshow_editor"
+repo_path = r"/path/to/slideshow_editor"
 ```
 
 **After (Centralized Configuration):**

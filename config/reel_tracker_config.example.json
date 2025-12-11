@@ -1,0 +1,40 @@
+{
+    "dropdown_values": {
+        "persona": ["", "Artist 1", "Artist 2"],
+        "release": ["", "Release 1", "Release 2"],
+        "reel_type": ["", "Type 1", "Type 2"],
+        "aspect_ratio": ["9:16"]
+    },
+    "last_csv_path": "",
+    "window_settings": {
+        "geometry": "1600x800",
+        "column_widths": {
+            "Reel ID": 140,
+            "Persona": 130,
+            "Release": 100,
+            "Reel Type": 130,
+            "Clip Filename": 180,
+            "Caption": 220,
+            "FilePath": 350
+        }
+    },
+    "app_settings": {
+        "auto_load_last_csv": true,
+        "auto_save_config": true,
+        "show_file_stats": true
+    },
+    "default_metadata": {
+        "persona": "",
+        "release": "",
+        "reel_type": "",
+        "caption_template": ""
+    },
+    "version_history": [],
+    "file_organization": {
+        "master_export_folder": "",
+        "auto_organize_enabled": true,
+        "safe_testing_mode": false,
+        "overwrite_protection": true,
+        "preserve_original_files": true
+    }
+}

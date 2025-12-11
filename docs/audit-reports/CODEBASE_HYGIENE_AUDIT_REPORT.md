@@ -28,7 +28,7 @@ This comprehensive audit analyzed 91 Python files across the bedrot-media-suite 
 - **Duplicate Names:** 23
 
 ### Function Registry Location
-- **New Registry:** `/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/function_registry.json`
+- **New Registry:** `/path/to/bedrot-media-suite/function_registry.json`
 - **Old Registry:** `__bedrot_media_suite__function_registry.json` (should be removed)
 
 ## 2. Security Violations

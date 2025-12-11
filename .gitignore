@@ -89,3 +89,21 @@ backups/*.csv
 # Function registry cache (ADDED)
 function_registry_cache.json
 nul
+
+# User-specific config files (contain local paths)
+config/*.json
+config/*.db
+!config/*.example.json
+!config/release_calendar_config.json
+!config/lyric_video_config.json
+
+# Generated registries
+tools/function_registry.json
+bedrot_media_suite_function_registry.json
+
+# Test logs and artifacts
+gui_test_log.txt
+*_test_log.txt
+
+# Random slideshow user configs
+archive/random_slideshow/config_root/*.json
