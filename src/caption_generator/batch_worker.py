@@ -49,7 +49,8 @@ class BatchCaptionWorker(QThread):
     def __init__(self, queue_items: List[Dict], settings: Dict,
                  output_folder: str, transcript_folder: str,
                  pairing_history: PairingHistory,
-                 continue_on_error: bool = True):
+                 continue_on_error: bool = True,
+                 max_words_per_segment: int = 1):
         """
         Initialize the batch worker.
 
@@ -63,6 +64,7 @@ class BatchCaptionWorker(QThread):
             transcript_folder: Where to save generated SRT files
             pairing_history: PairingHistory instance for recording pairings
             continue_on_error: Whether to continue processing on individual file errors
+            max_words_per_segment: Maximum words per subtitle segment (1-20)
         """
         super().__init__()
         self.queue_items = queue_items
@@ -71,6 +73,7 @@ class BatchCaptionWorker(QThread):
         self.transcript_folder = transcript_folder
         self.pairing_history = pairing_history
         self.continue_on_error = continue_on_error
+        self.max_words_per_segment = max_words_per_segment
 
         # Statistics tracking
         self.stats = {
@@ -275,8 +278,9 @@ class BatchCaptionWorker(QThread):
 
             srt_path = os.path.join(self.transcript_folder, f"{base_name}.srt")
 
-            # Generate segments with word-by-word timing
-            segments = words_to_segments(words, max_words=1)
+            # Generate segments with configurable words per segment
+            self.log_signal.emit(f"[TRANSCRIBE] Grouping into segments (max {self.max_words_per_segment} words each)")
+            segments = words_to_segments(words, max_words=self.max_words_per_segment)
 
             # Generate SRT
             if generate_srt(segments, srt_path):

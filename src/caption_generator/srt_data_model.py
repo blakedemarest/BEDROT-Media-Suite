@@ -568,6 +568,61 @@ class SRTDataModel:
             return True
         return False
 
+    def apply_offset(self, offset_ms: int) -> int:
+        """
+        Apply a time offset to all subtitle blocks.
+
+        Args:
+            offset_ms: Offset in milliseconds (positive = later, negative = earlier)
+
+        Returns:
+            Number of blocks that were modified
+        """
+        modified_count = 0
+
+        for block in self.blocks:
+            new_start = block.start_ms + offset_ms
+            new_end = block.end_ms + offset_ms
+
+            # Ensure times don't go negative
+            if new_start < 0:
+                new_start = 0
+            if new_end < 0:
+                new_end = 0
+
+            if new_start != block.start_ms or new_end != block.end_ms:
+                block.start_ms = new_start
+                block.end_ms = new_end
+                modified_count += 1
+
+        return modified_count
+
+    def scale_timing(self, factor: float) -> int:
+        """
+        Scale all subtitle timing by a factor.
+
+        Args:
+            factor: Scaling factor (e.g., 1.1 = 10% slower, 0.9 = 10% faster)
+
+        Returns:
+            Number of blocks that were modified
+        """
+        if factor <= 0:
+            return 0
+
+        modified_count = 0
+
+        for block in self.blocks:
+            new_start = int(block.start_ms * factor)
+            new_end = int(block.end_ms * factor)
+
+            if new_start != block.start_ms or new_end != block.end_ms:
+                block.start_ms = new_start
+                block.end_ms = new_end
+                modified_count += 1
+
+        return modified_count
+
     def __len__(self) -> int:
         """Return number of word blocks."""
         return len(self.blocks)

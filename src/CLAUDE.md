@@ -152,6 +152,25 @@ To test a module's launcher integration:
 | transcriber_tool | PyQt5 | None | elevenlabs, pysrt, webvtt-py |
 | caption_generator | PyQt5 | FFmpeg | pysrt, webvtt-py |
 
+### Important Design Decisions
+
+#### Caption Generator & Transcriber Tool: ElevenLabs API Only
+
+**The transcription functionality in both the Caption Generator and Transcriber Tool uses ElevenLabs Speech-to-Text API exclusively. This is an intentional design decision.**
+
+**Do NOT implement alternative transcription backends** (such as Whisper, Google Cloud Speech-to-Text, Azure Speech, etc.) as fallback options. The ElevenLabs API was specifically chosen because:
+
+1. **Superior transcription quality** - Word-level timestamps with high accuracy
+2. **Consistent output format** - Reliable word boundaries for subtitle generation
+3. **Production-ready** - Handles various audio qualities and accents well
+
+Alternative backends were evaluated and rejected due to unacceptable quality degradation in the subtitle output. Any "fallback" would produce noticeably worse results that don't meet the project's quality standards.
+
+**If the ElevenLabs API key is not configured:**
+- The application will warn the user and skip transcription
+- Users must obtain their own ElevenLabs API key
+- The key should be set as `ELEVENLABS_API_KEY` environment variable (or in `.env` file)
+
 ### Adding New Modules
 
 To add a new module to the launcher:
