@@ -10,7 +10,7 @@ import os
 
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QStackedWidget, QMessageBox, QWidget
+    QStackedWidget, QMessageBox, QWidget, QSpinBox, QGroupBox
 )
 from PyQt5.QtCore import Qt
 
@@ -77,6 +77,118 @@ class SRTEditorDialog(QDialog):
             padding: 8px 0;
         """)
         layout.addWidget(header_label)
+
+        # Timing Adjustment Controls
+        timing_group = QGroupBox("Timing Adjustment")
+        timing_group.setStyleSheet("""
+            QGroupBox {
+                border: 1px solid #404040;
+                border-radius: 4px;
+                margin-top: 8px;
+                padding-top: 8px;
+                font-weight: bold;
+                color: #00ffff;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
+        timing_layout = QHBoxLayout()
+        timing_layout.setSpacing(8)
+
+        # Offset label
+        offset_label = QLabel("Offset (ms):")
+        offset_label.setStyleSheet("color: #e0e0e0;")
+        timing_layout.addWidget(offset_label)
+
+        # Offset spinbox
+        self.offset_spin = QSpinBox()
+        self.offset_spin.setRange(-60000, 60000)  # +/- 60 seconds
+        self.offset_spin.setValue(0)
+        self.offset_spin.setSingleStep(100)
+        self.offset_spin.setToolTip("Time offset in milliseconds.\nPositive = subtitles appear later\nNegative = subtitles appear earlier")
+        self.offset_spin.setStyleSheet("""
+            QSpinBox {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+                border: 1px solid #404040;
+                border-radius: 4px;
+                padding: 4px 8px;
+                min-width: 80px;
+            }
+            QSpinBox:focus {
+                border: 1px solid #00ffff;
+            }
+        """)
+        timing_layout.addWidget(self.offset_spin)
+
+        # Quick offset buttons
+        btn_style = """
+            QPushButton {
+                background-color: #1a1a1a;
+                color: #00ffff;
+                border: 1px solid #404040;
+                border-radius: 3px;
+                padding: 4px 8px;
+                font-weight: bold;
+                min-width: 50px;
+            }
+            QPushButton:hover {
+                background-color: #252525;
+                border: 1px solid #00ffff;
+            }
+        """
+
+        btn_minus_1s = QPushButton("-1s")
+        btn_minus_1s.setStyleSheet(btn_style)
+        btn_minus_1s.setToolTip("Shift all subtitles 1 second earlier")
+        btn_minus_1s.clicked.connect(lambda: self._quick_offset(-1000))
+        timing_layout.addWidget(btn_minus_1s)
+
+        btn_minus_100ms = QPushButton("-100ms")
+        btn_minus_100ms.setStyleSheet(btn_style)
+        btn_minus_100ms.setToolTip("Shift all subtitles 100ms earlier")
+        btn_minus_100ms.clicked.connect(lambda: self._quick_offset(-100))
+        timing_layout.addWidget(btn_minus_100ms)
+
+        btn_plus_100ms = QPushButton("+100ms")
+        btn_plus_100ms.setStyleSheet(btn_style)
+        btn_plus_100ms.setToolTip("Shift all subtitles 100ms later")
+        btn_plus_100ms.clicked.connect(lambda: self._quick_offset(100))
+        timing_layout.addWidget(btn_plus_100ms)
+
+        btn_plus_1s = QPushButton("+1s")
+        btn_plus_1s.setStyleSheet(btn_style)
+        btn_plus_1s.setToolTip("Shift all subtitles 1 second later")
+        btn_plus_1s.clicked.connect(lambda: self._quick_offset(1000))
+        timing_layout.addWidget(btn_plus_1s)
+
+        # Apply offset button
+        self.apply_offset_btn = QPushButton("APPLY OFFSET")
+        self.apply_offset_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 170, 0, 0.8);
+                color: #000000;
+                font-weight: bold;
+                font-size: 11px;
+                padding: 6px 12px;
+                border: none;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 170, 0, 0.9);
+            }
+        """)
+        self.apply_offset_btn.setToolTip("Apply the offset value to all subtitles")
+        self.apply_offset_btn.clicked.connect(self._apply_offset)
+        timing_layout.addWidget(self.apply_offset_btn)
+
+        timing_layout.addStretch()
+
+        timing_group.setLayout(timing_layout)
+        layout.addWidget(timing_group)
 
         # View toggle buttons
         toggle_layout = QHBoxLayout()
@@ -332,6 +444,66 @@ class SRTEditorDialog(QDialog):
                 return
 
         self.reject()
+
+    def _quick_offset(self, offset_ms: int):
+        """Apply a quick offset and update the spinbox."""
+        current = self.offset_spin.value()
+        self.offset_spin.setValue(current + offset_ms)
+
+    def _apply_offset(self):
+        """Apply the current offset value to all subtitles."""
+        offset_ms = self.offset_spin.value()
+
+        if offset_ms == 0:
+            QMessageBox.information(
+                self, "No Offset",
+                "Offset is 0ms. No changes will be made."
+            )
+            return
+
+        # Sync current view to model first
+        if self.current_view == self.VIEW_RAW_SRT:
+            success, error = self.raw_srt_view.sync_to_model()
+            if not success:
+                QMessageBox.warning(
+                    self, "Parse Error",
+                    f"Could not parse SRT content:\n\n{error}\n\n"
+                    "Please fix the format before applying offset."
+                )
+                return
+
+        # Apply offset to model
+        modified = self.model.apply_offset(offset_ms)
+
+        if modified > 0:
+            # Mark as unsaved
+            self._mark_unsaved()
+
+            # Refresh views
+            self.word_editor_view.refresh_blocks()
+            self.raw_srt_view.refresh_from_model()
+
+            # Reset offset spinbox
+            self.offset_spin.setValue(0)
+
+            # Show confirmation
+            direction = "later" if offset_ms > 0 else "earlier"
+            abs_offset = abs(offset_ms)
+
+            if abs_offset >= 1000:
+                offset_str = f"{abs_offset / 1000:.1f}s"
+            else:
+                offset_str = f"{abs_offset}ms"
+
+            QMessageBox.information(
+                self, "Offset Applied",
+                f"Shifted {modified} subtitle(s) {offset_str} {direction}."
+            )
+        else:
+            QMessageBox.information(
+                self, "No Changes",
+                "No subtitles were modified."
+            )
 
     def closeEvent(self, event):
         """Handle window close button."""

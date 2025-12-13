@@ -264,6 +264,27 @@ class CaptionGeneratorApp(QMainWindow):
         align_row.addStretch()
         style_layout.addLayout(align_row)
 
+        # Words per segment row (for transcription)
+        words_row = QHBoxLayout()
+        words_label = QLabel("Words/Segment:")
+        words_label.setFixedWidth(100)
+        self.words_per_segment_spin = QSpinBox()
+        self.words_per_segment_spin.setRange(1, 20)
+        self.words_per_segment_spin.setValue(1)
+        self.words_per_segment_spin.setToolTip(
+            "Maximum words per subtitle segment when transcribing.\n"
+            "1 = one word at a time (karaoke style)\n"
+            "3-5 = readable phrases\n"
+            "8+ = full sentences"
+        )
+        words_hint = QLabel("(for auto-transcription)")
+        words_hint.setStyleSheet("color: #888888; font-size: 10px;")
+        words_row.addWidget(words_label)
+        words_row.addWidget(self.words_per_segment_spin)
+        words_row.addWidget(words_hint)
+        words_row.addStretch()
+        style_layout.addLayout(words_row)
+
         style_group.setLayout(style_layout)
         main_layout.addWidget(style_group)
 
@@ -558,6 +579,9 @@ class CaptionGeneratorApp(QMainWindow):
         self.all_caps_checkbox.setChecked(self.config.get("all_caps", False))
         self.ignore_grammar_checkbox.setChecked(self.config.get("ignore_grammar", False))
 
+        # Load words per segment setting
+        self.words_per_segment_spin.setValue(self.config.get("max_words_per_segment", 1))
+
     def _save_settings(self):
         """Save current UI settings to config."""
         alignment = "center"
@@ -577,6 +601,7 @@ class CaptionGeneratorApp(QMainWindow):
         self.config.set("output_folder", self.output_folder.text(), autosave=False)
         self.config.set("all_caps", self.all_caps_checkbox.isChecked(), autosave=False)
         self.config.set("ignore_grammar", self.ignore_grammar_checkbox.isChecked(), autosave=False)
+        self.config.set("max_words_per_segment", self.words_per_segment_spin.value(), autosave=False)
         self.config.save_config()
 
     def _log(self, message):
@@ -1075,7 +1100,8 @@ class CaptionGeneratorApp(QMainWindow):
             output_folder=self.output_folder.text().strip(),
             transcript_folder=self.config.get_transcript_folder(),
             pairing_history=self.pairing_history,
-            continue_on_error=self.config.get("batch_continue_on_error", True)
+            continue_on_error=self.config.get("batch_continue_on_error", True),
+            max_words_per_segment=self.words_per_segment_spin.value()
         )
 
         # Connect signals
