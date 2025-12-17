@@ -13,8 +13,41 @@ AGENTS.md
 openspec/
 .agent-os/
 
-# === INTERNAL REPORTS ===
+# === INTERNAL DOCUMENTATION ===
+# Exclude all docs except architecture summary
 docs/audit-reports/
+docs/backups/
+docs/specs/
+docs/*.md
+docs/*.html
+# NOTE: docs/architecture/bedrot-media-suite-summary.md is kept via release command
+
+# === ROOT INTERNAL FILES ===
+ARCHIVE_PLAN.md
+BEDROT_VISUAL_STYLE_GUIDE.md
+
+# === LOG DIRECTORIES (nested) ===
+**/logs/
+
+# === DATABASE FILES ===
+*.db
+*.sqlite
+
+# === BACKUP DIRECTORIES ===
+**/backups/
+
+# === AUTO-GENERATED FILES ===
+bedrot_media_suite_function_registry.json
+tools/function_registry.json
+
+# === TEST ARTIFACTS (keep tests/, exclude artifacts) ===
+gui_test_log.txt
+fix_and_test_gui.py
+
+# === DEBUG/ONE-OFF SCRIPTS ===
+tools/simple_video_test.py
+tools/test_moviepy_speed.py
+tools/test_video_aspect_ratio_migration.py
 
 # === PUBLIC TEMPLATE MARKER (self-exclude) ===
 .gitignore.public
@@ -76,7 +109,6 @@ dist/
 **/temp_snippets/
 **/*_temp*/
 temp/
-logs/
 
 # Environment files
 .env
@@ -100,7 +132,6 @@ test_downloads/
 *BACKUP*
 *EMERGENCY*
 *.backup
-backups/*.csv
 
 # Function registry cache
 function_registry_cache.json
