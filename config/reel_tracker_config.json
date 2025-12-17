@@ -1,0 +1,624 @@
+{
+    "dropdown_values": {
+        "persona": [
+            "",
+            "ZONE A0",
+            "PIG1987",
+            "Test Creator"
+        ],
+        "release": [
+            "",
+            "RENEGADE PIPELINE",
+            "THE STATE OF THE WORLD",
+            "THE SCALE",
+            "ICONIC BETA",
+            "THE SOURCE",
+            "HIS LAST WORDS",
+            "YOUR DECISION TO STAY",
+            "THE PIG",
+            "CENTRALIZED",
+            "I HOPE YOU ROT IN HEAVEN",
+            "THE BLACK BOX",
+            "SHORTFORMVIDEOCONTENT"
+        ],
+        "reel_type": [
+            "",
+            "GLITCH VISUAL",
+            "Tutorial",
+            "GLITCH VISUAL V2",
+            "GLITCH VISUAL 9:16"
+        ],
+        "aspect_ratio": [
+            "9:16"
+        ]
+    },
+    "last_csv_path": "E:/VIDEOS/RELEASE CONTENT/bedrot-reel-tracker.csv",
+    "window_settings": {
+        "geometry": "1600x800",
+        "column_widths": {
+            "Reel ID": 140,
+            "Persona": 130,
+            "Release": 100,
+            "Reel Type": 130,
+            "Clip Filename": 180,
+            "Caption": 220,
+            "FilePath": 350
+        }
+    },
+    "app_settings": {
+        "auto_load_last_csv": true,
+        "auto_save_config": true,
+        "show_file_stats": true
+    },
+    "default_metadata": {
+        "persona": "PIG1987",
+        "release": "SHORTFORMVIDEOCONTENT",
+        "reel_type": "GLITCH VISUAL",
+        "caption_template": ""
+    },
+    "version_history": [
+        {
+            "timestamp": "2025-11-06 09:21:45",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-06 09:21:45",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-06 09:24:52",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "PIG1987",
+                "release": "I HOPE YOU ROT IN HEAVEN",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "PIG1987",
+                "release": "THE BLACK BOX",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            }
+        },
+        {
+            "timestamp": "2025-11-06 09:41:31",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-06 09:41:31",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-06 09:41:31",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-06 09:41:31",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 06:40:23",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "PIG1987",
+                "release": "THE BLACK BOX",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "PIG1987",
+                "release": "THE BLACK BOX",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            }
+        },
+        {
+            "timestamp": "2025-11-07 08:13:01",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 08:13:01",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 08:13:01",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 08:13:01",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 08:13:46",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 08:13:46",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 08:13:46",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 08:13:46",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 08:45:34",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 08:45:34",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 08:45:34",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 08:45:34",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:36:45",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:36:45",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:36:45",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:36:45",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:36:50",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:36:50",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:36:50",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:36:50",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:36:52",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:36:52",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:36:52",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:36:52",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:37:11",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:37:11",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:37:11",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:37:11",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:37:13",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:37:13",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:37:13",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:37:13",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:37:17",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:37:17",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:37:17",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:37:17",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:40:29",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-07 09:40:29",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-07 09:40:29",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-07 09:40:29",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 11:28:46",
+            "action": "dropdown_added",
+            "dropdown_type": "release",
+            "changed_value": "SHORTFORMVIDEOCONTENT",
+            "previous_values": [
+                "",
+                "RENEGADE PIPELINE",
+                "THE STATE OF THE WORLD",
+                "THE SCALE",
+                "ICONIC BETA",
+                "THE SOURCE",
+                "HIS LAST WORDS",
+                "YOUR DECISION TO STAY",
+                "THE PIG",
+                "CENTRALIZED",
+                "I HOPE YOU ROT IN HEAVEN",
+                "THE BLACK BOX"
+            ],
+            "new_values": [
+                "",
+                "RENEGADE PIPELINE",
+                "THE STATE OF THE WORLD",
+                "THE SCALE",
+                "ICONIC BETA",
+                "THE SOURCE",
+                "HIS LAST WORDS",
+                "YOUR DECISION TO STAY",
+                "THE PIG",
+                "CENTRALIZED",
+                "I HOPE YOU ROT IN HEAVEN",
+                "THE BLACK BOX",
+                "SHORTFORMVIDEOCONTENT"
+            ]
+        },
+        {
+            "timestamp": "2025-11-12 11:28:51",
+            "action": "default_metadata_updated",
+            "previous": {
+                "persona": "PIG1987",
+                "release": "THE BLACK BOX",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            },
+            "new": {
+                "persona": "PIG1987",
+                "release": "SHORTFORMVIDEOCONTENT",
+                "reel_type": "GLITCH VISUAL",
+                "caption_template": ""
+            }
+        },
+        {
+            "timestamp": "2025-11-12 11:30:16",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-12 11:30:16",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-12 11:30:16",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 11:30:16",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 11:30:52",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-12 11:30:52",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-12 11:30:52",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 11:30:52",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 11:41:35",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-12 11:41:35",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-12 11:41:35",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 11:41:35",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 12:11:56",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-12 12:11:56",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-12 12:11:56",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 12:11:56",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 12:12:01",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-12 12:12:01",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-12 12:12:01",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 12:12:01",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 12:24:43",
+            "action": "export_folder_updated",
+            "previous": "E:/VIDEOS/RELEASE CONTENT",
+            "new": "E:/VIDEOS/RELEASE CONTENT"
+        },
+        {
+            "timestamp": "2025-11-12 12:24:43",
+            "action": "file_org_setting_updated",
+            "setting": "safe_testing_mode",
+            "previous": false,
+            "new": false
+        },
+        {
+            "timestamp": "2025-11-12 12:24:43",
+            "action": "file_org_setting_updated",
+            "setting": "overwrite_protection",
+            "previous": true,
+            "new": true
+        },
+        {
+            "timestamp": "2025-11-12 12:24:43",
+            "action": "file_org_setting_updated",
+            "setting": "auto_organize_enabled",
+            "previous": true,
+            "new": true
+        }
+    ],
+    "file_organization": {
+        "master_export_folder": "E:/VIDEOS/RELEASE CONTENT",
+        "auto_organize_enabled": true,
+        "safe_testing_mode": false,
+        "overwrite_protection": true,
+        "preserve_original_files": true
+    }
+}

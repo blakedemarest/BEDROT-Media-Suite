@@ -1,0 +1,14 @@
+{
+  "last_source_dir": "",
+  "output_dir": "E:/VIDEOS/A04_MEDIADOWNLOADEROUTPUTS",
+  "clip_length_seconds": 15.0,
+  "jitter_percent": 0.0,
+  "min_clip_length": 1.0,
+  "per_clip_jitter": true,
+  "reset_timestamps": true,
+  "overwrite_existing": false,
+  "max_parallel_jobs": 1,
+  "recent_files": [
+    "E:\\VIDEOS\\A04_MEDIADOWNLOADEROUTPUTS\\TEMP_DOWNLOAD_20251125_074318_Kpi0W0Zf.mp4"
+  ]
+}

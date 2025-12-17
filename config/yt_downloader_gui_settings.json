@@ -1,0 +1,10 @@
+{
+    "download_path": "E:/VIDEOS/A04_MEDIADOWNLOADEROUTPUTS",
+    "video_only": false,
+    "enable_cut": false,
+    "start_time": "01:00",
+    "end_time": "02:00",
+    "aspect_ratio": "Original",
+    "enable_chop": false,
+    "chop_interval": "60"
+}

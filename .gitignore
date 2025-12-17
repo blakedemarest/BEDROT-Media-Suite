@@ -1,0 +1,107 @@
+# =============================================================================
+# PUBLIC REPOSITORY .gitignore
+# =============================================================================
+# This file is used for the public portfolio repo (bedrot-media-suite).
+# It excludes AI infrastructure and internal development files.
+# =============================================================================
+
+# === AI INFRASTRUCTURE (INTERNAL ONLY) ===
+.claude/
+CLAUDE.md
+claude.md
+AGENTS.md
+openspec/
+.agent-os/
+
+# === INTERNAL REPORTS ===
+docs/audit-reports/
+
+# === PUBLIC TEMPLATE MARKER (self-exclude) ===
+.gitignore.public
+
+# =============================================================================
+# STANDARD EXCLUSIONS (same as private repo)
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folders
+.venv/
+venv/
+venv_*/
+ENV/
+env/
+.conda/
+.condarc
+.conda_lock/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode / PyCharm / IntelliJ
+.vscode/
+.idea/
+*.iml
+
+# Mac / Linux
+.DS_Store
+*.swp
+
+# Logs
+*.log
+
+# Video output (large files)
+*.mp4
+*.ts
+*.avi
+*.mov
+*.mkv
+*.webm
+*.flv
+*.wmv
+
+# Temporary processing directories
+**/remixer_temp_snippets/
+**/temp_snippets/
+**/*_temp*/
+temp/
+logs/
+
+# Environment files
+.env
+
+# Large test files and images (over 1MB)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+
+# Test artifacts
+**/test_results_*.json
+**/module_test_*.txt
+test_downloads/
+*test_output*
+
+# Backup and emergency files
+*backup*
+*BACKUP*
+*EMERGENCY*
+*.backup
+backups/*.csv
+
+# Function registry cache
+function_registry_cache.json
+nul

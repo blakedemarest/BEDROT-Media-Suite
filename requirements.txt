@@ -1,0 +1,57 @@
+# Core dependencies
+certifi
+charset-normalizer
+colorama
+decorator
+idna
+moviepy
+Pillow
+pyqt5
+pyqt5-sip
+pyqtwebengine
+pywin32
+pyyaml
+requests
+requests-oauthlib
+six
+urllib3
+yt-dlp
+customtkinter
+pandas
+tkinterdnd2
+python-dotenv
+numpy
+
+# MV Maker dependencies
+# ElevenLabs API (primary)
+elevenlabs
+requests  # Already listed above
+
+# Audio/video processing
+ffmpeg-python
+pydub
+pysrt
+webvtt-py
+
+# Fallback transcription support
+SpeechRecognition
+
+# Release Calendar dependencies
+# Note: PyQt6 is separate from PyQt5 and both can coexist
+PyQt6==6.6.1
+PyQt6-Qt6==6.6.1
+PyQt6-sip==13.6.0
+python-dateutil==2.8.2
+icalendar==5.0.11
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+pytz==2024.1
+
+# Lyric Video Uploader dependencies
+# NOTE: Install CUDA-enabled builds per docs/lyric_video_uploader/DEPENDENCIES.md
+torch
+torchaudio
+demucs
+pysubs2
+typer
+tqdm

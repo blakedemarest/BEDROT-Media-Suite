@@ -1,0 +1,23 @@
+{
+    "output_folder": "E:/VIDEOS/A07_CAPTION VIDEOS",
+    "font_name": "Verdana",
+    "font_size": 15,
+    "font_color": "#fbff00",
+    "background_color": "#000000",
+    "resolution": "1920x1080",
+    "fps": 60,
+    "alignment": "bottom",
+    "outline_size": 2,
+    "last_srt_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src\\transcripts",
+    "last_audio_folder": "C:/Users/Earth/OneDrive/Documents/Image-Line/FL Studio/Projects/BLANQUEAMIENTO",
+    "transparent_background": false,
+    "history_db_path": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\config\\caption_generator_history.db",
+    "auto_transcribe_on_drop": true,
+    "transcription_output_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src\\transcripts",
+    "api_key_env": "ELEVENLABS_API_KEY",
+    "max_words_per_segment": 1,
+    "batch_continue_on_error": true,
+    "all_caps": false,
+    "ignore_grammar": false,
+    "safe_area_mode": true
+}

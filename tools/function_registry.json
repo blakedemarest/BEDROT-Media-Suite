@@ -1,0 +1,957 @@
+{
+  "metadata": {
+    "generated_at": "1753798759.1159723",
+    "project_root": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools",
+    "total_files": 3,
+    "total_functions": 4,
+    "total_classes": 4,
+    "total_methods": 20
+  },
+  "files": {
+    "gitingest.py": {
+      "functions": {
+        "get_project_root": {
+          "type": "function",
+          "name": "get_project_root",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/gitingest.py",
+          "line": 23,
+          "args": [],
+          "docstring": "Get project root directory using centralized config or fallback.",
+          "is_async": false,
+          "language": "python"
+        },
+        "create_gitingest": {
+          "type": "function",
+          "name": "create_gitingest",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/gitingest.py",
+          "line": 40,
+          "args": [
+            "repo_path"
+          ],
+          "docstring": "Creates a Gitingest digest of the Git repository at the given path.\n\n    Args:\n        repo_path (str): The absolute path to the Git repository directory.\n                        If None, uses project root from centralized config.",
+          "is_async": false,
+          "language": "python"
+        }
+      },
+      "classes": {},
+      "imports": [
+        {
+          "module": "subprocess",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "os",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "sys",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "core.env_loader",
+          "name": "get_env_var",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "core.env_loader",
+          "name": "get_env_loader",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "core.path_utils",
+          "name": "get_path_resolver",
+          "alias": null,
+          "type": "from_import"
+        }
+      ],
+      "constants": [
+        {
+          "name": "SCRIPT_DIR",
+          "value": "<complex_expression>",
+          "line": 6
+        }
+      ]
+    },
+    "slideshow_editor.py": {
+      "functions": {
+        "load_config": {
+          "type": "function",
+          "name": "load_config",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+          "line": 32,
+          "args": [],
+          "docstring": "Load config from a local JSON file if it exists.",
+          "is_async": false,
+          "language": "python"
+        },
+        "save_config": {
+          "type": "function",
+          "name": "save_config",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+          "line": 42,
+          "args": [
+            "config_data"
+          ],
+          "docstring": "Save config to a local JSON file.",
+          "is_async": false,
+          "language": "python"
+        }
+      },
+      "classes": {
+        "SlideshowWorker": {
+          "type": "class",
+          "name": "SlideshowWorker",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+          "line": 50,
+          "docstring": "",
+          "bases": [
+            "QThread"
+          ],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self",
+                "image_files",
+                "duration",
+                "ratio",
+                "output_folder"
+              ],
+              "docstring": "",
+              "line": 56,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "run",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 63,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        },
+        "DragDropWidget": {
+          "type": "class",
+          "name": "DragDropWidget",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+          "line": 128,
+          "docstring": "",
+          "bases": [
+            "QLabel"
+          ],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self",
+                "parent"
+              ],
+              "docstring": "",
+              "line": 129,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "dragEnterEvent",
+              "args": [
+                "self",
+                "event"
+              ],
+              "docstring": "",
+              "line": 137,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "dropEvent",
+              "args": [
+                "self",
+                "event"
+              ],
+              "docstring": "",
+              "line": 143,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "clear_images",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 151,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        },
+        "SlideshowEditor": {
+          "type": "class",
+          "name": "SlideshowEditor",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+          "line": 156,
+          "docstring": "",
+          "bases": [
+            "QWidget"
+          ],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 157,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "clear_images",
+              "args": [
+                "self"
+              ],
+              "docstring": "Clear all loaded images.",
+              "line": 217,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "browse_folder",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 221,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "create_slideshow",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 229,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "on_progress_updated",
+              "args": [
+                "self",
+                "value"
+              ],
+              "docstring": "",
+              "line": 272,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "on_completed",
+              "args": [
+                "self",
+                "output_path"
+              ],
+              "docstring": "",
+              "line": 275,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "on_error",
+              "args": [
+                "self",
+                "error_msg"
+              ],
+              "docstring": "",
+              "line": 279,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "reset_ui",
+              "args": [
+                "self"
+              ],
+              "docstring": "Re-enable UI elements after the worker finishes or errors out.",
+              "line": 283,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        }
+      },
+      "imports": [
+        {
+          "module": "sys",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "os",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "random",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "json",
+          "alias": null,
+          "type": "import"
+        },
+        {
+          "module": "datetime",
+          "name": "datetime",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QApplication",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QWidget",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QVBoxLayout",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QLabel",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QPushButton",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QLineEdit",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QComboBox",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QMessageBox",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QFileDialog",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QHBoxLayout",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtWidgets",
+          "name": "QProgressBar",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtCore",
+          "name": "Qt",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtCore",
+          "name": "QThread",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PyQt5.QtCore",
+          "name": "pyqtSignal",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "moviepy.editor",
+          "name": "ImageClip",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "moviepy.editor",
+          "name": "concatenate_videoclips",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PIL",
+          "name": "Image",
+          "alias": null,
+          "type": "from_import"
+        }
+      ],
+      "constants": [
+        {
+          "name": "CONFIG_FILE",
+          "value": "config.json",
+          "line": 30
+        }
+      ]
+    },
+    "xyimagescaler.py": {
+      "functions": {},
+      "classes": {
+        "ScaleAndCropApp": {
+          "type": "class",
+          "name": "ScaleAndCropApp",
+          "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/xyimagescaler.py",
+          "line": 6,
+          "docstring": "",
+          "bases": [],
+          "methods": [
+            {
+              "name": "__init__",
+              "args": [
+                "self",
+                "master"
+              ],
+              "docstring": "",
+              "line": 7,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "create_widgets",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 19,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "open_image",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 42,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "process_image",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 54,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "display_preview",
+              "args": [
+                "self",
+                "img"
+              ],
+              "docstring": "",
+              "line": 94,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            },
+            {
+              "name": "save_image",
+              "args": [
+                "self"
+              ],
+              "docstring": "",
+              "line": 113,
+              "is_async": false,
+              "is_property": false,
+              "is_staticmethod": false,
+              "is_classmethod": false
+            }
+          ],
+          "language": "python"
+        }
+      },
+      "imports": [
+        {
+          "module": "tkinter",
+          "alias": "tk",
+          "type": "import"
+        },
+        {
+          "module": "tkinter",
+          "name": "filedialog",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "tkinter",
+          "name": "messagebox",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PIL",
+          "name": "Image",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "PIL",
+          "name": "ImageTk",
+          "alias": null,
+          "type": "from_import"
+        },
+        {
+          "module": "os",
+          "alias": null,
+          "type": "import"
+        }
+      ],
+      "constants": []
+    }
+  },
+  "functions": {
+    "gitingest.py::get_project_root": {
+      "type": "function",
+      "name": "get_project_root",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/gitingest.py",
+      "line": 23,
+      "args": [],
+      "docstring": "Get project root directory using centralized config or fallback.",
+      "is_async": false,
+      "language": "python"
+    },
+    "gitingest.py::create_gitingest": {
+      "type": "function",
+      "name": "create_gitingest",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/gitingest.py",
+      "line": 40,
+      "args": [
+        "repo_path"
+      ],
+      "docstring": "Creates a Gitingest digest of the Git repository at the given path.\n\n    Args:\n        repo_path (str): The absolute path to the Git repository directory.\n                        If None, uses project root from centralized config.",
+      "is_async": false,
+      "language": "python"
+    },
+    "slideshow_editor.py::load_config": {
+      "type": "function",
+      "name": "load_config",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+      "line": 32,
+      "args": [],
+      "docstring": "Load config from a local JSON file if it exists.",
+      "is_async": false,
+      "language": "python"
+    },
+    "slideshow_editor.py::save_config": {
+      "type": "function",
+      "name": "save_config",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+      "line": 42,
+      "args": [
+        "config_data"
+      ],
+      "docstring": "Save config to a local JSON file.",
+      "is_async": false,
+      "language": "python"
+    }
+  },
+  "classes": {
+    "slideshow_editor.py::SlideshowWorker": {
+      "type": "class",
+      "name": "SlideshowWorker",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+      "line": 50,
+      "docstring": "",
+      "bases": [
+        "QThread"
+      ],
+      "methods": [
+        {
+          "name": "__init__",
+          "args": [
+            "self",
+            "image_files",
+            "duration",
+            "ratio",
+            "output_folder"
+          ],
+          "docstring": "",
+          "line": 56,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "run",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 63,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        }
+      ],
+      "language": "python"
+    },
+    "slideshow_editor.py::DragDropWidget": {
+      "type": "class",
+      "name": "DragDropWidget",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+      "line": 128,
+      "docstring": "",
+      "bases": [
+        "QLabel"
+      ],
+      "methods": [
+        {
+          "name": "__init__",
+          "args": [
+            "self",
+            "parent"
+          ],
+          "docstring": "",
+          "line": 129,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "dragEnterEvent",
+          "args": [
+            "self",
+            "event"
+          ],
+          "docstring": "",
+          "line": 137,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "dropEvent",
+          "args": [
+            "self",
+            "event"
+          ],
+          "docstring": "",
+          "line": 143,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "clear_images",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 151,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        }
+      ],
+      "language": "python"
+    },
+    "slideshow_editor.py::SlideshowEditor": {
+      "type": "class",
+      "name": "SlideshowEditor",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/slideshow_editor.py",
+      "line": 156,
+      "docstring": "",
+      "bases": [
+        "QWidget"
+      ],
+      "methods": [
+        {
+          "name": "__init__",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 157,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "clear_images",
+          "args": [
+            "self"
+          ],
+          "docstring": "Clear all loaded images.",
+          "line": 217,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "browse_folder",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 221,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "create_slideshow",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 229,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "on_progress_updated",
+          "args": [
+            "self",
+            "value"
+          ],
+          "docstring": "",
+          "line": 272,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "on_completed",
+          "args": [
+            "self",
+            "output_path"
+          ],
+          "docstring": "",
+          "line": 275,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "on_error",
+          "args": [
+            "self",
+            "error_msg"
+          ],
+          "docstring": "",
+          "line": 279,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "reset_ui",
+          "args": [
+            "self"
+          ],
+          "docstring": "Re-enable UI elements after the worker finishes or errors out.",
+          "line": 283,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        }
+      ],
+      "language": "python"
+    },
+    "xyimagescaler.py::ScaleAndCropApp": {
+      "type": "class",
+      "name": "ScaleAndCropApp",
+      "file": "/mnt/c/Users/Earth/BEDROT PRODUCTIONS/bedrot-media-suite/tools/xyimagescaler.py",
+      "line": 6,
+      "docstring": "",
+      "bases": [],
+      "methods": [
+        {
+          "name": "__init__",
+          "args": [
+            "self",
+            "master"
+          ],
+          "docstring": "",
+          "line": 7,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "create_widgets",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 19,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "open_image",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 42,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "process_image",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 54,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "display_preview",
+          "args": [
+            "self",
+            "img"
+          ],
+          "docstring": "",
+          "line": 94,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        },
+        {
+          "name": "save_image",
+          "args": [
+            "self"
+          ],
+          "docstring": "",
+          "line": 113,
+          "is_async": false,
+          "is_property": false,
+          "is_staticmethod": false,
+          "is_classmethod": false
+        }
+      ],
+      "language": "python"
+    }
+  },
+  "duplicates": [],
+  "statistics": {
+    "files_by_directory": {
+      ".": 3
+    },
+    "functions_per_file": {
+      "gitingest.py": 2,
+      "slideshow_editor.py": 2,
+      "xyimagescaler.py": 0
+    },
+    "classes_per_file": {
+      "gitingest.py": 0,
+      "slideshow_editor.py": 3,
+      "xyimagescaler.py": 1
+    },
+    "duplicate_count": 0
+  }
+}

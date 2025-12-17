@@ -1,0 +1,18 @@
+{
+    "output_folder": "C:\\Users\\Earth\\BEDROT PRODUCTIONS\\bedrot-media-suite\\src\\transcripts",
+    "api_key_env": "ELEVENLABS_API_KEY",
+    "supported_formats": [
+        ".mp3",
+        ".mp4",
+        ".wav",
+        ".m4a",
+        ".flac"
+    ],
+    "language_code": "eng",
+    "enable_diarization": true,
+    "tag_audio_events": true,
+    "export_formats": {
+        "txt": false,
+        "srt": true
+    }
+}
